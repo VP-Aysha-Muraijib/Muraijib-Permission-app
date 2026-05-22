@@ -1702,101 +1702,60 @@ function doSendToAdmin(){
  const cat=isOfficial()?(en?'Official':'رسمي'):(en?'Personal':'شخصي');
  const name=gv('f_name');
 
- newRequestIdentifiers(); // رقم طلب ورمز تحقق فريدان لهذا الطلب
+ newRequestIdentifiers();
 
+ // ── موضوع الإيميل (قصير) ──────────────────────────────
  const subject='طلب استئذان '+(cat==='رسمي'||cat==='Official'?'(رسمي)':'(شخصي)')+' – '+name+' – '+currentReqId;
 
+ // ── نص الإيميل مختصر لتجنب خطأ AADSTS90015 ──────────
+ // Microsoft Outlook يرفض mailto أطول من ~2000 حرف
  const today=gv('f_date');
- const L=[];
- // ترويسة رسمية
- L.push('بسم الله الرحمن الرحيم');
- L.push('');
- L.push('مدرسة مريجب للتعليم الأساسي – الحلقة الثانية');
- L.push('وزارة التربية والتعليم – دولة الإمارات العربية المتحدة');
- L.push('');
- L.push('التاريخ: '+today);
- L.push('الموضوع: طلب استئذان – رقم الطلب '+currentReqId);
- L.push('');
- L.push('المكرّمة / مديرة المدرسة');
- L.push('المكرّم / نائب مدير المدرسة');
- L.push('السلام عليكم ورحمة الله وبركاته،،، وبعد');
- L.push('');
- L.push('يطيب لي أن أتقدّم إلى سعادتكم بطلب استئذان وفقاً للبيانات الموضّحة أدناه، راجياً التكرّم بالاطلاع والاعتماد:');
- L.push('');
- // جدول البيانات بمحاذاة منظّمة
- const row=(k,v)=>L.push('   '+k+': '+v);
- L.push('أولاً | بيانات مقدّم الطلب');
- row('الاسم', name);
- row('المسمى الوظيفي', gv('f_job'));
- row('القسم', gv('f_dept'));
- L.push('');
- L.push('ثانياً | تفاصيل الاستئذان');
- row('رقم الطلب', currentReqId);
- row('تصنيف الاستئذان', cat);
- row('نوع الاستئذان', typeTxt);
- row('تاريخ الاستئذان', gv('f_date'));
- row('وقت الخروج', gv('f_out'));
- row('وقت العودة المتوقع', gv('f_in'));
- row('عدد الساعات', gv('f_hrs'));
- row('سبب الاستئذان', gv('f_reason'));
- L.push('');
- L.push('ثالثاً | تغطية الحصص');
- row('وجود حصص أثناء الاستئذان', (document.getElementById('f_les').value==='yes'?'نعم':'لا'));
- row('تم ترتيب التغطية', (document.getElementById('f_cov').value==='yes'?'نعم':'لا'));
- row('المعلم البديل', gv('f_sub'));
- L.push('');
- L.push('وتفضّلوا بقبول وافر التقدير والاحترام،،،');
- L.push('');
- L.push('مقدّم الطلب: '+name);
- L.push('المسمى الوظيفي: '+gv('f_job'));
- L.push('رمز التحقق: '+currentVCode);
- L.push('');
- L.push('ملاحظة: في حال وجود مرفقات (تقرير طبي / خطاب رسمي / إثبات موعد / دعوة تدريب) يُرجى إرفاقها يدوياً مع هذا البريد قبل الإرسال.');
- L.push('');
- L.push('────────────────────────────────────');
- L.push('English Summary');
- L.push('────────────────────────────────────');
- L.push('Subject: Permission Request – '+name+' – '+currentReqId);
- L.push('');
- L.push('Dear Principal / Vice Principal,');
- L.push('');
- L.push('Kindly find below my permission request for your review and approval:');
- L.push('');
- const rowE=(k,v)=>L.push('   '+k+': '+v);
- rowE('Request ID', currentReqId);
- rowE('Name', name);
- rowE('Job Title', gv('f_job'));
- rowE('Department', gv('f_dept'));
- rowE('Category', cat);
- rowE('Permission Type', typeTxt);
- rowE('Date', gv('f_date'));
- rowE('Exit Time', gv('f_out'));
- rowE('Expected Return', gv('f_in'));
- rowE('Hours', gv('f_hrs'));
- rowE('Reason', gv('f_reason'));
- rowE('Verification Code', currentVCode);
- L.push('');
- L.push('Note: please attach any supporting documents manually before sending.');
- L.push('');
- L.push('Kind regards,');
- L.push(name);
+ const lines=[
+   'السلام عليكم،',
+   '',
+   'أتقدم بطلب استئذان للاعتماد:',
+   '',
+   'الاسم: '+name,
+   'التاريخ: '+today,
+   'الخروج: '+gv('f_out')+' — العودة: '+gv('f_in'),
+   'السبب: '+gv('f_reason'),
+   '',
+   'رقم الطلب: '+currentReqId,
+   'مع التقدير،',
+   name,
+ ];
+ const body=lines.join('
+');
 
- const body=L.join('\r\n');
- const mailto='mailto:'+encodeURIComponent(PRINCIPAL_EMAIL)
-   +'?cc='+encodeURIComponent(VICE_PRINCIPAL_EMAIL)
-   +'&subject='+encodeURIComponent(subject)
-   +'&body='+encodeURIComponent(body);
+ // بناء رابط mailto المختصر
+ const toEmail=encodeURIComponent(PRINCIPAL_EMAIL);
+ const ccEmail=encodeURIComponent(VICE_PRINCIPAL_EMAIL);
+ const subj=encodeURIComponent(subject);
+ const bod=encodeURIComponent(body);
+ const mailto='mailto:'+toEmail+'?cc='+ccEmail+'&subject='+subj+'&body='+bod;
 
- // شغّل الإشعار وحدّث البطاقة دون إعادة توليد المعرّفات (لتطابق البطاقة مع البريد المُرسَل)
+ // التحقق من الطول — إذا تجاوز 1900 حرف نحذف body ونبقي subject فقط
+ const mailtoShort='mailto:'+toEmail+'?cc='+ccEmail+'&subject='+subj;
+
+ // تحديث الإشعارات
  notifCount++;
  document.getElementById('notifCount').textContent=notifCount;
- const bell=document.getElementById('bell');bell.classList.add('ring');
+ const bell=document.getElementById('bell');
+ bell.classList.add('ring');
  setTimeout(()=>bell.classList.remove('ring'),1900);
  showToast();
  syncCard();
- emailSentToAdmin=true;       // تم إرسال البريد للإدارة → يُسمح الآن بعرض/طباعة البطاقة
- unlockCard();                // فك قفل البطاقة بصرياً
- window.location.href=mailto; // افتح البريد: المديرة (To) + نائب المدير (CC)
+
+ // ── فتح البريد أولاً ثم عرض البطاقة بعد تأخير قصير ──
+ // هذا يضمن ظهور البطاقة فقط بعد محاولة فتح الإيميل
+ const finalMailto = mailto.length <= 1900 ? mailto : mailtoShort;
+ window.open(finalMailto, '_blank') || (window.location.href = finalMailto);
+
+ // انتظر 800ms ثم افتح البطاقة لضمان ظهورها بعد الإيميل
+ setTimeout(function(){
+   emailSentToAdmin=true;
+   unlockCard();
+ }, 800);
 }
 
 /* ====== قفل/فك قفل البطاقة حسب حالة إرسال البريد ====== */
