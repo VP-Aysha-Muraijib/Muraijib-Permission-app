@@ -5,23 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>منظومة الاستئذان الإلكترونية الذكية | Smart Electronic Permission System</title>
 
-<!-- ===== PWA / iPhone Web App Meta ===== -->
+<!-- ═══════════════════════════════════════════════════
+     PWA — منظومة الاستئذان الذكية — مدرسة مريجب
+     Production-grade: manifest.json + sw.js (external files)
+     ═══════════════════════════════════════════════════ -->
+
+<!-- Core PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#8B6B6B">
+<meta name="color-scheme" content="light">
+
+<!-- iOS Safari PWA -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="استئذان مريجب">
-<meta name="application-name" content="Muraijib Permission">
-<meta name="theme-color" content="#8E6E80">
-<meta name="color-scheme" content="light">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Icons -->
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<!-- iOS Splash Screens — Portrait -->
+<link rel="apple-touch-startup-image"
+  media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3)"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1290' height='2796'%3E%3Crect width='1290' height='2796' fill='%23FBF8F4'/%3E%3Ccircle cx='645' cy='1200' r='180' fill='none' stroke='%23C9A84C' stroke-width='20'/%3E%3Ctext x='645' y='1510' font-size='60' text-anchor='middle' fill='%238B6B6B' font-family='Arial' font-weight='700'%3Eاستئذان مريجب%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-startup-image"
+  media="(device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3)"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1170' height='2532'%3E%3Crect width='1170' height='2532' fill='%23FBF8F4'/%3E%3Ccircle cx='585' cy='1100' r='160' fill='none' stroke='%23C9A84C' stroke-width='18'/%3E%3Ctext x='585' y='1380' font-size='52' text-anchor='middle' fill='%238B6B6B' font-family='Arial' font-weight='700'%3Eاستئذان مريجب%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-startup-image"
+  media="(device-width:375px) and (device-height:812px) and (-webkit-device-pixel-ratio:3)"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1125' height='2436'%3E%3Crect width='1125' height='2436' fill='%23FBF8F4'/%3E%3Ccircle cx='562' cy='1050' r='150' fill='none' stroke='%23C9A84C' stroke-width='16'/%3E%3Ctext x='562' y='1320' font-size='50' text-anchor='middle' fill='%238B6B6B' font-family='Arial' font-weight='700'%3Eاستئذان مريجب%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-startup-image"
+  media="(device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:2)"
+  href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='828' height='1792'%3E%3Crect width='828' height='1792' fill='%23FBF8F4'/%3E%3Ccircle cx='414' cy='800' r='130' fill='none' stroke='%23C9A84C' stroke-width='14'/%3E%3Ctext x='414' y='1020' font-size='44' text-anchor='middle' fill='%238B6B6B' font-family='Arial' font-weight='700'%3Eاستئذان مريجب%3C/text%3E%3C/svg%3E">
+
+<!-- SEO & PWA meta -->
+<meta name="application-name" content="استئذان مريجب">
+<meta name="description" content="منظومة الاستئذان الإلكترونية الذكية – مدرسة مريجب للتعليم الأساسي حلقة 2">
 <meta name="format-detection" content="telephone=no">
-<meta name="description" content="منظومة الاستئذان الإلكترونية الذكية – مدرسة مريجب للتعليم الأساسي حلقة 2 | Smart Electronic Permission System">
-
-<!-- ===== Favicon + Apple Touch Icon (inline SVG, no external file) ===== -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%238E6E80'/%3E%3Ctext x='50' y='50' font-size='52' text-anchor='middle' dominant-baseline='central' fill='%23FBF8F4' font-family='Tajawal,Arial,sans-serif' font-weight='700'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%238E6E80'/%3E%3Ccircle cx='90' cy='66' r='30' fill='none' stroke='%23FBF8F4' stroke-width='6'/%3E%3Crect x='58' y='104' width='64' height='42' rx='9' fill='%23FBF8F4'/%3E%3Ctext x='90' y='160' font-size='15' text-anchor='middle' fill='%23FBF8F4' font-family='Arial,sans-serif' font-weight='700'%3EMRJ%3C/text%3E%3C/svg%3E">
-
-<!-- ===== Inline Web App Manifest (data URI, works without separate file) ===== -->
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%D9%85%D9%86%D8%B8%D9%88%D9%85%D8%A9%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D8%A6%D8%B0%D8%A7%D9%86%20%D8%A7%D9%84%D8%B0%D9%83%D9%8A%D8%A9%22%2C%22short_name%22%3A%22%D8%A7%D8%B3%D8%AA%D8%A6%D8%B0%D8%A7%D9%86%20%D9%85%D8%B1%D9%8A%D8%AC%D8%A8%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23FBF8F4%22%2C%22theme_color%22%3A%22%238E6E80%22%2C%22dir%22%3A%22rtl%22%2C%22lang%22%3A%22ar%22%7D">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -1865,9 +1889,139 @@ document.getElementById('confirmOverlay').addEventListener('click',function(e){
 document.getElementById('confirmProceed').addEventListener('click',function(){
  if(confirmAnswers.moe==='yes' && confirmAnswers.prin==='yes'){
   closeConfirm();
-  doSendToAdmin(); // متابعة الإرسال الفعلي وفتح الطباعة/البريد
+  doSendToAdmin();
  }
 });
 </script>
+
+<!-- ═══ PWA SERVICE WORKER REGISTRATION ═══ -->
+<style>
+#pwa-toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  z-index:9999;background:#fff;border:1px solid #E3D7CA;border-radius:16px;
+  box-shadow:0 8px 32px rgba(139,107,107,.18);padding:14px 20px;
+  display:flex;align-items:center;gap:12px;max-width:340px;width:calc(100% - 32px);
+  opacity:0;transition:all .4s cubic-bezier(.22,1,.36,1);pointer-events:none;
+}
+#pwa-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#pwa-toast .pt-icon{width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,#C9A84C,#A07830);
+  display:grid;place-items:center;font-size:1.4rem;flex-shrink:0}
+#pwa-toast .pt-body{flex:1}
+#pwa-toast .pt-title{font-size:.88rem;font-weight:700;color:#3D2B1F;font-family:'Tajawal',sans-serif}
+#pwa-toast .pt-sub{font-size:.76rem;color:#8B6B6B;font-family:'Tajawal',sans-serif}
+#pwa-btn{background:linear-gradient(135deg,#8B6B6B,#6B5050);color:#fff;
+  border:none;border-radius:10px;padding:8px 16px;
+  font-family:'Tajawal',sans-serif;font-size:.84rem;font-weight:700;cursor:pointer}
+#pwa-close-btn{background:none;border:none;cursor:pointer;font-size:1.1rem;color:#A08878;padding:2px}
+
+#ios-guide{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:9999;background:#3A3438;color:#fff;border-radius:18px;
+  padding:18px 22px;max-width:340px;width:calc(100% - 40px);
+  font-family:'Tajawal',sans-serif;text-align:center;
+  box-shadow:0 14px 40px rgba(0,0,0,.3);display:none;
+}
+#ios-guide strong{display:block;font-size:1rem;margin-bottom:8px}
+#ios-guide ol{text-align:right;padding-right:18px;margin:8px 0;font-size:.86rem;line-height:2.1}
+#ios-guide .close-ios{margin-top:12px;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:10px;padding:8px 20px;font-family:inherit;font-size:.84rem;cursor:pointer}
+</style>
+
+<!-- Android PWA Install Toast -->
+<div id="pwa-toast" role="dialog" aria-label="تثبيت التطبيق">
+  <div class="pt-icon">📲</div>
+  <div class="pt-body">
+    <div class="pt-title">ثبّتي التطبيق</div>
+    <div class="pt-sub">استئذان مريجب — يعمل بدون إنترنت</div>
+  </div>
+  <button id="pwa-btn" onclick="pwaInstall()">تثبيت</button>
+  <button id="pwa-close-btn" onclick="pwaDismiss()" aria-label="إغلاق">✕</button>
+</div>
+
+<div id="ios-guide">
+  <strong>📲 أضف التطبيق لشاشتك الرئيسية</strong>
+  <ol>
+    <li>اضغط على زر المشاركة <strong>⬆</strong> في Safari</li>
+    <li>اختر <strong>"Add to Home Screen"</strong></li>
+    <li>اضغط <strong>"Add"</strong> — وانتهى!</li>
+  </ol>
+  <button class="close-ios" onclick="document.getElementById('ios-guide').style.display='none'">فهمت ✓</button>
+</div>
+
+<script>
+// ═══ PWA Registration — external sw.js ═══
+(function() {
+  'use strict';
+
+  // ── Register Service Worker ──────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(function(reg) {
+          console.log('[PWA] SW registered:', reg.scope);
+          reg.addEventListener('updatefound', function() {
+            var newSW = reg.installing;
+            if (newSW) {
+              newSW.addEventListener('statechange', function() {
+                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[PWA] Update available');
+                }
+              });
+            }
+          });
+        })
+        .catch(function(e) { console.warn('[PWA] SW failed:', e); });
+    });
+  }
+
+  // ── iOS Safari install prompt ────────────────
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isSafari = /safari/i.test(navigator.userAgent) && !/chrome|crios|fxios/i.test(navigator.userAgent);
+  var isStandalone = ('standalone' in navigator) && navigator.standalone;
+
+  if (isIOS && isSafari && !isStandalone) {
+    setTimeout(function() {
+      var g = document.getElementById('ios-guide');
+      if (g) g.style.display = 'block';
+    }, 2500);
+  }
+
+  // ── Android/Chrome install prompt ───────────
+  var deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var toast = document.getElementById('pwa-toast');
+    if (toast) toast.classList.add('show');
+  });
+
+  window.addEventListener('appinstalled', function() {
+    var toast = document.getElementById('pwa-toast');
+    if (toast) toast.classList.remove('show');
+    deferredPrompt = null;
+    console.log('[PWA] App installed!');
+  });
+
+  window.pwaInstall = function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(result) {
+      console.log('[PWA] User choice:', result.outcome);
+      deferredPrompt = null;
+      var toast = document.getElementById('pwa-toast');
+      if (toast) toast.classList.remove('show');
+    });
+  };
+
+  window.pwaDismiss = function() {
+    var toast = document.getElementById('pwa-toast');
+    if (toast) toast.classList.remove('show');
+  };
+
+})();
+</script>
+
+
 </body>
 </html>
