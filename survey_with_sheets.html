@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>استبانة رأي فريق الإدارة — منظومة الاستئذان الذكية</title>
+<meta name="theme-color" content="#8B6B6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="استبانة مريجب">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F0EBE3;--white:#FBF8F4;--card:#FFFFFF;
+  --brown:#3D2B1F;--brownM:#6B5B50;--brownL:#A08878;
+  --mauve:#8B6B6B;--mauveL:#B89898;--mauvePale:#EAE0DC;
+  --gold:#C9A84C;--line:#DDD0C8;--lineM:#C4B4A8;
+  --green:#2D6A4F;--greenBg:#D8F3DC;
+  --r:12px;--rs:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;direction:rtl;background:var(--bg);min-height:100vh;padding-bottom:60px;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--line);display:flex;max-width:700px;margin:0 auto;box-shadow:0 2px 8px rgba(61,43,31,.06)}
+.ntab{flex:1;padding:13px 8px;text-align:center;font-size:12px;font-weight:700;color:var(--brownL);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;font-family:'Tajawal',sans-serif}
+.ntab.active{color:var(--mauve);border-bottom-color:var(--mauve);background:var(--white)}
+.ntab .ico{font-size:18px;display:block;margin-bottom:2px}
+.nbadge{background:var(--mauve);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-right:3px;display:none}
+
+/* VIEWS */
+.view{display:none;max-width:700px;margin:0 auto;padding:0 12px}
+.view.active{display:block}
+
+/* COVER */
+.cover{background:var(--card);border-radius:0 0 var(--r) var(--r);padding:28px 24px 22px;border-bottom:1px solid var(--line);position:relative;overflow:hidden;max-width:700px;margin:0 auto}
+.cover::after{content:'';position:absolute;top:-70px;left:-70px;width:200px;height:200px;border-radius:50%;background:var(--mauvePale);opacity:.4;pointer-events:none}
+.ct{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;position:relative}
+.moe{display:flex;align-items:center;gap:10px}
+.moe-ring{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;flex-shrink:0}
+.moe-info strong{display:block;font-size:12px;font-weight:700;color:var(--brown)}
+.moe-info span{font-size:11px;color:var(--brownM)}
+.tag{background:var(--mauvePale);border:1px solid var(--mauveL);border-radius:20px;padding:4px 13px;font-size:11px;color:var(--mauve);font-weight:600}
+.ctitle{font-size:20px;font-weight:800;color:var(--brown);margin-bottom:5px;position:relative}
+.csub{font-size:13px;color:var(--brownM);margin-bottom:14px;line-height:1.65}
+.divr{display:flex;align-items:center;gap:8px;margin:14px 0}
+.divr .dl{flex:1;height:1px;background:var(--line)}
+.divr .dg{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.mrow{display:flex;gap:16px;flex-wrap:wrap}
+.mi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--brownL)}
+
+/* PROGRESS */
+.pb-wrap{max-width:700px;margin:0 auto}
+.pb{height:3px;background:var(--line)}
+.pf{height:100%;background:linear-gradient(90deg,var(--mauve),var(--gold));transition:width .4s;width:0%}
+.pt{text-align:center;font-size:11px;color:var(--brownL);padding:6px 0 0}
+
+/* SECTION */
+.sec{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.sh{background:var(--white);border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;gap:9px}
+.sn{width:26px;height:26px;border-radius:50%;background:var(--mauve);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.st{font-size:13px;font-weight:700;color:var(--brown)}
+.sb{padding:18px}
+.qb{margin-bottom:22px}.qb:last-child{margin-bottom:0}
+.ql{font-size:13px;font-weight:700;color:var(--brown);margin-bottom:10px;line-height:1.6;display:flex;gap:7px;align-items:flex-start}
+.qnum{background:var(--mauvePale);color:var(--mauve);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.req{color:var(--mauve);font-size:11px}
+
+/* STARS */
+.stars{display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:4px}
+.stars input{display:none}
+.stars label{font-size:32px;cursor:pointer;color:var(--line);transition:color .1s;line-height:1;user-select:none}
+.stars input:checked~label,.stars label:hover,.stars label:hover~label{color:var(--gold)}
+.stxt{font-size:11px;color:var(--brownL);margin-right:8px}
+
+/* LIKERT */
+.lk{display:flex;gap:5px}
+.lki{flex:1}
+.lki input{display:none}
+.lki label{display:block;text-align:center;padding:9px 4px;border:1px solid var(--line);border-radius:var(--rs);font-size:11px;color:var(--brownM);cursor:pointer;transition:all .15s;line-height:1.4}
+.lki input:checked+label{background:var(--mauve);border-color:var(--mauve);color:#fff;font-weight:700}
+.lki label:hover{border-color:var(--mauveL);color:var(--mauve)}
+
+/* OPTIONS */
+.og{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+@media(max-width:400px){.og{grid-template-columns:1fr}}
+.oi input{display:none}
+.oi label{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--rs);font-size:12px;color:var(--brownM);cursor:pointer;transition:all .15s}
+.oi input:checked+label{border-color:var(--mauve);background:var(--mauvePale);color:var(--brown);font-weight:600}
+.oi label:hover{border-color:var(--mauveL)}
+.oc{width:15px;height:15px;border-radius:3px;border:1.5px solid var(--lineM);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
+.oi input:checked+label .oc{background:var(--mauve);border-color:var(--mauve);color:#fff}
+
+/* NPS */
+.nps{display:flex;gap:4px;flex-wrap:wrap}
+.nps-i input{display:none}
+.nps-i label{display:flex;align-items:center;justify-content:center;width:52px;height:40px;border:1px solid var(--line);border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--brownM);cursor:pointer;transition:all .15s}
+.nps-i input:checked+label{background:var(--mauve);border-color:var(--mauve);color:#fff}
+.nps-i label:hover{border-color:var(--mauve);color:var(--mauve)}
+.nps-labels{display:flex;justify-content:space-between;margin-top:5px}
+.nps-labels span{font-size:10px;color:var(--brownL)}
+
+/* TEXTAREA */
+.qta{width:100%;border:1px solid var(--line);border-radius:var(--rs);padding:10px 13px;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--brown);resize:vertical;min-height:78px;direction:rtl;outline:none;transition:border .15s;background:var(--white)}
+.qta:focus{border-color:var(--mauve);box-shadow:0 0 0 3px rgba(139,107,107,.08)}
+.qta::placeholder{color:var(--brownL)}
+
+/* SUBMIT */
+.subwrap{margin-top:20px;text-align:center}
+.subbtn{background:var(--mauve);color:#fff;border:none;border-radius:10px;padding:13px 38px;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:opacity .15s;box-shadow:0 4px 14px rgba(139,107,107,.25)}
+.subbtn:hover{opacity:.87}
+.subbtn:active{transform:scale(.98)}
+.subbtn:disabled{opacity:.5;cursor:not-allowed}
+.subnote{font-size:11px;color:var(--brownL);margin-top:7px}
+
+/* SENDING SPINNER */
+.sending{display:none;text-align:center;padding:20px;font-size:13px;color:var(--brownM)}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--line);border-top-color:var(--mauve);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-left:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SUCCESS */
+.done{display:none;margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:36px 24px;text-align:center}
+.done h3{font-size:18px;font-weight:800;color:var(--brown);margin:14px 0 8px}
+.done p{font-size:13px;color:var(--brownM);line-height:1.8}
+.done-line{width:60px;height:3px;background:linear-gradient(90deg,var(--mauve),var(--gold));margin:16px auto 0;border-radius:2px}
+.done-gold{font-size:52px;color:var(--gold)}
+
+/* ══ DASHBOARD ══════════════════════════════════════════════ */
+/* Password */
+.pass-modal{position:fixed;inset:0;background:rgba(61,43,31,.55);z-index:300;display:flex;align-items:center;justify-content:center}
+.pass-box{background:var(--card);border-radius:var(--r);padding:32px 28px;max-width:340px;width:92%;text-align:center}
+.pass-icon{font-size:40px;margin-bottom:12px}
+.pass-box h4{font-size:16px;font-weight:800;color:var(--brown);margin-bottom:6px}
+.pass-box p{font-size:12px;color:var(--brownM);margin-bottom:18px;line-height:1.6}
+.pass-input{width:100%;border:1.5px solid var(--line);border-radius:var(--rs);padding:11px 14px;font-family:'Tajawal',sans-serif;font-size:16px;text-align:center;letter-spacing:.2em;color:var(--brown);outline:none;direction:ltr;margin-bottom:8px;transition:border .15s}
+.pass-input:focus{border-color:var(--mauve)}
+.pass-input.err{border-color:#9B2335;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pass-hint{font-size:11px;color:#9B2335;margin-bottom:14px;min-height:16px}
+.pass-btn{background:var(--mauve);color:#fff;border:none;border-radius:var(--rs);padding:11px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%}
+.pass-cancel{margin-top:10px;background:none;border:none;color:var(--brownL);font-family:'Tajawal',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline}
+
+/* KPI */
+.dash-hdr{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.dash-title{font-size:17px;font-weight:800;color:var(--brown);margin-bottom:3px}
+.dash-sub{font-size:12px;color:var(--brownM);margin-bottom:14px}
+.dash-acts{display:flex;gap:8px;flex-wrap:wrap}
+.dact{border:1px solid var(--line);border-radius:var(--rs);padding:7px 14px;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--white);color:var(--brownM);transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.dact:hover{border-color:var(--mauve);color:var(--mauve)}
+.dact.primary{background:var(--mauve);color:#fff;border-color:var(--mauve)}
+.dact.danger{color:#9B2335;border-color:#9B2335}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:500px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--rs);padding:14px 10px;text-align:center}
+.kpi-n{font-size:26px;font-weight:800;color:var(--mauve);line-height:1}
+.kpi-l{font-size:11px;color:var(--brownL);margin-top:4px}
+.kpi-s{font-size:10px;color:var(--brownL);margin-top:2px}
+
+/* Chart cards */
+.cc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-top:12px}
+.cc-title{font-size:13px;font-weight:700;color:var(--brown);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.cc-n{background:var(--mauvePale);color:var(--mauve);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:700}
+
+/* Bars */
+.bars{display:flex;flex-direction:column;gap:8px}
+.br{display:flex;align-items:center;gap:8px}
+.bl{font-size:11px;color:var(--brownM);min-width:100px;text-align:right;flex-shrink:0;line-height:1.3}
+.bt{flex:1;background:var(--line);border-radius:4px;height:24px;overflow:hidden;position:relative}
+.bf{height:100%;background:var(--mauve);border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1);min-width:0}
+.bv{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.bv.dark{color:var(--brownM);right:auto;left:8px}
+.bc{font-size:11px;color:var(--brownL);min-width:24px;text-align:left;flex-shrink:0}
+
+/* NPS display */
+.nps-disp{display:flex;gap:8px;margin-top:4px}
+.nb{flex:1;padding:12px 8px;border-radius:var(--rs);text-align:center}
+.nb.det{background:#FDECEA}.nb.pas{background:#FFF8E7}.nb.pro{background:var(--greenBg)}
+.nb .nn{font-size:22px;font-weight:800}
+.nb.det .nn{color:#9B2335}.nb.pas .nn{color:#7B4F12}.nb.pro .nn{color:var(--green)}
+.nb .nl{font-size:10px;color:var(--brownM);margin-top:3px}
+.nps-score{text-align:center;padding:14px;background:var(--mauvePale);border-radius:var(--rs);margin-top:10px}
+.nps-score .ns-n{font-size:34px;font-weight:800;color:var(--mauve)}
+.nps-score .ns-l{font-size:11px;color:var(--brownM);margin-top:2px}
+
+/* Comments */
+.clist{display:flex;flex-direction:column;gap:9px}
+.ci{background:var(--white);border:1px solid var(--line);border-radius:var(--rs);padding:11px 13px}
+.ci-m{font-size:11px;color:var(--brownL);margin-bottom:4px}
+.ci-t{font-size:13px;color:var(--brown);line-height:1.6}
+
+/* Empty */
+.empty{text-align:center;padding:36px 20px;color:var(--brownL)}
+.empty .ei{font-size:36px;margin-bottom:10px;opacity:.45}
+.empty p{font-size:13px}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--brown);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Tajawal',sans-serif;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--green)}
+.toast.err{background:#9B2335}
+
+/* Reset modal */
+.rm{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;display:none}
+.rm.open{display:flex}
+.rmb{background:var(--card);border-radius:var(--r);padding:26px 22px;max-width:300px;width:90%;text-align:center}
+.rmb h4{font-size:15px;font-weight:700;color:var(--brown);margin-bottom:7px}
+.rmb p{font-size:12px;color:var(--brownM);margin-bottom:16px;line-height:1.6}
+.rm-btns{display:flex;gap:8px}
+.rm-btns button{flex:1;padding:9px;border-radius:var(--rs);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--line)}
+.rm-cancel{background:var(--white);color:var(--brownM)}
+.rm-ok{background:#9B2335;color:#fff;border-color:#9B2335}
+
+/* Connection status */
+.conn{display:inline-flex;align-items:center;gap:5px;font-size:11px;margin-top:6px}
+.conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.conn.ok .conn-dot{background:var(--green)}
+.conn.err .conn-dot{background:#9B2335}
+.conn.checking .conn-dot{background:var(--gold);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+
+<!-- NAV TABS -->
+<div class="nav">
+  <div class="ntab active" onclick="gotoView('survey')" id="tab-survey">
+    <span class="ico">📝</span>الاستبانة
+  </div>
+  <div class="ntab" onclick="gotoView('dashboard')" id="tab-dashboard">
+    <span class="ico">📊</span>النتائج
+    <span class="nbadge" id="nbadge"></span>
+  </div>
+</div>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="ct">
+    <div class="moe">
+      <div class="moe-ring">✦</div>
+      <div class="moe-info">
+        <strong>وزارة التربية والتعليم</strong>
+        <span>مدرسة مريجب للتعليم الأساسي — حلقة 2</span>
+      </div>
+    </div>
+    <div class="tag">ما بعد الورشة</div>
+  </div>
+  <div class="ctitle">استبانة رأي فريق الإدارة</div>
+  <div class="csub">بعد ورشة عمل منظومة الاستئذان الذكية — آراؤكم وطموحاتكم تصنع القرار</div>
+  <div class="divr"><div class="dl"></div><div class="dg"></div><div class="dl"></div></div>
+  <div class="mrow">
+    <div class="mi">⏱ 3 دقائق</div>
+    <div class="mi">📋 8 أسئلة</div>
+    <div class="mi">🔒 سرية تامة</div>
+    <div class="mi">☁ تُحفظ مركزياً</div>
+  </div>
+</div>
+
+<div class="pb-wrap">
+  <div class="pb"><div class="pf" id="pf"></div></div>
+  <div class="pt" id="ptxt">0 من 8 أسئلة</div>
+</div>
+
+<!-- ══ SURVEY VIEW ══════════════════════════════════════ -->
+<div class="view active" id="view-survey">
+
+<div class="sec">
+  <div class="sh"><div class="sn">1</div><div class="st">تقييم ورشة العمل</div></div>
+  <div class="sb">
+    <div class="qb">
+      <div class="ql"><span class="qnum">1</span>كيف تقيّمين ورشة عمل المنظومة بشكل عام؟ <span class="req">*</span></div>
+      <div class="stars">
+        <input type="radio" name="q1" id="q1s5" value="5"><label for="q1s5">★</label>
+        <input type="radio" name="q1" id="q1s4" value="4"><label for="q1s4">★</label>
+        <input type="radio" name="q1" id="q1s3" value="3"><label for="q1s3">★</label>
+        <input type="radio" name="q1" id="q1s2" value="2"><label for="q1s2">★</label>
+        <input type="radio" name="q1" id="q1s1" value="1"><label for="q1s1">★</label>
+        <span class="stxt">من 5</span>
+      </div>
+    </div>
+    <div class="qb">
+      <div class="ql"><span class="qnum">2</span>هل الورشة أوضحت كيفية استخدام المنظومة بشكل كافٍ؟ <span class="req">*</span></div>
+      <div class="lk">
+        <div class="lki"><input type="radio" name="q2" id="q2a" value="5"><label for="q2a">موافقة<br>تماماً</label></div>
+        <div class="lki"><input type="radio" name="q2" id="q2b" value="4"><label for="q2b">موافقة</label></div>
+        <div class="lki"><input type="radio" name="q2" id="q2c" value="3"><label for="q2c">محايدة</label></div>
+        <div class="lki"><input type="radio" name="q2" id="q2d" value="2"><label for="q2d">غير<br>موافقة</label></div>
+        <div class="lki"><input type="radio" name="q2" id="q2e" value="1"><label for="q2e">غير موافقة<br>إطلاقاً</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh"><div class="sn">2</div><div class="st">الرأي في المنظومة</div></div>
+  <div class="sb">
+    <div class="qb">
+      <div class="ql"><span class="qnum">3</span>مقارنةً بالنظام الورقي، المنظومة الذكية: <span class="req">*</span></div>
+      <div class="lk">
+        <div class="lki"><input type="radio" name="q3" id="q3a" value="5"><label for="q3a">أفضل<br>بكثير</label></div>
+        <div class="lki"><input type="radio" name="q3" id="q3b" value="4"><label for="q3b">أفضل<br>نسبياً</label></div>
+        <div class="lki"><input type="radio" name="q3" id="q3c" value="3"><label for="q3c">متساوية</label></div>
+        <div class="lki"><input type="radio" name="q3" id="q3d" value="2"><label for="q3d">أصعب<br>نسبياً</label></div>
+        <div class="lki"><input type="radio" name="q3" id="q3e" value="1"><label for="q3e">أصعب<br>بكثير</label></div>
+      </div>
+    </div>
+    <div class="qb">
+      <div class="ql"><span class="qnum">4</span>ما أبرز مزايا المنظومة برأيك؟ (اختاري ما ينطبق) <span class="req">*</span></div>
+      <div class="og">
+        <div class="oi"><input type="checkbox" name="q4" id="q4a" value="سرعة الإجراءات"><label for="q4a"><div class="oc">✓</div>سرعة الإجراءات</label></div>
+        <div class="oi"><input type="checkbox" name="q4" id="q4b" value="التوثيق التلقائي"><label for="q4b"><div class="oc">✓</div>التوثيق التلقائي</label></div>
+        <div class="oi"><input type="checkbox" name="q4" id="q4c" value="الموافقة من أي مكان"><label for="q4c"><div class="oc">✓</div>الموافقة من أي مكان</label></div>
+        <div class="oi"><input type="checkbox" name="q4" id="q4d" value="إلغاء الورق"><label for="q4d"><div class="oc">✓</div>إلغاء الورق</label></div>
+        <div class="oi"><input type="checkbox" name="q4" id="q4e" value="البطاقة الرقمية"><label for="q4e"><div class="oc">✓</div>البطاقة الرقمية</label></div>
+        <div class="oi"><input type="checkbox" name="q4" id="q4f" value="الشفافية والأرشفة"><label for="q4f"><div class="oc">✓</div>الشفافية والأرشفة</label></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh"><div class="sn">3</div><div class="st">التحديات والمقترحات</div></div>
+  <div class="sb">
+    <div class="qb">
+      <div class="ql"><span class="qnum">5</span>ما أكبر تحدٍّ تتوقعينه عند التطبيق الفعلي؟</div>
+      <div class="og">
+        <div class="oi"><input type="checkbox" name="q5" id="q5a" value="ضعف الإنترنت"><label for="q5a"><div class="oc">✓</div>ضعف الإنترنت</label></div>
+        <div class="oi"><input type="checkbox" name="q5" id="q5b" value="الحاجة لتدريب إضافي"><label for="q5b"><div class="oc">✓</div>الحاجة لتدريب إضافي</label></div>
+        <div class="oi"><input type="checkbox" name="q5" id="q5c" value="مقاومة التغيير"><label for="q5c"><div class="oc">✓</div>مقاومة التغيير</label></div>
+        <div class="oi"><input type="checkbox" name="q5" id="q5d" value="مشكلات تقنية"><label for="q5d"><div class="oc">✓</div>مشكلات تقنية</label></div>
+        <div class="oi"><input type="checkbox" name="q5" id="q5e" value="لا تحديات متوقعة"><label for="q5e"><div class="oc">✓</div>لا تحديات متوقعة</label></div>
+        <div class="oi"><input type="checkbox" name="q5" id="q5f" value="أخرى"><label for="q5f"><div class="oc">✓</div>أخرى</label></div>
+      </div>
+    </div>
+    <div class="qb">
+      <div class="ql"><span class="qnum">6</span>ما اقتراحك الأهم لتطوير المنظومة؟</div>
+      <textarea class="qta" id="q6ta" placeholder="مثلاً: تبسيط خطوة الإيميل، إضافة تنبيهات..."></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh"><div class="sn">4</div><div class="st">التوصية والنية للاستخدام</div></div>
+  <div class="sb">
+    <div class="qb">
+      <div class="ql"><span class="qnum">7</span>ما احتمالية توصيتك بالمنظومة لزميلاتك؟ <span class="req">*</span></div>
+      <div class="nps">
+        <div class="nps-i"><input type="radio" name="q7" id="q7n1"  value="1" ><label for="q7n1">1</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n2"  value="2" ><label for="q7n2">2</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n3"  value="3" ><label for="q7n3">3</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n4"  value="4" ><label for="q7n4">4</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n5"  value="5" ><label for="q7n5">5</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n6"  value="6" ><label for="q7n6">6</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n7"  value="7" ><label for="q7n7">7</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n8"  value="8" ><label for="q7n8">8</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n9"  value="9" ><label for="q7n9">9</label></div>
+        <div class="nps-i"><input type="radio" name="q7" id="q7n10" value="10"><label for="q7n10">10</label></div>
+      </div>
+      <div class="nps-labels"><span>1 — لن أوصي</span><span>10 — سأوصي بشدة</span></div>
+    </div>
+    <div class="qb">
+      <div class="ql"><span class="qnum">8</span>كلمة أخيرة للقيادة المدرسية</div>
+      <textarea class="qta" id="q8ta" placeholder="رأيك يهمنا — شاركينا بحرية تامة..."></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="subwrap">
+  <button class="subbtn" id="subbtn" onclick="doSubmit()">✉ إرسال الاستبانة</button>
+  <div class="subnote">إجابتك تُحفظ في قاعدة البيانات المركزية تلقائياً</div>
+</div>
+
+<div class="sending" id="sending">
+  <div class="spinner"></div> جاري حفظ إجابتك...
+</div>
+
+<div class="done" id="done">
+  <div class="done-gold">✦</div>
+  <h3>شكراً لمشاركتك</h3>
+  <p>تم حفظ إجابتك في قاعدة البيانات بنجاح ✓<br>رأيك سيساهم في تطوير منظومة الاستئذان</p>
+  <div class="done-line"></div>
+</div>
+
+</div><!-- /survey view -->
+
+<!-- ══ DASHBOARD VIEW ══════════════════════════════════ -->
+<div class="view" id="view-dashboard">
+
+<div class="dash-hdr">
+  <div class="dash-title">لوحة نتائج الاستبانة</div>
+  <div class="dash-sub" id="dash-sub">جاري التحميل...</div>
+  <div id="conn-status"></div>
+  <div class="dash-acts" style="margin-top:12px">
+    <button class="dact primary" onclick="loadFromSheets()">🔄 تحديث النتائج</button>
+    <button class="dact" onclick="exportCSV()">⬇ تصدير CSV</button>
+    <button class="dact" onclick="window.print()">🖨 طباعة</button>
+    <button class="dact danger" onclick="document.getElementById('rm').classList.add('open')">🗑 مسح المحلي</button>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-n" id="k-total">—</div><div class="kpi-l">الاستجابات</div></div>
+  <div class="kpi"><div class="kpi-n" id="k-stars">—</div><div class="kpi-l">تقييم الورشة</div><div class="kpi-s">من 5 ★</div></div>
+  <div class="kpi"><div class="kpi-n" id="k-nps">—</div><div class="kpi-l">معدل NPS</div></div>
+  <div class="kpi"><div class="kpi-n" id="k-rec">—</div><div class="kpi-l">نسبة التوصية</div></div>
+</div>
+
+<div class="cc"><div class="cc-title"><span class="cc-n">1</span>تقييم ورشة العمل ★</div><div class="bars" id="q1b"></div></div>
+<div class="cc"><div class="cc-title"><span class="cc-n">2</span>وضوح الورشة في شرح المنظومة</div><div class="bars" id="q2b"></div></div>
+<div class="cc"><div class="cc-title"><span class="cc-n">3</span>المنظومة مقارنةً بالنظام الورقي</div><div class="bars" id="q3b"></div></div>
+<div class="cc"><div class="cc-title"><span class="cc-n">4</span>أبرز مزايا المنظومة</div><div class="bars" id="q4b"></div></div>
+<div class="cc"><div class="cc-title"><span class="cc-n">5</span>التحديات المتوقعة عند التطبيق</div><div class="bars" id="q5b"></div></div>
+<div class="cc">
+  <div class="cc-title"><span class="cc-n">7</span>مؤشر التوصية — NPS</div>
+  <div class="nps-disp">
+    <div class="nb det"><div class="nn" id="nd">0</div><div class="nl">معارضون (1-6)</div></div>
+    <div class="nb pas"><div class="nn" id="np">0</div><div class="nl">محايدون (7-8)</div></div>
+    <div class="nb pro"><div class="nn" id="npr">0</div><div class="nl">مروّجون (9-10)</div></div>
+  </div>
+  <div class="nps-score"><div class="ns-n" id="nps-f">—</div><div class="ns-l">معدل NPS = % المروّجين − % المعارضين</div></div>
+</div>
+<div class="cc"><div class="cc-title"><span class="cc-n">6</span>اقتراحات التطوير</div><div class="clist" id="q6c"></div></div>
+<div class="cc"><div class="cc-title"><span class="cc-n">8</span>كلمات الفريق للقيادة</div><div class="clist" id="q8c"></div></div>
+
+</div><!-- /dashboard view -->
+
+<!-- PASSWORD MODAL -->
+<div class="pass-modal" id="pass-modal" style="display:none">
+  <div class="pass-box">
+    <div class="pass-icon">🔐</div>
+    <h4>لوحة النتائج — للقيادة فقط</h4>
+    <p>أدخلي كلمة المرور للاطلاع على نتائج الاستبانة</p>
+    <input class="pass-input" type="password" id="pinput" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')chkPass()">
+    <div class="pass-hint" id="phint"></div>
+    <button class="pass-btn" onclick="chkPass()">دخول</button>
+    <br><button class="pass-cancel" onclick="cancelPass()">رجوع</button>
+  </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="rm" id="rm">
+  <div class="rmb">
+    <h4>مسح البيانات المحلية؟</h4>
+    <p>سيتم مسح النسخة المحلية فقط.<br>البيانات في Google Sheets تبقى محفوظة.</p>
+    <div class="rm-btns">
+      <button class="rm-cancel" onclick="document.getElementById('rm').classList.remove('open')">إلغاء</button>
+      <button class="rm-ok" onclick="clearLocal()">مسح</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ⚙️  CONFIG — عدّلي هذه القيم قبل الرفع على GitHub
+// ════════════════════════════════════════════════════════
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx7nHgo6IPLAhVHJr64phFsJvwOxMmacDT0bg4BcuURDojLrpc6kb_Yix5h_9L0DjIqGw/exec'; // ← الصقي رابط Apps Script هنا
+const DASH_PASS  = 'muraijib2026';              // ← كلمة المرور للوحة النتائج
+// ════════════════════════════════════════════════════════
+
+const STORE_KEY = 'mrjb_sv2';
+let unlocked = false;
+let allData  = [];
+
+// ── LOCAL STORE ──────────────────────────────────────────
+function loadLocal(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||[];}catch(e){return[];} }
+function saveLocal(a){ localStorage.setItem(STORE_KEY, JSON.stringify(a)); }
+
+// ── VIEWS ─────────────────────────────────────────────────
+function gotoView(v){
+  if(v==='dashboard'&&!unlocked){
+    document.getElementById('pass-modal').style.display='flex';
+    setTimeout(()=>document.getElementById('pinput').focus(),100);
+    return;
+  }
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('tab-'+v).classList.add('active');
+  if(v==='dashboard') initDash();
+}
+
+// ── PASSWORD ──────────────────────────────────────────────
+function chkPass(){
+  const v=document.getElementById('pinput').value;
+  const inp=document.getElementById('pinput');
+  const hint=document.getElementById('phint');
+  if(v===DASH_PASS){
+    unlocked=true;
+    document.getElementById('pass-modal').style.display='none';
+    inp.value='';hint.textContent='';
+    gotoView('dashboard');
+  } else {
+    inp.classList.add('err');
+    hint.textContent='كلمة المرور غير صحيحة';
+    setTimeout(()=>inp.classList.remove('err'),400);
+    inp.value='';
+  }
+}
+function cancelPass(){
+  document.getElementById('pass-modal').style.display='none';
+  document.getElementById('pinput').value='';
+  document.getElementById('phint').textContent='';
+}
+
+// ── PROGRESS ──────────────────────────────────────────────
+const REQ=['q1','q2','q3','q4','q7'];
+const TOTAL=8;
+function isAns(n){
+  return document.querySelectorAll('[name="'+n+'"]:checked').length>0
+    ||(document.getElementById(n+'ta')&&document.getElementById(n+'ta').value.trim().length>0);
+}
+function updProg(){
+  let c=0; for(let i=1;i<=TOTAL;i++) if(isAns('q'+i)) c++;
+  document.getElementById('pf').style.width=Math.round(c/TOTAL*100)+'%';
+  document.getElementById('ptxt').textContent=c+' من '+TOTAL+' أسئلة';
+}
+document.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(el=>el.addEventListener('change',updProg));
+document.querySelectorAll('textarea').forEach(el=>el.addEventListener('input',updProg));
+
+// ── SUBMIT ────────────────────────────────────────────────
+async function doSubmit(){
+  const miss=REQ.filter(n=>!isAns(n));
+  if(miss.length){
+    showToast('يُرجى الإجابة على الأسئلة المطلوبة (*)','err');
+    document.querySelector('[name="'+miss[0]+'"]').closest('.qb').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  // Collect
+  const entry={ts:new Date().toISOString()};
+  ['q1','q2','q3','q7'].forEach(n=>{const el=document.querySelector('[name="'+n+'"]:checked');entry[n]=el?el.value:null;});
+  ['q4','q5'].forEach(n=>{entry[n]=[...document.querySelectorAll('[name="'+n+'"]:checked')].map(el=>el.value);});
+  entry.q6=document.getElementById('q6ta').value.trim();
+  entry.q8=document.getElementById('q8ta').value.trim();
+
+  // UI: show spinner
+  document.getElementById('subbtn').disabled=true;
+  document.getElementById('subwrap').style.display='none';
+  document.getElementById('sending').style.display='block';
+
+  // Save locally first
+  const local=loadLocal(); local.push(entry); saveLocal(local);
+  updBadge(local.length);
+
+  // Send to Google Sheets
+  let online=false;
+  if(SHEETS_URL&&SHEETS_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    try{
+      await fetch(SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)});
+      online=true;
+    }catch(e){}
+  }
+
+  // Show success
+  document.getElementById('sending').style.display='none';
+  document.getElementById('done').style.display='block';
+  document.getElementById('pf').style.width='100%';
+  document.getElementById('ptxt').textContent='مكتملة ✓';
+  document.getElementById('done').scrollIntoView({behavior:'smooth',block:'center'});
+  showToast(online?'تم الحفظ في Google Sheets ✓':'تم الحفظ محلياً (تحقق من الاتصال)','ok');
+}
+
+// ── BADGE ─────────────────────────────────────────────────
+function updBadge(n){
+  const b=document.getElementById('nbadge');
+  if(n>0){b.textContent=n;b.style.display='inline';}else b.style.display='none';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function initDash(){
+  allData=loadLocal();
+  updBadge(allData.length);
+  renderDash(allData);
+  // Also try to load from sheets (shows connection status)
+  if(SHEETS_URL&&SHEETS_URL!=='YOUR_APPS_SCRIPT_URL_HERE') checkConn();
+}
+
+async function loadFromSheets(){
+  showToast('البيانات تُحفظ في Sheets — افتحي Sheet مباشرة للاطلاع على كل الإجابات');
+  renderDash(loadLocal());
+}
+
+function checkConn(){
+  const el=document.getElementById('conn-status');
+  el.innerHTML='<div class="conn checking"><div class="conn-dot"></div><span>جاري التحقق من الاتصال...</span></div>';
+  fetch(SHEETS_URL,{method:'GET',mode:'no-cors'})
+    .then(()=>el.innerHTML='<div class="conn ok"><div class="conn-dot"></div><span>متصل بـ Google Sheets ✓</span></div>')
+    .catch(()=>el.innerHTML='<div class="conn err"><div class="conn-dot"></div><span>تحقق من رابط Apps Script</span></div>');
+}
+
+// ── RENDER DASHBOARD ──────────────────────────────────────
+const L5N  =['ممتاز (5★)','جيد جداً (4★)','جيد (3★)','مقبول (2★)','ضعيف (1★)'];
+const LKW  =['موافقة تماماً','موافقة','محايدة','غير موافقة','غير موافقة إطلاقاً'];
+const LKC  =['أفضل بكثير','أفضل نسبياً','متساوية','أصعب نسبياً','أصعب بكثير'];
+const FEATS=['سرعة الإجراءات','التوثيق التلقائي','الموافقة من أي مكان','إلغاء الورق','البطاقة الرقمية','الشفافية والأرشفة'];
+const CHALS=['ضعف الإنترنت','الحاجة لتدريب إضافي','مقاومة التغيير','مشكلات تقنية','لا تحديات متوقعة','أخرى'];
+
+function renderBars(id,labels,counts,total){
+  const el=document.getElementById(id);
+  if(!total){el.innerHTML='<div class="empty"><div class="ei">📭</div><p>لا توجد استجابات بعد</p></div>';return;}
+  const max=Math.max(...counts,1);
+  el.innerHTML=labels.map((l,i)=>{
+    const pct=total?Math.round(counts[i]/total*100):0;
+    const w=Math.round(counts[i]/max*100);
+    const dark=pct<15;
+    return`<div class="br">
+      <div class="bl">${l}</div>
+      <div class="bt"><div class="bf" style="width:${w}%"><span class="bv${dark?' dark':''}">${pct}%</span></div></div>
+      <div class="bc">${counts[i]}</div>
+    </div>`;
+  }).join('');
+}
+
+function byVal(data,key,vals){ return vals.map(v=>data.filter(d=>d[key]==v).length); }
+function byCb(data,key,vals){ return vals.map(v=>data.filter(d=>Array.isArray(d[key])&&d[key].includes(v)).length); }
+
+function renderDash(data){
+  const n=data.length;
+  document.getElementById('dash-sub').textContent=n?n+' استجابة مسجّلة':'لا توجد استجابات بعد';
+  document.getElementById('k-total').textContent=n||'0';
+
+  if(n){
+    const starsAvg=data.reduce((s,d)=>s+(parseFloat(d.q1)||0),0)/n;
+    document.getElementById('k-stars').textContent=starsAvg.toFixed(1)+' ★';
+
+    const npsV=data.map(d=>parseInt(d.q7)||0).filter(v=>v>0);
+    const pros=npsV.filter(v=>v>=9).length;
+    const dets=npsV.filter(v=>v<=6).length;
+    const pass=npsV.filter(v=>v===7||v===8).length;
+    const score=npsV.length?Math.round((pros-dets)/npsV.length*100):null;
+    document.getElementById('k-nps').textContent=score!==null?score:'—';
+    document.getElementById('nd').textContent=dets;
+    document.getElementById('np').textContent=pass;
+    document.getElementById('npr').textContent=pros;
+    document.getElementById('nps-f').textContent=score!==null?score:'—';
+    const rec=npsV.length?Math.round(npsV.filter(v=>v>=8).length/npsV.length*100):0;
+    document.getElementById('k-rec').textContent=rec+'%';
+  } else {
+    ['k-stars','k-nps','k-rec'].forEach(id=>document.getElementById(id).textContent='—');
+    ['nd','np','npr','nps-f'].forEach(id=>document.getElementById(id).textContent='0');
+  }
+
+  renderBars('q1b',L5N,byVal(data,'q1',['5','4','3','2','1']),n);
+  renderBars('q2b',LKW,byVal(data,'q2',['5','4','3','2','1']),n);
+  renderBars('q3b',LKC,byVal(data,'q3',['5','4','3','2','1']),n);
+  renderBars('q4b',FEATS,byCb(data,'q4',FEATS),n);
+  renderBars('q5b',CHALS,byCb(data,'q5',CHALS),n);
+
+  ['q6','q8'].forEach(k=>{
+    const el=document.getElementById(k+'c');
+    const items=data.filter(d=>d[k]&&d[k].trim());
+    el.innerHTML=items.length
+      ?items.map((d,i)=>`<div class="ci"><div class="ci-m">استجابة #${i+1} · ${new Date(d.ts).toLocaleDateString('ar-AE')}</div><div class="ci-t">${d[k]}</div></div>`).join('')
+      :'<div class="empty"><div class="ei">💬</div><p>لا توجد تعليقات بعد</p></div>';
+  });
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────
+function exportCSV(){
+  const data=loadLocal();
+  if(!data.length){showToast('لا توجد بيانات محلية للتصدير','err');return;}
+  const H=['التاريخ','تقييم الورشة','وضوح الورشة','مقارنة المنظومة','المزايا','التحديات','الاقتراح','NPS','كلمة للقيادة'];
+  const R=data.map(d=>[
+    new Date(d.ts).toLocaleString('ar-AE'),
+    d.q1||'',d.q2||'',d.q3||'',
+    Array.isArray(d.q4)?d.q4.join(' | '):'',
+    Array.isArray(d.q5)?d.q5.join(' | '):'',
+    d.q6||'',d.q7||'',d.q8||''
+  ]);
+  const csv=[H,...R].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='استبانة_مريجب_'+new Date().toLocaleDateString('ar-AE').replace(/\//g,'-')+'.csv';
+  a.click();
+  showToast('تم التصدير بنجاح');
+}
+
+// ── CLEAR LOCAL ───────────────────────────────────────────
+function clearLocal(){
+  localStorage.removeItem(STORE_KEY);
+  allData=[];
+  document.getElementById('rm').classList.remove('open');
+  updBadge(0);
+  renderDash([]);
+  showToast('تم مسح البيانات المحلية');
+}
+
+// ── TOAST ─────────────────────────────────────────────────
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+updBadge(loadLocal().length);
+updProg();
+</script>
+</body>
+</html>
