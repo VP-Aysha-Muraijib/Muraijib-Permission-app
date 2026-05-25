@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحليل الاستئذان — الإدارة — مدرسة مريجب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:      #F0EBE3;
+  --card:    #FBF8F4;
+  --card2:   #EDE5DC;
+  --white:   #FFFFFF;
+  --brown:   #3D2B1F;
+  --brown-m: #6B5B50;
+  --brown-l: #A08878;
+  --mauve:   #8B6B6B;
+  --mauve-l: #B89898;
+  --mauve-p: #EAE0DC;
+  --gold:    #C9A84C;
+  --gold-l:  #F0DFA8;
+  --line:    #DDD0C8;
+  --green:   #4A7C59;
+  --green-l: #EBF4EF;
+  --red:     #8B3A3A;
+  --red-l:   #FAEAEA;
+  --amber:   #8B5E1A;
+  --amber-l: #FDF3E3;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body { font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--brown); line-height: 1.8; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--brown); color: var(--white);
+  padding: 0 24px; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-brand { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; }
+.topbar-brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.topbar-right { display: flex; align-items: center; gap: 12px; font-size: 12px; opacity: .7; }
+.gold-strip { height: 3px; background: linear-gradient(90deg,var(--mauve),var(--gold),var(--gold-l),var(--gold),var(--mauve)); }
+
+/* MAIN */
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; }
+
+/* PAGE HEADER */
+.page-head { margin-bottom: 28px; }
+.page-head h1 { font-size: clamp(20px,3vw,26px); font-weight: 800; color: var(--brown); margin-bottom: 6px; }
+.page-head p { font-size: 13px; color: var(--brown-m); font-weight: 300; }
+
+/* UPLOAD SECTION */
+.upload-card {
+  background: var(--card);
+  border: 2px dashed var(--line);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  margin-bottom: 28px;
+  transition: border-color .2s;
+}
+.upload-card:hover { border-color: var(--mauve); }
+.upload-card h3 { font-size: 15px; font-weight: 700; color: var(--brown); margin-bottom: 6px; }
+.upload-card p { font-size: 13px; color: var(--brown-m); margin-bottom: 16px; font-weight: 300; }
+.upload-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: none; border-radius: 10px;
+  font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; padding: 10px 20px; transition: opacity .15s, transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--mauve); color: var(--white); box-shadow: 0 4px 12px rgba(139,107,107,.2); }
+.btn-primary:hover { opacity: .88; }
+.btn-secondary { background: var(--card2); color: var(--brown); border: 1px solid var(--line); }
+.btn-secondary:hover { background: var(--line); }
+.btn-gold { background: var(--gold); color: var(--brown); }
+.btn-sm { font-size: 12px; padding: 7px 14px; }
+
+/* FILTERS */
+.filters {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-group label { font-size: 11px; color: var(--brown-l); font-weight: 700; letter-spacing: .04em; }
+.filter-group select {
+  font-family: 'Tajawal', sans-serif; font-size: 13px; color: var(--brown);
+  background: var(--white); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 12px; outline: none; cursor: pointer; min-width: 140px;
+  -webkit-appearance: none;
+}
+.filter-group select:focus { border-color: var(--mauve); }
+.filter-reset { margin-right: auto; }
+
+/* KPI GRID */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+@media (max-width:700px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 16px;
+  border-top: 3px solid var(--gold);
+  position: relative;
+}
+.kpi-card .kv { font-size: 32px; font-weight: 800; color: var(--mauve); line-height: 1; margin-bottom: 6px; }
+.kpi-card .kl { font-size: 12px; color: var(--brown-m); font-weight: 600; }
+.kpi-card .ks { font-size: 11px; color: var(--brown-l); margin-top: 3px; }
+.kpi-card.green  { border-top-color: var(--green); } .kpi-card.green  .kv { color: var(--green); }
+.kpi-card.red    { border-top-color: var(--red); }   .kpi-card.red    .kv { color: var(--red); }
+.kpi-card.amber  { border-top-color: var(--amber); } .kpi-card.amber  .kv { color: var(--amber); }
+
+/* CHARTS GRID */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px; }
+@media (max-width:680px) { .charts-grid { grid-template-columns: 1fr; } }
+.charts-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width:900px) { .charts-grid.three { grid-template-columns: 1fr 1fr; } }
+
+/* CHART CARD */
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.chart-card.full { grid-column: 1 / -1; }
+.chart-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chart-head h3 { font-size: 13px; font-weight: 700; color: var(--brown); }
+.chart-head .badge {
+  font-size: 10px; background: var(--mauve-p); color: var(--mauve);
+  border-radius: 6px; padding: 2px 8px; font-weight: 700;
+}
+.chart-body { padding: 16px; }
+.chart-canvas { max-height: 240px; }
+
+/* RANKING LIST */
+.rank-list { display: flex; flex-direction: column; gap: 8px; }
+.rank-item {
+  display: flex; align-items: center; gap: 10px;
+}
+.rank-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--mauve-p); color: var(--mauve);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rank-num.top { background: var(--gold-l); color: var(--amber); }
+.rank-label { flex: 1; font-size: 13px; color: var(--brown); }
+.rank-bar-wrap { width: 100px; height: 6px; background: var(--mauve-p); border-radius: 3px; overflow: hidden; }
+.rank-bar { height: 100%; background: var(--mauve); border-radius: 3px; transition: width .5s ease; }
+.rank-count { font-size: 12px; font-weight: 700; color: var(--mauve); min-width: 24px; text-align: left; }
+
+/* DATA TABLE */
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  background: var(--card2); padding: 10px 12px; text-align: right;
+  font-size: 11px; font-weight: 700; color: var(--brown-m);
+  border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.data-table td {
+  padding: 9px 12px; border-bottom: 1px solid var(--line); color: var(--brown-m);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--card2); }
+.pill {
+  display: inline-block; border-radius: 6px; padding: 2px 8px;
+  font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.pill-ok   { background: var(--green-l); color: var(--green); }
+.pill-pend { background: var(--amber-l); color: var(--amber); }
+.pill-rej  { background: var(--red-l); color: var(--red); }
+.pill-off  { background: var(--mauve-p); color: var(--mauve); }
+
+/* ALERT */
+.alert {
+  padding: 12px 16px; border-radius: 10px;
+  font-size: 13px; font-weight: 600; margin-bottom: 16px;
+}
+.alert-info { background: #EBF4EF; color: var(--green); border: 1px solid #C8DDD0; }
+.alert-warn { background: var(--amber-l); color: var(--amber); border: 1px solid #E8D5A0; }
+
+/* SECTION DIVIDER */
+.sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.sec-head h2 { font-size: 15px; font-weight: 700; color: var(--brown); }
+.sec-head .hl { flex: 1; height: 1px; background: var(--line); }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 40px 20px;
+  color: var(--brown-l); font-size: 13px;
+}
+.empty-state h4 { font-size: 15px; color: var(--brown-m); margin-bottom: 6px; }
+
+/* FOOTER */
+footer {
+  background: var(--card2); border-top: 1px solid var(--line);
+  padding: 20px 24px; text-align: center;
+  font-size: 11px; color: var(--brown-l);
+}
+
+/* PRINT */
+@media print {
+  .topbar, .upload-card, .filters .btn, footer { display: none; }
+  .kpi-card, .chart-card { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="gold-strip"></div>
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="dot"></div>
+    لوحة تحليل الاستئذان — إدارة مدرسة مريجب
+  </div>
+  <div class="topbar-right">
+    <span id="lastUpdated">—</span>
+    <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:none" onclick="window.print()">🖨 طباعة</button>
+  </div>
+</div>
+
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-head">
+    <h1>تحليل بيانات الاستئذان</h1>
+    <p>لوحة تحكم إدارية — مدرسة مريجب للتعليم الأساسي حلقة 2 — للاستخدام الداخلي فقط</p>
+  </div>
+
+  <!-- UPLOAD / CONNECT -->
+  <div class="upload-card" id="uploadCard">
+    <h3>🔗 ربط بيانات Google Sheets أو رفع ملف CSV</h3>
+    <p>يمكن رفع ملف CSV مصدّر من Google Sheets، أو تحميل البيانات مباشرة من الرابط.</p>
+    <div class="upload-actions">
+      <button class="btn btn-primary" onclick="loadDemo()">📊 تحميل البيانات التجريبية</button>
+      <label class="btn btn-secondary" style="cursor:pointer">
+        📁 رفع ملف CSV
+        <input type="file" accept=".csv" style="display:none" onchange="loadCSV(event)">
+      </label>
+      <button class="btn btn-secondary" onclick="loadFromSheets()">☁️ تحديث من Sheets</button>
+    </div>
+  </div>
+
+  <!-- ALERT -->
+  <div class="alert alert-info" id="dataAlert" style="display:none"></div>
+
+  <!-- FILTERS -->
+  <div class="filters" id="filtersBar" style="display:none">
+    <div class="filter-group">
+      <label>الشهر</label>
+      <select id="filterMonth" onchange="applyFilters()">
+        <option value="">كل الأشهر</option>
+        <option value="1">يناير</option><option value="2">فبراير</option>
+        <option value="3">مارس</option><option value="4">أبريل</option>
+        <option value="5">مايو</option><option value="6">يونيو</option>
+        <option value="7">يوليو</option><option value="8">أغسطس</option>
+        <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
+        <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>التصنيف</label>
+      <select id="filterCat" onchange="applyFilters()">
+        <option value="">الكل</option>
+        <option value="شخصي">شخصي</option>
+        <option value="رسمي">رسمي</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>الحالة</label>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">الكل</option>
+        <option value="معتمد">معتمد</option>
+        <option value="قيد المراجعة">قيد المراجعة</option>
+        <option value="مرفوض">مرفوض</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>القسم</label>
+      <select id="filterDept" onchange="applyFilters()">
+        <option value="">كل الأقسام</option>
+      </select>
+    </div>
+    <button class="btn btn-secondary btn-sm filter-reset" onclick="resetFilters()">↺ إعادة تعيين</button>
+    <button class="btn btn-gold btn-sm" onclick="exportCSV()">⬇ تصدير CSV</button>
+  </div>
+
+  <!-- KPIs -->
+  <div id="kpiSection" style="display:none">
+    <div class="sec-head"><h2>مؤشرات الأداء الرئيسية</h2><div class="hl"></div></div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kv" id="kTotal">—</div><div class="kl">إجمالي الطلبات</div><div class="ks" id="kTotalSub">—</div></div>
+      <div class="kpi-card green"><div class="kv" id="kApproved">—</div><div class="kl">معتمد</div><div class="ks" id="kApprovedPct">—</div></div>
+      <div class="kpi-card amber"><div class="kv" id="kPending">—</div><div class="kl">قيد المراجعة</div><div class="ks" id="kPendingPct">—</div></div>
+      <div class="kpi-card red"><div class="kv" id="kRejected">—</div><div class="kl">مرفوض</div><div class="ks" id="kRejectedPct">—</div></div>
+      <div class="kpi-card"><div class="kv" id="kTotalHours">—</div><div class="kl">إجمالي ساعات الاستئذان</div><div class="ks">للشهر الحالي</div></div>
+      <div class="kpi-card amber"><div class="kv" id="kExceeded">—</div><div class="kl">تجاوز حد الـ6 ساعات</div><div class="ks">موظف / موظفة</div></div>
+      <div class="kpi-card green"><div class="kv" id="kTopReason">—</div><div class="kl">السبب الأكثر تكراراً</div><div class="ks" id="kTopReasonSub">—</div></div>
+      <div class="kpi-card"><div class="kv" id="kTopPerson">—</div><div class="kl">الأكثر استئذاناً</div><div class="ks" id="kTopPersonSub">—</div></div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 1 -->
+  <div id="chartsSection" style="display:none">
+
+    <div class="sec-head" style="margin-top:24px"><h2>التحليل البياني</h2><div class="hl"></div></div>
+
+    <div class="charts-grid">
+      <!-- Monthly trend -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>الطلبات حسب الشهر</h3>
+          <span class="badge">اتجاه زمني</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartMonthly" class="chart-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- By day of week -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>الطلبات حسب يوم الأسبوع</h3>
+          <span class="badge">توزيع أيام</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartDays" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-grid" style="margin-top:18px">
+      <!-- Top staff -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>أكثر الموظفين استئذاناً</h3>
+          <span class="badge">Top 10</span>
+        </div>
+        <div class="chart-body">
+          <div class="rank-list" id="rankStaff"></div>
+        </div>
+      </div>
+
+      <!-- Top reasons -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>أكثر أسباب الاستئذان</h3>
+          <span class="badge">تكرار السبب</span>
+        </div>
+        <div class="chart-body">
+          <div class="rank-list" id="rankReasons"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-grid three" style="margin-top:18px">
+      <!-- Category pie -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>رسمي مقابل شخصي</h3>
+          <span class="badge">التصنيف</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartCat" class="chart-canvas" style="max-height:180px"></canvas>
+        </div>
+      </div>
+
+      <!-- Status donut -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>توزيع الحالات</h3>
+          <span class="badge">الاعتماد</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartStatus" class="chart-canvas" style="max-height:180px"></canvas>
+        </div>
+      </div>
+
+      <!-- By department -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <h3>الطلبات حسب القسم</h3>
+          <span class="badge">توزيع</span>
+        </div>
+        <div class="chart-body">
+          <canvas id="chartDept" class="chart-canvas" style="max-height:180px"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours usage per person -->
+    <div class="chart-card full" style="margin-top:18px">
+      <div class="chart-head">
+        <h3>استهلاك ساعات الاستئذان الشخصي — مقارنة بالحد المسموح (6 ساعات شهرياً)</h3>
+        <span class="badge">رصيد الساعات</span>
+      </div>
+      <div class="chart-body">
+        <canvas id="chartHours" style="max-height:260px"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div id="tableSection" style="display:none;margin-top:24px">
+    <div class="sec-head">
+      <h2>جدول البيانات التفصيلي</h2>
+      <div class="hl"></div>
+      <span style="font-size:12px;color:var(--brown-l)" id="tableCount">—</span>
+    </div>
+    <div class="chart-card">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>المسمى</th>
+              <th>القسم</th>
+              <th>التصنيف</th>
+              <th>النوع</th>
+              <th>التاريخ</th>
+              <th>الخروج</th>
+              <th>العودة</th>
+              <th>المدة</th>
+              <th>الحالة</th>
+              <th>رقم الطلب</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  لوحة تحكم إدارية — منظومة الاستئذان الإلكترونية الذكية — مدرسة مريجب — للاستخدام الداخلي فقط
+</footer>
+
+<script>
+'use strict';
+
+// ── CONFIG ────────────────────────────────────────────────────
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzwkQfpLXpQekbehQLX4id3uzE6QzrEOYjOXTa-IId2lq4khCajbJoWcSvmZUsPKKWYQw/exec';
+const MONTHS_AR  = ['','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const DAYS_AR    = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const C = { mauve:'#8B6B6B', gold:'#C9A84C', green:'#4A7C59', red:'#8B3A3A', amber:'#8B5E1A', mauve_l:'#B89898', gold_l:'#F0DFA8', line:'#DDD0C8' };
+
+// Chart.js RTL defaults
+Chart.defaults.font.family = "'Tajawal', sans-serif";
+Chart.defaults.color = '#6B5B50';
+
+// ── STATE ─────────────────────────────────────────────────────
+let allData    = [];   // raw rows
+let filtered   = [];   // after filters
+let charts     = {};   // chart instances
+
+// ── DEMO DATA ─────────────────────────────────────────────────
+function demoData() {
+  const names  = ['سارة المنصوري','هند الكعبي','نورة الزهراني','أمينة الشامسي','لطيفة العمري','مريم الحوسني','فاطمة السعدي','خلود الرشيدي','ريم المزروعي','وفاء الحمادي','سلمى البلوشي','دلال النعيمي'];
+  const jobs   = ['معلمة','معلمة مادة','إدارية','مشرفة','أخصائية اجتماعية','أمينة مكتبة'];
+  const depts  = ['اللغة العربية','الرياضيات','العلوم','الإنجليزية','التربية الإسلامية','الإدارة والدعم','الاجتماعيات'];
+  const cats   = ['شخصي','شخصي','شخصي','رسمي'];
+  const types  = {
+    'شخصي': ['موعد طبي','ظرف عائلي','ساعة السعادة','ساعات الرضاعة','معاملة حكومية','ظرف طارئ','مناسبة اجتماعية'],
+    'رسمي': ['تدريب وزاري','اجتماع رسمي','مهمة وزارية','زيارة ميدانية']
+  };
+  const statuses = ['معتمد','معتمد','معتمد','قيد المراجعة','مرفوض'];
+  const rows = [];
+  // Generate 80 rows across 5 months
+  for (let i = 0; i < 80; i++) {
+    const name = names[i % names.length];
+    const cat  = cats[Math.floor(Math.random() * cats.length)];
+    const type = types[cat][Math.floor(Math.random() * types[cat].length)];
+    const month = 1 + Math.floor(i / 16);
+    const day   = 1 + (i % 28);
+    const date  = `2026-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const exitH = 8 + Math.floor(Math.random() * 4);
+    const dur   = 1 + Math.floor(Math.random() * 3);
+    const retH  = exitH + dur;
+    const hours = dur + ':00';
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    rows.push({
+      name, job: jobs[i % jobs.length],
+      dept: depts[i % depts.length],
+      cat, type, date,
+      exitTime: `${String(exitH).padStart(2,'0')}:00`,
+      retTime:  `${String(retH).padStart(2,'0')}:00`,
+      hours, status,
+      reqId: `#PRM-2026-${String(1000+i).padStart(4,'0')}`,
+    });
+  }
+  return rows;
+}
+
+// ── LOAD FUNCTIONS ────────────────────────────────────────────
+function loadDemo() {
+  allData = demoData();
+  filtered = [...allData];
+  showAlert('✅ تم تحميل البيانات التجريبية (' + allData.length + ' طلب). يمكنك رفع ملف CSV الفعلي من Google Sheets للتحليل الحقيقي.', 'info');
+  populateDeptFilter();
+  render();
+}
+
+function loadFromSheets() {
+  showAlert('⏳ جاري تحميل البيانات من Google Sheets...', 'info');
+  if (!SHEETS_URL || SHEETS_URL.includes('YOUR')) {
+    showAlert('⚠ يُرجى إضافة رابط Google Apps Script في ملف admin-dashboard.html', 'warn');
+    return;
+  }
+  fetch(SHEETS_URL + '?action=getData')
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.rows) throw new Error('No data');
+      allData = data.rows;
+      filtered = [...allData];
+      populateDeptFilter();
+      render();
+      showAlert('✅ تم تحميل ' + allData.length + ' طلب من Google Sheets.', 'info');
+    })
+    .catch(e => {
+      showAlert('⚠ تعذر الاتصال بـ Google Sheets. تحقق من الرابط أو استخدم ملف CSV.', 'warn');
+    });
+}
+
+function loadCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    if (rows.length === 0) { showAlert('⚠ الملف فارغ أو تنسيقه غير مدعوم.', 'warn'); return; }
+    allData = rows;
+    filtered = [...allData];
+    populateDeptFilter();
+    render();
+    showAlert('✅ تم تحميل ' + allData.length + ' سجل من الملف: ' + file.name, 'info');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,''));
+  // Map CSV columns to our data model
+  const colMap = {
+    'الاسم': 'name', 'name': 'name',
+    'المسمى': 'job', 'job': 'job',
+    'القسم': 'dept', 'dept': 'dept',
+    'التصنيف': 'cat', 'cat': 'cat',
+    'النوع': 'type', 'type': 'type',
+    'التاريخ': 'date', 'date': 'date',
+    'الخروج': 'exitTime', 'exitTime': 'exitTime',
+    'العودة': 'retTime', 'retTime': 'retTime',
+    'المدة': 'hours', 'hours': 'hours',
+    'الحالة': 'status', 'status': 'status',
+    'رقم الطلب': 'reqId', 'reqId': 'reqId',
+  };
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    const vals = line.split(',').map(v => v.trim().replace(/"/g,''));
+    const row = {};
+    headers.forEach((h, i) => { const key = colMap[h] || h; row[key] = vals[i] || '—'; });
+    return row;
+  });
+}
+
+// ── FILTERS ───────────────────────────────────────────────────
+function populateDeptFilter() {
+  const sel = document.getElementById('filterDept');
+  const depts = [...new Set(allData.map(r => r.dept).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">كل الأقسام</option>';
+  depts.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o); });
+}
+
+function applyFilters() {
+  const month  = document.getElementById('filterMonth').value;
+  const cat    = document.getElementById('filterCat').value;
+  const status = document.getElementById('filterStatus').value;
+  const dept   = document.getElementById('filterDept').value;
+
+  filtered = allData.filter(r => {
+    if (month && r.date) { const m = new Date(r.date).getMonth() + 1; if (m !== +month) return false; }
+    if (cat    && r.cat    !== cat)    return false;
+    if (status && r.status !== status) return false;
+    if (dept   && r.dept   !== dept)   return false;
+    return true;
+  });
+  renderAll();
+}
+
+function resetFilters() {
+  ['filterMonth','filterCat','filterStatus','filterDept'].forEach(id => { document.getElementById(id).value = ''; });
+  filtered = [...allData];
+  renderAll();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render() {
+  document.getElementById('uploadCard').style.display = 'none';
+  document.getElementById('filtersBar').style.display = 'flex';
+  document.getElementById('kpiSection').style.display = 'block';
+  document.getElementById('chartsSection').style.display = 'block';
+  document.getElementById('tableSection').style.display = 'block';
+  document.getElementById('lastUpdated').textContent = 'آخر تحديث: ' + new Date().toLocaleTimeString('ar');
+  renderAll();
+}
+
+function renderAll() {
+  renderKPIs();
+  renderCharts();
+  renderTable();
+}
+
+// ── KPIs ──────────────────────────────────────────────────────
+function renderKPIs() {
+  const data = filtered;
+  const total    = data.length;
+  const approved = data.filter(r => r.status === 'معتمد').length;
+  const pending  = data.filter(r => r.status === 'قيد المراجعة').length;
+  const rejected = data.filter(r => r.status === 'مرفوض').length;
+  const pct = n => total > 0 ? Math.round(n/total*100) + '%' : '—';
+
+  setText('kTotal',        total);
+  setText('kTotalSub',     'طلب استئذان');
+  setText('kApproved',     approved);
+  setText('kApprovedPct',  'نسبة الاعتماد: ' + pct(approved));
+  setText('kPending',      pending);
+  setText('kPendingPct',   pct(pending) + ' من الإجمالي');
+  setText('kRejected',     rejected);
+  setText('kRejectedPct',  pct(rejected) + ' من الإجمالي');
+
+  // Total hours (personal only)
+  let totalMins = 0;
+  data.filter(r => r.cat === 'شخصي').forEach(r => {
+    if (r.hours && r.hours !== '—') {
+      const parts = r.hours.split(':');
+      if (parts.length === 2) totalMins += +parts[0]*60 + +parts[1];
+    }
+  });
+  setText('kTotalHours', Math.floor(totalMins/60) + ':' + String(totalMins%60).padStart(2,'0'));
+
+  // Exceeded 6h
+  const hoursPerPerson = {};
+  data.filter(r => r.cat === 'شخصي').forEach(r => {
+    if (!r.name || r.name === '—') return;
+    if (!hoursPerPerson[r.name]) hoursPerPerson[r.name] = 0;
+    if (r.hours && r.hours !== '—') {
+      const p = r.hours.split(':');
+      if (p.length === 2) hoursPerPerson[r.name] += +p[0]*60 + +p[1];
+    }
+  });
+  const exceeded = Object.values(hoursPerPerson).filter(m => m > 360).length;
+  setText('kExceeded', exceeded);
+
+  // Top reason
+  const reasonCount = countBy(data, 'type');
+  const topReason = topKey(reasonCount);
+  setText('kTopReason', topReason || '—');
+  setText('kTopReasonSub', topReason ? reasonCount[topReason] + ' مرة' : '');
+
+  // Top person
+  const personCount = countBy(data, 'name');
+  const topPerson = topKey(personCount);
+  setText('kTopPerson', topPerson || '—');
+  setText('kTopPersonSub', topPerson ? personCount[topPerson] + ' طلباً' : '');
+}
+
+// ── CHARTS ────────────────────────────────────────────────────
+function renderCharts() {
+  renderMonthly();
+  renderDays();
+  renderRankStaff();
+  renderRankReasons();
+  renderCatPie();
+  renderStatusDoughnut();
+  renderDeptBar();
+  renderHoursBar();
+}
+
+function renderMonthly() {
+  const counts = Array(12).fill(0);
+  filtered.forEach(r => {
+    if (r.date && r.date !== '—') {
+      const m = new Date(r.date).getMonth();
+      if (m >= 0 && m < 12) counts[m]++;
+    }
+  });
+  makeChart('chartMonthly', 'bar', MONTHS_AR.slice(1), counts, {
+    color: C.mauve, label: 'عدد الطلبات',
+    options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+}
+
+function renderDays() {
+  const counts = Array(7).fill(0);
+  filtered.forEach(r => {
+    if (r.date && r.date !== '—') {
+      const d = new Date(r.date).getDay();
+      counts[d]++;
+    }
+  });
+  makeChart('chartDays', 'bar', DAYS_AR, counts, {
+    color: C.gold, label: 'عدد الطلبات',
+    options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+}
+
+function renderRankStaff() {
+  const counts = countBy(filtered, 'name');
+  renderRankList('rankStaff', counts, 10);
+}
+
+function renderRankReasons() {
+  const counts = countBy(filtered, 'type');
+  renderRankList('rankReasons', counts, 8);
+}
+
+function renderRankList(elId, counts, limit) {
+  const el = document.getElementById(elId);
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, limit);
+  const max = sorted[0]?.[1] || 1;
+  el.innerHTML = sorted.map(([label, count], i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i===0?'top':''}">${i+1}</div>
+      <div class="rank-label">${label}</div>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${Math.round(count/max*100)}%"></div></div>
+      <div class="rank-count">${count}</div>
+    </div>
+  `).join('');
+}
+
+function renderCatPie() {
+  const personal = filtered.filter(r => r.cat === 'شخصي').length;
+  const official = filtered.filter(r => r.cat === 'رسمي').length;
+  makeChart('chartCat', 'doughnut', ['شخصي','رسمي'], [personal, official], {
+    colors: [C.mauve, C.gold], label: 'التصنيف'
+  });
+}
+
+function renderStatusDoughnut() {
+  const approved = filtered.filter(r => r.status === 'معتمد').length;
+  const pending  = filtered.filter(r => r.status === 'قيد المراجعة').length;
+  const rejected = filtered.filter(r => r.status === 'مرفوض').length;
+  makeChart('chartStatus', 'doughnut',
+    ['معتمد','قيد المراجعة','مرفوض'],
+    [approved, pending, rejected],
+    { colors: [C.green, C.amber, C.red], label: 'الحالة' }
+  );
+}
+
+function renderDeptBar() {
+  const counts = countBy(filtered, 'dept');
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  makeChart('chartDept', 'bar',
+    sorted.map(e=>e[0]), sorted.map(e=>e[1]),
+    { color: C.mauve_l, label: 'الطلبات', options: { indexAxis: 'y', scales: { x: { beginAtZero: true } } } }
+  );
+}
+
+function renderHoursBar() {
+  const hoursPerPerson = {};
+  filtered.filter(r => r.cat === 'شخصي').forEach(r => {
+    if (!r.name || r.name === '—') return;
+    if (!hoursPerPerson[r.name]) hoursPerPerson[r.name] = 0;
+    if (r.hours && r.hours !== '—') {
+      const p = r.hours.split(':');
+      if (p.length === 2) hoursPerPerson[r.name] += +p[0] + (+p[1])/60;
+    }
+  });
+  const sorted = Object.entries(hoursPerPerson).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const colors = sorted.map(([,h]) => h > 6 ? C.red : h > 5 ? C.amber : C.mauve);
+  makeChart('chartHours', 'bar',
+    sorted.map(e=>e[0]),
+    sorted.map(e=>+e[1].toFixed(1)),
+    {
+      colors, label: 'الساعات المستخدمة',
+      options: {
+        scales: {
+          y: { beginAtZero: true, max: 8,
+            title: { display: true, text: 'الساعات' },
+            ticks: {
+              callback: v => v + 'h'
+            }
+          }
+        },
+        plugins: {
+          annotation: { annotations: {
+            limitLine: { type: 'line', yMin: 6, yMax: 6, borderColor: C.red, borderWidth: 1.5, borderDash: [4,4],
+              label: { content: 'الحد الأقصى 6h', enabled: true, position: 'start', color: C.red, font: { size: 11 } }
+            }
+          }}
+        }
+      }
+    }
+  );
+}
+
+// ── TABLE ─────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('dataTableBody');
+  const pillMap = { 'معتمد': 'pill-ok', 'قيد المراجعة': 'pill-pend', 'مرفوض': 'pill-rej', 'رسمي': 'pill-off' };
+  document.getElementById('tableCount').textContent = filtered.length + ' سجل';
+  tbody.innerHTML = filtered.map((r, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${r.name || '—'}</strong></td>
+      <td>${r.job || '—'}</td>
+      <td>${r.dept || '—'}</td>
+      <td><span class="pill ${r.cat === 'رسمي' ? 'pill-off' : 'pill-pend'}">${r.cat || '—'}</span></td>
+      <td>${r.type || '—'}</td>
+      <td>${r.date || '—'}</td>
+      <td>${r.exitTime || '—'}</td>
+      <td>${r.retTime || '—'}</td>
+      <td><strong>${r.hours || '—'}</strong></td>
+      <td><span class="pill ${pillMap[r.status] || ''}">${r.status || '—'}</span></td>
+      <td style="font-family:monospace;font-size:11px">${r.reqId || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['الاسم','المسمى','القسم','التصنيف','النوع','التاريخ','الخروج','العودة','المدة','الحالة','رقم الطلب'];
+  const keys    = ['name','job','dept','cat','type','date','exitTime','retTime','hours','status','reqId'];
+  const rows    = [headers.join(','), ...filtered.map(r => keys.map(k => `"${r[k]||''}"`).join(','))];
+  const blob    = new Blob(['\uFEFF'+rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a       = document.createElement('a');
+  a.href        = URL.createObjectURL(blob);
+  a.download    = 'استبانة_مريجب_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ── CHART FACTORY ─────────────────────────────────────────────
+function makeChart(id, type, labels, values, opts) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  const isDoughnut = type === 'doughnut';
+  const bgColors = opts.colors
+    ? opts.colors.map(c => c + (isDoughnut ? '' : '99'))
+    : Array(values.length).fill((opts.color || C.mauve) + (isDoughnut ? '' : '99'));
+  const borderColors = opts.colors || Array(values.length).fill(opts.color || C.mauve);
+
+  charts[id] = new Chart(ctx, {
+    type,
+    data: {
+      labels,
+      datasets: [{
+        label: opts.label || '',
+        data: values,
+        backgroundColor: bgColors,
+        borderColor: borderColors,
+        borderWidth: isDoughnut ? 2 : 1,
+        borderRadius: isDoughnut ? 0 : 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { display: isDoughnut, position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { rtl: true }
+      },
+      ...(opts.options || {})
+    }
+  });
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function countBy(arr, key) {
+  const counts = {};
+  arr.forEach(r => {
+    const v = r[key];
+    if (v && v !== '—') counts[v] = (counts[v] || 0) + 1;
+  });
+  return counts;
+}
+function topKey(obj) {
+  let top = null, max = 0;
+  Object.entries(obj).forEach(([k,v]) => { if (v > max) { max = v; top = k; } });
+  return top;
+}
+function setText(id, val) {
+  const e = document.getElementById(id);
+  if (e) e.textContent = val;
+}
+function showAlert(msg, type) {
+  const el = document.getElementById('dataAlert');
+  el.textContent = msg;
+  el.className = `alert alert-${type}`;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
