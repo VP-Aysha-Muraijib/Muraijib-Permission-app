@@ -246,9 +246,9 @@ footer {
   <!-- UPLOAD / CONNECT -->
   <div class="upload-card" id="uploadCard">
     <h3>🔗 ربط بيانات Google Sheets أو رفع ملف CSV</h3>
-    <p>يمكن رفع ملف CSV مصدّر من Google Sheets، أو تحميل البيانات مباشرة من الرابط.</p>
+    <p>اضغطي "تحديث من Sheets" لتحميل بيانات طلبات الاستئذان الفعلية — البيانات تبدأ من 25 مايو 2026.</p>
     <div class="upload-actions">
-      <button class="btn btn-primary" onclick="loadDemo()">📊 تحميل البيانات التجريبية</button>
+      <button class="btn btn-secondary" onclick="loadDemo()" style="opacity:.4;font-size:11px">🔧 بيانات تجريبية (للاختبار فقط)</button>
       <label class="btn btn-secondary" style="cursor:pointer">
         📁 رفع ملف CSV
         <input type="file" accept=".csv" style="display:none" onchange="loadCSV(event)">

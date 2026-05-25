@@ -1108,27 +1108,27 @@ body { /* default ar */ }
 
     <div class="stat-grid" style="margin-bottom:16px">
       <div class="stat-card">
-        <div class="sv">148</div>
+        <div class="sv">0</div>
         <div class="sl"><span class="ar">إجمالي الطلبات</span><span class="en">Total Requests</span></div>
       </div>
       <div class="stat-card">
-        <div class="sv">121</div>
+        <div class="sv">0</div>
         <div class="sl"><span class="ar">معتمد</span><span class="en">Approved</span></div>
       </div>
       <div class="stat-card">
-        <div class="sv">14</div>
+        <div class="sv">0</div>
         <div class="sl"><span class="ar">قيد المراجعة</span><span class="en">Pending</span></div>
       </div>
       <div class="stat-card">
-        <div class="sv">13</div>
+        <div class="sv">0</div>
         <div class="sl"><span class="ar">مرفوض</span><span class="en">Rejected</span></div>
       </div>
       <div class="stat-card">
-        <div class="sv">9</div>
+        <div class="sv">0</div>
         <div class="sl"><span class="ar">طارئة</span><span class="en">Emergency</span></div>
       </div>
       <div class="stat-card">
-        <div class="sv">82%</div>
+        <div class="sv">—</div>
         <div class="sl"><span class="ar">نسبة الاعتماد</span><span class="en">Approval Rate</span></div>
       </div>
     </div>
@@ -1257,7 +1257,7 @@ const CFG = {
   PRINCIPAL_EMAIL:    'alyazya.aldahri@moe.sch.ae',
   VICE_EMAIL:         'aysha-ak.alnuaimi@moe.sch.ae',
   MAX_HOURS_MIN:      360,   // 6 hours in minutes
-  PRIOR_USED_MIN:     150,   // 2:30 prior usage simulation
+  PRIOR_USED_MIN:     0,     // يبدأ من الصفر — 25 مايو 2026
   WARN_THRESHOLD_MIN: 300,   // 5 hours = show warning
 };
 
@@ -1419,14 +1419,7 @@ const DATA = {
     { name:'Jaqueline',                job:'Teacher - Jujitsu',       dept:'التربية البدنية' },
   ],
 
-  recentRequests: [
-    ['موزة سعيد الشامسي',   '2026-05-20', '2:00', 'approved'],
-    ['سامية يحيى',          '2026-05-21', '1:30', 'approved'],
-    ['مها محمد النعيمي',     '2026-05-21', '3:00', 'pending'],
-    ['حصة السبوسي',         '2026-05-22', '0:45', 'approved'],
-    ['شمسة عزيز',           '2026-05-22', '2:30', 'rejected'],
-    ['فاطمة صبحي',          '2026-05-23', '1:00', 'pending'],
-  ],
+  recentRequests: [],   // تبدأ البيانات من 25 مايو 2026
 };
 
 /* ── STATE ─────────────────────────────────────────────── */
