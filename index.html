@@ -1533,6 +1533,18 @@ function toggleLang() {
   $('langBtn').textContent = isEn ? 'English' : 'عربي';
 }
 
+/* ── GOOGLE SHEETS LOGGING ────────────────────────────── */
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzkL4El32NWbK2vbrKRSqjc-lGvhRGG7jZMMX74s3-Q43VkAyeDR2CYO_b1RYlNcIHR/exec';
+
+function logToSheets(data) {
+  if (!SHEETS_URL) return;
+  const form = new FormData();
+  Object.entries(data).forEach(([k, v]) => form.append(k, v || '—'));
+  fetch(SHEETS_URL, { method: 'POST', body: form })
+    .then(r => r.ok ? console.log('[Sheets] logged ✓') : console.warn('[Sheets]', r.status))
+    .catch(e => console.warn('[Sheets] offline:', e));
+}
+
 /* ── PWA / SERVICE WORKER ──────────────────────────────── */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
