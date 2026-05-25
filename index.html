@@ -776,12 +776,17 @@ body { /* default ar */ }
         </div>
 
         <div class="form-grid" style="margin-top:16px">
-          <div class="field full">
+          <div class="field full" style="position:relative">
             <label>
               <span class="ar">الاسم الكامل <span class="req">*</span></span>
               <span class="en">Full Name <span class="req">*</span></span>
             </label>
-            <input id="f_name" type="text" placeholder="—">
+            <input id="f_name" type="text" placeholder="—"
+              autocomplete="off"
+              oninput="onNameInput(this.value)"
+              onfocus="onNameInput(this.value)"
+              onblur="setTimeout(()=>hideAC(),200)">
+            <div id="nameAC" style="display:none;position:absolute;z-index:50;background:var(--white);border:1px solid var(--line);border-radius:var(--r-sm);box-shadow:var(--shadow-m);max-height:220px;overflow-y:auto;width:100%;margin-top:2px"></div>
           </div>
 
           <div class="field">
@@ -1259,27 +1264,47 @@ const CFG = {
 /* ── DATA ──────────────────────────────────────────────── */
 const DATA = {
   jobTitles: [
-    ['معلم / معلمة', 'teacher'],
-    ['معلم مادة', 'subject-teacher'],
-    ['إداري / إدارية', 'admin'],
-    ['مشرف / مشرفة', 'supervisor'],
-    ['أخصائي اجتماعي', 'social-worker'],
-    ['أخصائي نفسي', 'psychologist'],
-    ['أمين / أمينة مكتبة', 'librarian'],
-    ['أخصائي مختبر', 'lab-specialist'],
-    ['فني / فنية', 'technician'],
+    ['مديرة المدرسة',          'principal'],
+    ['مساعدة المديرة',         'vice-principal'],
+    ['HOF Arabic',             'hof-arabic'],
+    ['منسق شؤون إدارية',       'admin-coord'],
+    ['مسؤول تسجيل',            'registrar'],
+    ['أمينة سر',               'secretary'],
+    ['مساعد إداري',            'admin-assistant'],
+    ['منسق أمن وسلامة',        'safety-coord'],
+    ['اختصاصية اجتماعية',      'social-specialist'],
+    ['اختصاصية نفسية',         'psych-specialist'],
+    ['اختصاصي مصادر تعلم',    'learning-resources'],
+    ['اختصاصية مختبر',         'lab-specialist'],
+    ['معلمة - تربية إسلامية',  'teacher-islamic'],
+    ['معلمة - لغة عربية',      'teacher-arabic'],
+    ['معلمة - لغة إنجليزية',   'teacher-english'],
+    ['Teacher - English',      'teacher-english-en'],
+    ['معلمة - رياضيات',        'teacher-math'],
+    ['Teacher - Math',         'teacher-math-en'],
+    ['معلمة - علوم',            'teacher-science'],
+    ['Teacher - Science',      'teacher-science-en'],
+    ['معلمة - دراسات اجتماعية','teacher-social'],
+    ['معلمة - تقنية معلومات',  'teacher-it'],
+    ['معلمة - لغة فرنسية',     'teacher-french'],
+    ['معلمة - دراما',          'teacher-drama'],
+    ['معلمة - تربية موسيقية',  'teacher-music'],
+    ['معلمة - تربية فنية',     'teacher-art'],
+    ['معلمة - تربية رياضية',   'teacher-pe'],
+    ['Teacher - Jujitsu',      'teacher-jujitsu'],
+    ['معلمة - تربية خاصة',     'teacher-special'],
   ],
   departments: [
-    ['اللغة العربية', 'arabic'],
-    ['الرياضيات', 'math'],
-    ['العلوم', 'science'],
-    ['اللغة الإنجليزية', 'english'],
-    ['التربية الإسلامية', 'islamic'],
-    ['الدراسات الاجتماعية', 'social'],
-    ['التربية البدنية', 'pe'],
-    ['الفنون', 'arts'],
-    ['الحاسوب والتقنية', 'it'],
-    ['الإدارة والدعم', 'admin-support'],
+    ['الإدارة والدعم',          'admin-support'],
+    ['اللغة العربية',           'arabic'],
+    ['اللغة الإنجليزية',        'english'],
+    ['الرياضيات',               'math'],
+    ['العلوم',                  'science'],
+    ['التربية الإسلامية',       'islamic'],
+    ['الدراسات الاجتماعية',     'social'],
+    ['تقنية المعلومات',         'it'],
+    ['التربية البدنية',         'pe'],
+    ['الفنون',                  'arts'],
   ],
   permTypes: {
     personal: [
@@ -1308,13 +1333,99 @@ const DATA = {
       ['أخرى رسمية',             'other-official'],
     ],
   },
+  // كشف الموظفين الفعلي — مدرسة مريجب 2025/2026
+  staffList: [
+    // الهيئة الإدارية
+    { name:'اليازية نخيرة الظاهري',    job:'مديرة المدرسة',          dept:'الإدارة والدعم' },
+    { name:'عائشة عوض النعيمي',        job:'مساعدة المديرة',         dept:'الإدارة والدعم' },
+    { name:'سلمى مصبح الظاهري',        job:'مساعدة المديرة',         dept:'الإدارة والدعم' },
+    { name:'حليمة البلوشي',             job:'HOF Arabic',             dept:'اللغة العربية' },
+    { name:'أمل عبيد البلوشي',          job:'مسؤول تسجيل',            dept:'الإدارة والدعم' },
+    { name:'فاطمة محمد الشقفة',         job:'منسق شؤون إدارية',       dept:'الإدارة والدعم' },
+    { name:'مريم راشد الدرمكي',         job:'إداري / إدارية',         dept:'الإدارة والدعم' },
+    { name:'علياء ضاحي الحميري',        job:'أمينة سر',               dept:'الإدارة والدعم' },
+    { name:'شمة حارب الكتبي',           job:'أمينة سر',               dept:'الإدارة والدعم' },
+    { name:'مريم خلفان الظاهري',        job:'مساعد إداري',            dept:'الإدارة والدعم' },
+    { name:'علياء سالم الشامسي',        job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
+    { name:'هدى أحمد الكعبي',           job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
+    { name:'اليازية عبدالله الدرمكي',   job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
+    { name:'اليازية جمعة الخييلي',      job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
+    { name:'نرجس خميس الريسي',          job:'اختصاصية نفسية',         dept:'الإدارة والدعم' },
+    { name:'ثمينة سالم المحرزي',        job:'اختصاصي مصادر تعلم',    dept:'الإدارة والدعم' },
+    { name:'حصة سهيل المزروعي',         job:'اختصاصي مصادر تعلم',    dept:'الإدارة والدعم' },
+    { name:'مريم هلال الدرمكي',         job:'اختصاصية مختبر',         dept:'العلوم' },
+    { name:'رقية صالح الصوافي',         job:'اختصاصية مختبر',         dept:'العلوم' },
+    { name:'إيناس خالد',                job:'منسق أمن وسلامة',        dept:'الإدارة والدعم' },
+    // الهيئة التدريسية — التربية الإسلامية
+    { name:'مريم خليفة الدرمكي',        job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
+    { name:'جميلة صبيح الكعبي',         job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
+    { name:'موزة سالم المضاوي',         job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
+    { name:'خولة إبراهيم البلوشي',      job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
+    // اللغة العربية
+    { name:'موزة سعيد الشامسي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'راوية محمد الظاهري',        job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'جميلة علي الدرمكي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'سلامة حمد العامري',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'شيخة الشامسي',             job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'عائشة محمد الغيثي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    { name:'منى محمد صقر',             job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
+    // اللغة الإنجليزية
+    { name:'ناعمة عبدالله الكعبي',      job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
+    { name:'شمسة عزيز',                job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
+    { name:'فريال فياض أحمد',          job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
+    { name:'Robyn Canau',              job:'Teacher - English',       dept:'اللغة الإنجليزية' },
+    { name:'بشرى إمام خادم',           job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
+    { name:'أمنة الشامسي',             job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
+    // الرياضيات
+    { name:'Sheejamol Babu',           job:'Teacher - Math',          dept:'الرياضيات' },
+    { name:'Rahila Naseeha',           job:'Teacher - Math',          dept:'الرياضيات' },
+    { name:'سامية يحيى',               job:'معلمة - رياضيات',        dept:'الرياضيات' },
+    { name:'نمارق عبدالله',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
+    { name:'أمامة الفلاسي',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
+    { name:'سمية سليم',                job:'معلمة - رياضيات',        dept:'الرياضيات' },
+    { name:'كنة الشامسي',              job:'معلمة - رياضيات',        dept:'الرياضيات' },
+    // تقنية المعلومات
+    { name:'حصة ناصر الأحبابي',        job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
+    { name:'سهيلة الكتبي',             job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
+    { name:'حصة السبوسي',              job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
+    // الدراسات الاجتماعية
+    { name:'زلفة الظاهري',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
+    { name:'مريم العتيبة',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
+    { name:'الهن العفاري',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
+    { name:'موزة سيف',                 job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
+    // العلوم
+    { name:'مها محمد النعيمي',          job:'معلمة - علوم',           dept:'العلوم' },
+    { name:'Anita Raja',               job:'Teacher - Science',       dept:'العلوم' },
+    { name:'دارين محمد',               job:'معلمة - علوم',           dept:'العلوم' },
+    { name:'صالحة السبوسي',            job:'معلمة - علوم',           dept:'العلوم' },
+    { name:'فاطمة صبحي',              job:'معلمة - علوم',           dept:'العلوم' },
+    { name:'هند زيدان',                job:'معلمة - علوم',           dept:'العلوم' },
+    // اللغة الفرنسية
+    { name:'حكيمة الهلالي',            job:'معلمة - لغة فرنسية',     dept:'الإدارة والدعم' },
+    { name:'هيبة غابري',               job:'معلمة - لغة فرنسية',     dept:'الإدارة والدعم' },
+    // فنون وموسيقى ودراما
+    { name:'صبرين حمدي',              job:'معلمة - دراما',           dept:'الفنون' },
+    { name:'جهان سلمان',               job:'معلمة - تربية موسيقية',  dept:'الفنون' },
+    { name:'أمل موسى القبيسي',         job:'معلمة - تربية فنية',     dept:'الفنون' },
+    // التربية الرياضية
+    { name:'سندس القلطي',              job:'معلمة - تربية رياضية',   dept:'التربية البدنية' },
+    { name:'هند خالد',                 job:'معلمة - تربية رياضية',   dept:'التربية البدنية' },
+    // التربية الخاصة
+    { name:'أماني جعيد',               job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
+    { name:'العنود عبدربه البريكي',    job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
+    { name:'حمدة سيف الظاهري',        job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
+    // جيوجيتسو
+    { name:'Diana Menezes',            job:'Teacher - Jujitsu',       dept:'التربية البدنية' },
+    { name:'Jaqueline',                job:'Teacher - Jujitsu',       dept:'التربية البدنية' },
+  ],
+
   recentRequests: [
-    ['سارة المنصوري', '2026-05-20', '2:00', 'approved'],
-    ['هند الكعبي',   '2026-05-21', '1:30', 'approved'],
-    ['نورة الزهراني','2026-05-21', '3:00', 'pending'],
-    ['أمينة الشامسي', '2026-05-22', '0:45', 'approved'],
-    ['لطيفة العمري', '2026-05-22', '2:30', 'rejected'],
-    ['مريم الحوسني', '2026-05-23', '1:00', 'pending'],
+    ['موزة سعيد الشامسي',   '2026-05-20', '2:00', 'approved'],
+    ['سامية يحيى',          '2026-05-21', '1:30', 'approved'],
+    ['مها محمد النعيمي',     '2026-05-21', '3:00', 'pending'],
+    ['حصة السبوسي',         '2026-05-22', '0:45', 'approved'],
+    ['شمسة عزيز',           '2026-05-22', '2:30', 'rejected'],
+    ['فاطمة صبحي',          '2026-05-23', '1:00', 'pending'],
   ],
 };
 
@@ -1751,7 +1862,7 @@ function printCard() {
   }, 150);
 }
 
-/* ── DOWNLOAD IMAGE: html2canvas ───────────────────────── */
+/* ── DOWNLOAD IMAGE ────────────────────────────────────── */
 async function downloadImage() {
   if (!state.emailSent) {
     alert(isAr()
@@ -1761,37 +1872,87 @@ async function downloadImage() {
   }
   syncCard();
 
-  // Build card in off-screen container
+  // Show loading state on button
+  const btn = document.querySelector('[onclick="downloadImage()"]');
+  const origText = btn ? btn.innerHTML : '';
+  if (btn) btn.innerHTML = '⏳ <span class="ar">جاري التحضير...</span><span class="en">Preparing...</span>';
+
+  // Build card in a VISIBLE off-screen container
+  // Must be visible for html2canvas to render correctly
   const container = document.createElement('div');
-  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:white;padding:16px';
+  container.style.cssText = [
+    'position:fixed',
+    'top:0',
+    'right:0',           // RTL: use right instead of left
+    'width:560px',       // fixed px width — no mm units
+    'background:#ffffff',
+    'padding:20px',
+    'z-index:8888',
+    'opacity:0.01',      // nearly invisible but still rendered
+    'pointer-events:none',
+  ].join(';');
+
   container.innerHTML = buildPrintCard();
   document.body.appendChild(container);
 
-  // Wait for fonts
+  // Wait for DOM + fonts to fully render
   await document.fonts.ready;
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 600));
 
   try {
-    const canvas = await html2canvas(container.firstElementChild, {
-      scale: 3,
+    const target = container.firstElementChild;
+    const canvas = await html2canvas(target, {
+      scale: 2,
       useCORS: true,
+      allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
+      width:  target.offsetWidth,
+      height: target.offsetHeight,
     });
 
-    // Download
-    const link = document.createElement('a');
-    const name  = ($('c_name').textContent || 'card').replace(/\s+/g, '_');
-    const date  = ($('c_date').textContent || '').replace(/-/g, '');
-    link.download = `استئذان_${name}_${date}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
+    // Verify canvas has content
+    if (canvas.width === 0 || canvas.height === 0) {
+      throw new Error('Empty canvas');
+    }
+
+    // Get data URL and verify it has content
+    const dataURL = canvas.toDataURL('image/png');
+    if (dataURL.length < 1000) {
+      throw new Error('Canvas data too small — likely empty');
+    }
+
+    // Trigger download
+    const link      = document.createElement('a');
+    const staffName = ($('c_name').textContent || 'card').trim();
+    const cardDate  = ($('c_date').textContent || '').replace(/-/g, '');
+    link.download   = 'استئذان_' + staffName + '_' + cardDate + '.png';
+    link.href       = dataURL;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 
     showToast('📸', isAr() ? 'تم تنزيل الصورة بنجاح' : 'Image downloaded successfully');
-  } catch (e) {
-    alert(isAr() ? '⚠ تعذر تنزيل الصورة. جرّب طباعة PDF بدلاً.' : '⚠ Image download failed. Try Print PDF instead.');
+
+  } catch (err) {
+    console.error('[downloadImage]', err);
+    // Fallback: open image in new tab so user can long-press save on mobile
+    try {
+      const target = container.firstElementChild;
+      const canvas2 = await html2canvas(target, { scale: 2, backgroundColor: '#ffffff' });
+      const tab = window.open('', '_blank');
+      if (tab) {
+        tab.document.write('<img src="' + canvas2.toDataURL() + '" style="max-width:100%">');
+        tab.document.title = 'بطاقة الاستئذان';
+      }
+    } catch {
+      alert(isAr()
+        ? '⚠ تعذر تنزيل الصورة. جرّب زر طباعة PDF بدلاً.'
+        : '⚠ Image download failed. Try Print PDF instead.');
+    }
   } finally {
     document.body.removeChild(container);
+    if (btn) btn.innerHTML = origText;
   }
 }
 
@@ -1894,6 +2055,72 @@ window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredInstallPrompt = e;
 });
+
+/* ── NAME AUTOCOMPLETE ─────────────────────────────────── */
+function onNameInput(val) {
+  const ac = $('nameAC');
+  if (!ac) return;
+  const q = val.trim().toLowerCase();
+  // Show all if empty, filter if typed
+  const matches = q.length === 0
+    ? DATA.staffList.slice(0, 10)
+    : DATA.staffList.filter(s =>
+        s.name.toLowerCase().includes(q) ||
+        s.name.includes(val.trim())
+      ).slice(0, 12);
+
+  if (matches.length === 0) { ac.style.display = 'none'; return; }
+
+  ac.innerHTML = matches.map(s => `
+    <div onclick="selectStaff(${JSON.stringify(s).replace(/"/g,"'")})"
+      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--line);
+             font-size:13px;color:var(--brown);transition:background .12s"
+      onmouseover="this.style.background='var(--card2)'"
+      onmouseout="this.style.background=''">
+      <div style="font-weight:700">${s.name}</div>
+      <div style="font-size:11px;color:var(--brown-l);margin-top:2px">${s.job} · ${s.dept}</div>
+    </div>
+  `).join('');
+  ac.style.display = 'block';
+}
+
+function selectStaff(s) {
+  $('f_name').value = s.name;
+  // Auto-fill job and department
+  const jobSel  = $('f_job');
+  const deptSel = $('f_dept');
+  if (jobSel) {
+    // Find closest match in options
+    for (let o of jobSel.options) {
+      if (o.value === s.job || o.text === s.job) {
+        jobSel.value = o.value; break;
+      }
+    }
+    // If no exact match, add as option and select
+    let found = false;
+    for (let o of jobSel.options) { if (o.text === s.job) { found = true; break; } }
+    if (!found) {
+      const opt = document.createElement('option');
+      opt.value = s.job; opt.text = s.job; opt.selected = true;
+      jobSel.appendChild(opt);
+    } else {
+      jobSel.value = s.job;
+    }
+  }
+  if (deptSel) {
+    for (let o of deptSel.options) {
+      if (o.text === s.dept || o.value === s.dept) {
+        deptSel.value = o.value; break;
+      }
+    }
+  }
+  hideAC();
+}
+
+function hideAC() {
+  const ac = $('nameAC');
+  if (ac) ac.style.display = 'none';
+}
 
 /* ── START ─────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', init);
