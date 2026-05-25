@@ -16,6 +16,7 @@
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 
@@ -521,14 +522,137 @@ body {
 .divider .dl { flex: 1; height: 1px; background: var(--line); }
 .divider .dg { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
 
+/* ── HOURS TIMELINE ── */
+.hours-timeline {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 18px 18px 14px;
+  margin-top: 8px;
+}
+.htl-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.htl-title {
+  font-size: 12px; font-weight: 700; color: var(--brown-m);
+  letter-spacing: .04em;
+}
+.htl-limit {
+  font-size: 11px; color: var(--brown-l);
+}
+/* Track */
+.htl-track {
+  position: relative;
+  height: 28px;
+  background: var(--card2);
+  border-radius: 14px;
+  overflow: visible;
+  margin-bottom: 8px;
+}
+/* Filled segments */
+.htl-used {
+  position: absolute; top: 0; right: 0;
+  height: 100%; border-radius: 14px;
+  background: linear-gradient(90deg, var(--mauve), var(--mauve-l));
+  transition: width .6s cubic-bezier(.22,1,.36,1);
+  display: flex; align-items: center; justify-content: flex-start;
+  padding-right: 10px;
+  min-width: 0;
+}
+.htl-used.warn {
+  background: linear-gradient(90deg, var(--amber, #8B5E1A), #D4921F);
+}
+.htl-used.over {
+  background: linear-gradient(90deg, var(--red), #C06060);
+}
+.htl-used-label {
+  font-size: 11px; font-weight: 700; color: var(--white);
+  white-space: nowrap; opacity: 0;
+  transition: opacity .3s;
+}
+.htl-used.has-width .htl-used-label { opacity: 1; }
+/* New request segment */
+.htl-new {
+  position: absolute; top: 0;
+  height: 100%; border-radius: 0 14px 14px 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold) 0px, var(--gold) 6px,
+    var(--gold-l) 6px, var(--gold-l) 10px
+  );
+  opacity: .85;
+  transition: width .5s ease, right .5s ease;
+}
+/* Limit marker at 6h */
+.htl-limit-line {
+  position: absolute; top: -4px; bottom: -4px;
+  width: 2px; background: var(--red);
+  border-radius: 1px;
+}
+.htl-limit-flag {
+  position: absolute; top: -18px;
+  font-size: 9px; color: var(--red); font-weight: 700;
+  white-space: nowrap; transform: translateX(50%);
+}
+/* Hour markers */
+.htl-markers {
+  display: flex; justify-content: space-between;
+  padding: 0 0 0;
+}
+.htl-marker {
+  font-size: 10px; color: var(--brown-l);
+  position: relative;
+}
+/* Stats row */
+.htl-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.htl-stat { text-align: center; }
+.htl-stat .sv {
+  font-size: 20px; font-weight: 800; color: var(--brown);
+  line-height: 1;
+}
+.htl-stat .sv.used-color { color: var(--mauve); }
+.htl-stat .sv.new-color  { color: var(--gold); }
+.htl-stat .sv.rem-color  { color: var(--green); }
+.htl-stat .sv.warn-color { color: var(--amber, #8B5E1A); }
+.htl-stat .sv.over-color { color: var(--red); }
+.htl-stat .sl { font-size: 11px; color: var(--brown-l); margin-top: 3px; }
+.htl-alert {
+  margin-top: 10px; padding: 8px 12px; border-radius: 8px;
+  font-size: 12px; font-weight: 600; display: none;
+}
+.htl-alert.warn { display:block; background:var(--amber-l,#FDF3E3); color:var(--amber,#8B5E1A); }
+.htl-alert.over { display:block; background:var(--red-l); color:var(--red); }
+
 /* ── PRINT ── */
+/* ── PRINT: card only ── */
 @media print {
-  .topbar, .hero, .section:not(#section-form):not(#section-card),
-  .form-actions, .approval-btns, .ios-guide, .toast, .modal-overlay,
-  .app-footer, .gold-strip { display: none !important; }
-  .perm-card { box-shadow: none !important; }
-  .perm-card.locked { filter: none !important; }
-  body { background: white; }
+  /* Hide absolutely everything */
+  body > * { display: none !important; }
+  /* Show only the print portal */
+  #printPortal { display: block !important; }
+}
+/* Print portal — renders outside normal flow */
+#printPortal {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: white;
+  padding: 0;
+}
+#printPortal .print-wrap {
+  width: 148mm; /* A5 width */
+  margin: 0 auto;
+  padding: 8mm;
+  font-family: 'Tajawal', sans-serif;
+}
+@page {
+  size: A5 portrait;
+  margin: 8mm;
 }
 
 /* ── ANIMATIONS ── */
@@ -717,13 +841,7 @@ body { /* default ar */ }
             <input id="f_hrs" type="text" readonly placeholder="0:00">
           </div>
 
-          <div class="field full">
-            <label>
-              <span class="ar">سبب الاستئذان <span class="req">*</span></span>
-              <span class="en">Reason <span class="req">*</span></span>
-            </label>
-            <input id="f_reason" type="text" placeholder="—">
-          </div>
+
 
           <div class="field">
             <label>
@@ -756,32 +874,68 @@ body { /* default ar */ }
           </div>
         </div>
 
-        <!-- Hours tracker (personal only) -->
-        <div class="hours-box" id="hoursBox">
-          <div class="hours-grid">
-            <div class="hours-stat">
-              <div class="v" id="h_dur">0:00</div>
-              <div class="l"><span class="ar">مدة هذا الطلب</span><span class="en">This Request</span></div>
+        <!-- Hours Timeline (personal only) -->
+        <div class="hours-timeline" id="hoursBox">
+          <div class="htl-header">
+            <span class="htl-title">
+              <span class="ar">⏱ رصيد ساعات الاستئذان الشخصي — هذا الشهر</span>
+              <span class="en">⏱ Personal Leave Hours — This Month</span>
+            </span>
+            <span class="htl-limit">
+              <span class="ar">الحد الأقصى 6 ساعات</span>
+              <span class="en">Max 6 hours</span>
+            </span>
+          </div>
+
+          <!-- Visual timeline track -->
+          <div class="htl-track" id="htlTrack">
+            <!-- Already used (grey/mauve) -->
+            <div class="htl-used" id="htlUsed" style="width:41.7%">
+              <span class="htl-used-label" id="htlUsedLabel">2:30</span>
             </div>
-            <div class="hours-stat">
-              <div class="v" id="h_used">2:30</div>
-              <div class="l"><span class="ar">المستخدم شهرياً</span><span class="en">Monthly Used</span></div>
-            </div>
-            <div class="hours-stat">
-              <div class="v" id="h_rem">3:30</div>
-              <div class="l"><span class="ar">المتبقي من 6 ساعات</span><span class="en">Remaining of 6h</span></div>
+            <!-- This request (gold striped) -->
+            <div class="htl-new" id="htlNew" style="width:0%;right:41.7%"></div>
+            <!-- 6h limit line -->
+            <div class="htl-limit-line" style="right:100%" id="htlLimitLine">
+              <div class="htl-limit-flag">6h</div>
             </div>
           </div>
-          <div class="hours-bar">
-            <div class="hours-bar-fill" id="barFill"></div>
+
+          <!-- Hour tick marks -->
+          <div class="htl-markers">
+            <span class="htl-marker">6h</span>
+            <span class="htl-marker">5h</span>
+            <span class="htl-marker">4h</span>
+            <span class="htl-marker">3h</span>
+            <span class="htl-marker">2h</span>
+            <span class="htl-marker">1h</span>
+            <span class="htl-marker">0</span>
           </div>
-          <div class="alert-strip" id="alertWarn">
+
+          <!-- Stats -->
+          <div class="htl-stats">
+            <div class="htl-stat">
+              <div class="sv used-color" id="h_used">2:30</div>
+              <div class="sl"><span class="ar">مُستخدم سابقاً</span><span class="en">Already Used</span></div>
+            </div>
+            <div class="htl-stat">
+              <div class="sv new-color" id="h_dur">0:00</div>
+              <div class="sl"><span class="ar">هذا الطلب</span><span class="en">This Request</span></div>
+            </div>
+            <div class="htl-stat">
+              <div class="sv rem-color" id="h_rem">3:30</div>
+              <div class="sl"><span class="ar">المتبقي</span><span class="en">Remaining</span></div>
+            </div>
+          </div>
+
+          <!-- Alerts -->
+          <div class="htl-alert" id="alertWarn">
             ⚠ <span class="ar">تنبيه: تبقى أقل من ساعة على الحد الأعلى.</span>
-            <span class="en">Warning: Less than one hour remaining before the limit.</span>
+            <span class="en">Warning: Less than 1 hour remaining.</span>
           </div>
-          <div class="alert-strip" id="alertOver">
-            ⛔ <span class="ar">تجاوز: وصلت إلى الحد الأعلى المسموح به (6 ساعات).</span>
-            <span class="en">Exceeded: You have reached the maximum allowed limit (6 hours).</span>
+          <div class="htl-alert" id="alertOver">
+            ⛔ <span class="ar">تجاوز: وصلت إلى حد الـ6 ساعات الشهرية.</span>
+            <span class="en">Exceeded: You've reached the 6-hour monthly limit.</span>
           </div>
         </div>
 
@@ -928,10 +1082,13 @@ body { /* default ar */ }
       </div>
       <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="printCard()">
-          🖨 <span class="ar">طباعة / تحميل PDF</span><span class="en">Print / Download PDF</span>
+          🖨 <span class="ar">طباعة PDF</span><span class="en">Print PDF</span>
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="resetAll()">
-          <span class="ar">طلب جديد</span><span class="en">New Request</span>
+        <button class="btn btn-gold" onclick="downloadImage()">
+          📸 <span class="ar">تنزيل صورة</span><span class="en">Download Image</span>
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="resetAll()" style="margin-right:auto">
+          <span class="ar">↺ طلب جديد</span><span class="en">↺ New Request</span>
         </button>
       </div>
     </div>
@@ -1314,37 +1471,66 @@ function calcHours() {
   const out = toMin($v('f_out'));
   const ret = toMin($v('f_in'));
 
-  if (out === null || ret === null || ret <= out) return;
+  if (out === null || ret === null || ret <= out) {
+    // Reset new-request segment
+    updateTimeline(0);
+    return;
+  }
 
   const dur = ret - out;
-  $('f_hrs').value = fmtMin(dur);
+  $('f_hrs').value    = fmtMin(dur);
   $('h_dur').textContent = fmtMin(dur);
 
   if (state.category === 'official') return;
 
-  const total     = CFG.PRIOR_USED_MIN + dur;
-  const remaining = Math.max(0, CFG.MAX_HOURS_MIN - total);
-  const pct       = Math.min(100, total / CFG.MAX_HOURS_MIN * 100);
+  updateTimeline(dur);
+}
 
-  $('h_used').textContent = fmtMin(total);
-  $('h_rem').textContent  = fmtMin(remaining);
+function updateTimeline(newMin) {
+  const MAX    = CFG.MAX_HOURS_MIN;   // 360 min = 6h
+  const PRIOR  = CFG.PRIOR_USED_MIN;  // 2:30 already used
+  const total  = PRIOR + newMin;
+  const remain = Math.max(0, MAX - total);
 
-  const fill = $('barFill');
-  fill.style.width = pct + '%';
-  fill.classList.remove('warn', 'over');
+  // ── Update stat numbers ──
+  $('h_used').textContent = fmtMin(PRIOR);
+  $('h_dur').textContent  = fmtMin(newMin);
+  $('h_rem').textContent  = fmtMin(remain);
 
+  // ── Update stat colors ──
+  const remEl = $('h_rem');
+  remEl.className = 'sv ' + (total >= MAX ? 'over-color' : total >= CFG.WARN_THRESHOLD_MIN ? 'warn-color' : 'rem-color');
+
+  // ── Timeline segments (RTL: right=0h, left=6h) ──
+  const usedPct  = Math.min(100, PRIOR / MAX * 100);          // grey used segment
+  const newPct   = Math.min(100 - usedPct, newMin / MAX * 100); // gold new segment
+  const overPct  = Math.max(0, (total - MAX) / MAX * 100);    // overflow
+
+  const usedEl = $('htlUsed');
+  const newEl  = $('htlNew');
+
+  // Used bar grows from right
+  usedEl.style.width = usedPct + '%';
+  usedEl.classList.toggle('has-width', PRIOR > 0);
+  $('htlUsedLabel').textContent = fmtMin(PRIOR);
+
+  // New request bar sits adjacent to used bar (also from right)
+  newEl.style.width = Math.min(newPct, 100 - usedPct) + '%';
+  newEl.style.right = usedPct + '%';
+
+  // State classes
+  const isOver = total >= MAX;
+  const isWarn = !isOver && total >= CFG.WARN_THRESHOLD_MIN;
+  usedEl.classList.toggle('warn', isWarn);
+  usedEl.classList.toggle('over', isOver);
+
+  // ── Alerts ──
   const warn = $('alertWarn');
   const over = $('alertOver');
   warn.classList.remove('warn');
   over.classList.remove('over');
-
-  if (total >= CFG.MAX_HOURS_MIN) {
-    fill.classList.add('over');
-    over.classList.add('over');
-  } else if (total >= CFG.WARN_THRESHOLD_MIN) {
-    fill.classList.add('warn');
-    warn.classList.add('warn');
-  }
+  if (isOver)      { over.classList.add('over'); }
+  else if (isWarn) { warn.classList.add('warn'); }
 }
 
 /* ── SEND TO ADMIN ─────────────────────────────────────── */
@@ -1388,7 +1574,7 @@ function doSend() {
   const date   = $v('f_date') || '—';
   const out    = $v('f_out')  || '—';
   const ret    = $v('f_in')   || '—';
-  const reason = $v('f_reason') || '—';
+  const typeSel2 = $('f_type'); const reason = typeSel2?.options[typeSel2.selectedIndex]?.text || '—';
   const cat    = state.category === 'official' ? 'رسمي' : 'شخصي';
 
   // ── Short email body (avoids AADSTS90015 Microsoft error) ──
@@ -1478,6 +1664,70 @@ function unlockCard() {
   $('cardUnlocked').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+/* ── BUILD PRINT CARD HTML ────────────────────────────── */
+function buildPrintCard() {
+  const g = id => { const e = $(id); return e ? e.textContent.trim() : '—'; };
+  const isOff = state.category === 'official';
+  const catLabel = isOff ? 'رسمي' : 'شخصي';
+
+  return `
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap');
+    * { box-sizing:border-box; margin:0; padding:0; }
+    .pc { font-family:'Tajawal',sans-serif; direction:rtl; width:148mm; background:#fff; border:1.5px solid #DDD0C8; border-radius:12px; overflow:hidden; }
+    .pc-head { background:#8B6B6B; color:#fff; padding:14px 18px; text-align:center; }
+    .pc-head h2 { font-size:15px; font-weight:800; letter-spacing:.03em; margin-bottom:3px; }
+    .pc-head p { font-size:9px; opacity:.75; }
+    .pc-gold { height:3px; background:linear-gradient(90deg,#8B6B6B,#C9A84C,#F0DFA8,#C9A84C,#8B6B6B); }
+    .pc-body { padding:12px 16px; }
+    .pc-grid { display:grid; grid-template-columns:1fr 1fr; border:1px solid #EDE5DC; border-radius:8px; overflow:hidden; margin-bottom:10px; }
+    .pc-row { padding:8px 10px; border-bottom:1px solid #EDE5DC; }
+    .pc-row:nth-child(odd) { background:#FBF8F4; }
+    .pc-row:last-child,.pc-row:nth-last-child(2):not(.full) { border-bottom:none; }
+    .pc-row.full { grid-column:1/-1; border-bottom:none; }
+    .k { font-size:9px; color:#A08878; font-weight:600; letter-spacing:.03em; margin-bottom:2px; }
+    .v { font-size:12px; font-weight:700; color:#3D2B1F; }
+    .v.green { color:#4A7C59; }
+    .pc-ids { display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#EDE5DC; border-radius:8px; padding:10px 12px; }
+    .pc-ids .k { font-size:9px; color:#6B5B50; margin-bottom:3px; }
+    .pc-ids .v { font-size:11px; color:#8B6B6B; font-family:monospace; font-weight:700; }
+    .pc-footer { text-align:center; padding:8px 12px; border-top:1px solid #EDE5DC; font-size:8px; color:#A08878; margin-top:10px; }
+    .pc-stamp { display:inline-block; border:1.5px solid #4A7C59; border-radius:6px; padding:2px 10px; color:#4A7C59; font-size:10px; font-weight:700; margin-bottom:4px; }
+  </style>
+  <div class="pc">
+    <div class="pc-gold"></div>
+    <div class="pc-head">
+      <h2>بطاقة استئذان رقمية معتمدة</h2>
+      <p>مدرسة مريجب للتعليم الأساسي — حلقة 2 — وزارة التربية والتعليم — العين</p>
+    </div>
+    <div class="pc-body">
+      <div class="pc-grid">
+        <div class="pc-row"><div class="k">الاسم</div><div class="v">${g('c_name')}</div></div>
+        <div class="pc-row"><div class="k">المسمى الوظيفي</div><div class="v">${g('c_job')}</div></div>
+        <div class="pc-row"><div class="k">التصنيف</div><div class="v">${catLabel}</div></div>
+        <div class="pc-row"><div class="k">نوع الاستئذان</div><div class="v">${g('c_type')}</div></div>
+        <div class="pc-row"><div class="k">التاريخ</div><div class="v">${g('c_date')}</div></div>
+        <div class="pc-row"><div class="k">المدة</div><div class="v">${g('c_hrs')}</div></div>
+        <div class="pc-row"><div class="k">وقت الخروج</div><div class="v">${g('c_out')}</div></div>
+        <div class="pc-row"><div class="k">وقت العودة</div><div class="v">${g('c_in')}</div></div>
+        <div class="pc-row full">
+          <div class="k">حالة الاعتماد</div>
+          <div class="v green">✓ معتمد</div>
+        </div>
+      </div>
+      <div class="pc-ids">
+        <div><div class="k">رقم الطلب</div><div class="v">${state.currentReqId}</div></div>
+        <div><div class="k">رمز التحقق</div><div class="v">${state.currentVCode}</div></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-stamp">✓ معتمد</div><br>
+        منظومة الاستئذان الإلكترونية الذكية — مدرسة مريجب 2026
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── PRINT: A5 card only ───────────────────────────────── */
 function printCard() {
   if (!state.emailSent) {
     alert(isAr()
@@ -1486,13 +1736,63 @@ function printCard() {
     return;
   }
   syncCard();
-  document.body.classList.add('print-card-only');
-  const cleanup = () => {
-    document.body.classList.remove('print-card-only');
-    window.removeEventListener('afterprint', cleanup);
-  };
-  window.addEventListener('afterprint', cleanup);
-  setTimeout(() => { window.print(); setTimeout(cleanup, 800); }, 120);
+
+  // Fill print portal
+  const portal = $('printWrap');
+  portal.innerHTML = buildPrintCard();
+
+  // Show portal, print, hide portal
+  $('printPortal').style.display = 'block';
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => {
+      $('printPortal').style.display = 'none';
+    }, 800);
+  }, 150);
+}
+
+/* ── DOWNLOAD IMAGE: html2canvas ───────────────────────── */
+async function downloadImage() {
+  if (!state.emailSent) {
+    alert(isAr()
+      ? '⚠ أرسل الطلب إلى الإدارة أولاً.'
+      : '⚠ Send the request to administration first.');
+    return;
+  }
+  syncCard();
+
+  // Build card in off-screen container
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:white;padding:16px';
+  container.innerHTML = buildPrintCard();
+  document.body.appendChild(container);
+
+  // Wait for fonts
+  await document.fonts.ready;
+  await new Promise(r => setTimeout(r, 200));
+
+  try {
+    const canvas = await html2canvas(container.firstElementChild, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    // Download
+    const link = document.createElement('a');
+    const name  = ($('c_name').textContent || 'card').replace(/\s+/g, '_');
+    const date  = ($('c_date').textContent || '').replace(/-/g, '');
+    link.download = `استئذان_${name}_${date}.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
+
+    showToast('📸', isAr() ? 'تم تنزيل الصورة بنجاح' : 'Image downloaded successfully');
+  } catch (e) {
+    alert(isAr() ? '⚠ تعذر تنزيل الصورة. جرّب طباعة PDF بدلاً.' : '⚠ Image download failed. Try Print PDF instead.');
+  } finally {
+    document.body.removeChild(container);
+  }
 }
 
 /* ── APPROVAL SIMULATION ───────────────────────────────── */
@@ -1522,12 +1822,7 @@ function resetForm() {
   });
   setDefaultDate();
   setCategory('personal');
-  $('barFill').style.width = '0%';
-  $('h_dur').textContent  = '0:00';
-  $('h_used').textContent = fmtMin(CFG.PRIOR_USED_MIN);
-  $('h_rem').textContent  = fmtMin(CFG.MAX_HOURS_MIN - CFG.PRIOR_USED_MIN);
-  $('alertWarn').classList.remove('warn');
-  $('alertOver').classList.remove('over');
+  updateTimeline(0);
 }
 
 function resetAll() {
@@ -1542,8 +1837,13 @@ function resetAll() {
 }
 
 /* ── TOAST ─────────────────────────────────────────────── */
-function showToast() {
+function showToast(icon, msg) {
   const t = $('toast');
+  if (icon) { const ic = t.querySelector('.toast-icon'); if (ic) ic.textContent = icon; }
+  if (msg)  {
+    const ar = t.querySelector('.ar'); const en = t.querySelector('.en');
+    if (ar) ar.textContent = msg; if (en) en.textContent = msg;
+  }
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 4000);
 }
@@ -1598,5 +1898,12 @@ window.addEventListener('beforeinstallprompt', e => {
 /* ── START ─────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<!-- ── PRINT PORTAL — card only, A5 ── -->
+<div id="printPortal">
+  <div class="print-wrap" id="printWrap">
+    <!-- filled dynamically by buildPrintCard() -->
+  </div>
+</div>
+
 </body>
 </html>
