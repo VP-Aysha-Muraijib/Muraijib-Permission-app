@@ -647,7 +647,7 @@ body { /* default ar */ }
 
         <!-- Official note -->
         <div class="official-note" id="officialNote">
-          <span class="ar">📋 الاستئذان الرسمي (تدريب، مهمة وزارية، اجتماع رسمي) لا يُحتسب من رصيد الـ6 ساعات الشخصية ويتطلب إرفاق مستند رسمي.</span>
+          <span class="ar">📋 الاستئذان الرسمي (دورات تدريبية، ورش عمل، زيارات ميدانية، ساعات الرضاعة...) غير محدود بـ6 ساعات وقد يستلزم مستنداً رسمياً.</span>
           <span class="en">📋 Official leave (training, ministry mission, official meeting) does not count toward the 6-hour personal limit and requires official documentation.</span>
         </div>
 
@@ -769,7 +769,7 @@ body { /* default ar */ }
             </div>
             <div class="hours-stat">
               <div class="v" id="h_rem">3:30</div>
-              <div class="l"><span class="ar">المتبقي من 6</span><span class="en">Remaining of 6h</span></div>
+              <div class="l"><span class="ar">المتبقي من 6 ساعات</span><span class="en">Remaining of 6h</span></div>
             </div>
           </div>
           <div class="hours-bar">
@@ -1126,27 +1126,29 @@ const DATA = {
   ],
   permTypes: {
     personal: [
-      // ── حقوق نظامية ──
-      ['ساعة السعادة',       'happiness-hour'],
-      ['ساعات الرضاعة',      'breastfeeding'],
-      ['إجازة اعتيادية',     'annual-leave'],
-      ['إجازة مرضية',        'sick-leave'],
-      // ── أسباب شخصية ──
-      ['موعد طبي',           'medical'],
-      ['ظرف عائلي',          'family'],
-      ['مناسبة اجتماعية',    'social-event'],
-      ['معاملة حكومية',      'government'],
-      ['ظرف طارئ / طارئة',   'emergency'],
-      ['أخرى',               'other-personal'],
+      ['ظرف عائلي',              'family'],
+      ['موعد مستشفى',            'hospital'],
+      ['ساعة السعادة',           'happiness-hour'],
+      ['مدرسة أبنائي',           'children-school'],
+      ['موعد طبي خارج المدرسة',  'medical'],
+      ['معاملة حكومية',          'government'],
+      ['ظرف طارئ',               'emergency'],
+      ['مناسبة اجتماعية',        'social-event'],
+      ['التزام شخصي',            'personal-commitment'],
+      ['أخرى',                   'other-personal'],
     ],
     official: [
-      ['تدريب وزاري',         'ministry-training'],
-      ['اجتماع رسمي خارجي',  'external-meeting'],
-      ['مهمة وزارية',         'ministry-mission'],
-      ['زيارة ميدانية',       'field-visit'],
-      ['مؤتمر / ملتقى تربوي','conference'],
-      ['تحكيم / لجنة',       'committee'],
-      ['انتداب',              'secondment'],
+      ['دورة تدريبية',           'training'],
+      ['زيارة ميدانية',          'field-visit'],
+      ['ساعات الرضاعة',          'breastfeeding'],
+      ['ورشة عمل',               'workshop'],
+      ['اجتماع رسمي',            'official-meeting'],
+      ['مهمة وزارية',            'ministry-mission'],
+      ['مؤتمر / ملتقى تربوي',   'conference'],
+      ['تحكيم / لجنة وزارية',   'committee'],
+      ['انتداب رسمي',            'secondment'],
+      ['زيارة إشرافية',          'supervision-visit'],
+      ['أخرى رسمية',             'other-official'],
     ],
   },
   recentRequests: [
@@ -1281,6 +1283,30 @@ function setCategory(cat) {
   officialNote.classList.toggle('show', cat === 'official');
 
   calcHours();
+}
+
+/* ── TYPE SPECIAL NOTE ────────────────────────────────────── */
+function updateTypeNote() {
+  const type = $v('f_type');
+  const note = $('typeSpecialNote');
+  if (!note) return;
+  const notes = {
+    'happiness-hour':    '🌟 ساعة السعادة: حق نظامي — تُحتسب ضمن رصيد الـ6 ساعات الشخصية.',
+    'hospital':          '🏥 موعد المستشفى: يُفضَّل إرفاق ورقة الموعد الطبي عند التقديم.',
+    'children-school':   '🏫 مدرسة الأبناء: يشمل الاجتماعات والحفلات المدرسية الرسمية.',
+    'emergency':         '🚨 ظرف طارئ: يُعتمد فوراً — أبلغي الإدارة مسبقاً إن أمكن.',
+    'breastfeeding':     '🤱 ساعات الرضاعة: حق قانوني للأمهات — مصنّف رسمي غير محدود بـ6 ساعات.',
+    'training':          '📚 دورة تدريبية: أرفقي خطاب الدورة أو رابطها الرسمي.',
+    'workshop':          '🛠 ورشة عمل: تتطلب موافقة رسمية مسبقة من الإدارة.',
+    'secondment':        '📋 انتداب رسمي: يستلزم خطاب انتداب من الجهة المختصة.',
+    'supervision-visit': '🔍 زيارة إشرافية: أرفقي جدول الزيارة أو خطاب التكليف.',
+  };
+  if (notes[type]) {
+    note.textContent = notes[type];
+    note.style.display = 'block';
+  } else {
+    note.style.display = 'none';
+  }
 }
 
 /* ── HOURS CALCULATION ─────────────────────────────────── */
