@@ -709,7 +709,7 @@ body { /* default ar */ }
       <span class="bell-icon" id="bell">🔔</span>
       <span class="bell-badge" id="notifCount">0</span>
     </div>
-    <button class="btn btn-secondary btn-sm" onclick="toggleLang()" id="langBtn" style="padding:6px 10px;font-size:11px;flex-shrink:0">English</button>
+
   </div>
 </div>
 
@@ -742,6 +742,17 @@ body { /* default ar */ }
         <span class="ar">استكشف المنظومة</span>
         <span class="en">Explore System</span>
       </a>
+    </div>
+    <!-- Language toggle — easy to tap, inside hero -->
+    <div style="margin-top:16px">
+      <button onclick="toggleLang()" id="langBtn"
+        style="background:var(--card2);border:1px solid var(--line);
+               border-radius:20px;padding:8px 22px;
+               font-family:'Tajawal',sans-serif;font-size:13px;
+               font-weight:700;color:var(--brown);cursor:pointer;
+               transition:background .15s">
+        🌐 English
+      </button>
     </div>
   </div>
 </div>
@@ -2134,7 +2145,7 @@ function toggleLang() {
   b.classList.toggle('lang-ar', isEn);
   b.dir  = isEn ? 'rtl' : 'ltr';
   b.lang = isEn ? 'ar'  : 'en';
-  $('langBtn').textContent = isEn ? 'English' : 'عربي';
+  $('langBtn').textContent = isEn ? '🌐 English' : '🌐 عربي';
 }
 
 /* ── GOOGLE SHEETS LOGGING ────────────────────────────── */
