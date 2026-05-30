@@ -675,10 +675,10 @@ body {
 .fade-up { animation: fadeUp .5s ease forwards; }
 
 /* ── LANG SWITCH ── */
-.lang-en .ar { display: none; }
-.lang-ar .en { display: none; }
-body { /* default ar */ }
-.en { display: none; }
+/* Language display rules */
+.en { display: none; }                  /* hide EN by default (AR mode) */
+.lang-en .ar { display: none !important; }  /* hide AR when EN active */
+.lang-en .en { display: inline !important; } /* show EN when EN active */
 </style>
 </head>
 <body class="lang-ar">
@@ -2146,6 +2146,15 @@ function toggleLang() {
   b.dir  = isEn ? 'rtl' : 'ltr';
   b.lang = isEn ? 'ar'  : 'en';
   $('langBtn').textContent = isEn ? '🌐 English' : '🌐 عربي';
+
+  // Force correct display for all language elements
+  const goingEn = !isEn;
+  document.querySelectorAll('.en').forEach(el => {
+    el.style.display = goingEn ? '' : 'none';
+  });
+  document.querySelectorAll('.ar').forEach(el => {
+    el.style.display = goingEn ? 'none' : '';
+  });
 }
 
 /* ── GOOGLE SHEETS LOGGING ────────────────────────────── */
