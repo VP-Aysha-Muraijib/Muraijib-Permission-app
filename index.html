@@ -1287,73 +1287,72 @@ const CFG = {
 /* ── DATA ──────────────────────────────────────────────── */
 const DATA = {
   jobTitles: [
-    ['مديرة المدرسة',          'principal'],
-    ['مساعدة المديرة',         'vice-principal'],
-    ['HOF Arabic',             'hof-arabic'],
-    ['منسق شؤون إدارية',       'admin-coord'],
-    ['مسؤول تسجيل',            'registrar'],
-    ['أمينة سر',               'secretary'],
-    ['مساعد إداري',            'admin-assistant'],
-    ['منسق أمن وسلامة',        'safety-coord'],
-    ['اختصاصية اجتماعية',      'social-specialist'],
-    ['اختصاصية نفسية',         'psych-specialist'],
-    ['اختصاصي مصادر تعلم',    'learning-resources'],
-    ['اختصاصية مختبر',         'lab-specialist'],
-    ['معلمة - تربية إسلامية',  'teacher-islamic'],
-    ['معلمة - لغة عربية',      'teacher-arabic'],
-    ['معلمة - لغة إنجليزية',   'teacher-english'],
-    ['Teacher - English',      'teacher-english-en'],
-    ['معلمة - رياضيات',        'teacher-math'],
-    ['Teacher - Math',         'teacher-math-en'],
-    ['معلمة - علوم',            'teacher-science'],
-    ['Teacher - Science',      'teacher-science-en'],
-    ['معلمة - دراسات اجتماعية','teacher-social'],
-    ['معلمة - تقنية معلومات',  'teacher-it'],
-    ['معلمة - لغة فرنسية',     'teacher-french'],
-    ['معلمة - دراما',          'teacher-drama'],
-    ['معلمة - تربية موسيقية',  'teacher-music'],
-    ['معلمة - تربية فنية',     'teacher-art'],
-    ['معلمة - تربية رياضية',   'teacher-pe'],
-    ['Teacher - Jujitsu',      'teacher-jujitsu'],
-    ['معلمة - تربية خاصة',     'teacher-special'],
+    // Admin
+    ['مديرة المدرسة',          'School Principal',        'principal'],
+    ['مساعدة المديرة',         'Vice Principal',           'vice-principal'],
+    ['HOF Arabic',             'HOF Arabic',               'hof-arabic'],
+    ['منسق شؤون إدارية',       'Admin Coordinator',        'admin-coord'],
+    ['مسؤول تسجيل',            'Registrar',                'registrar'],
+    ['أمينة سر',               'Secretary',                'secretary'],
+    ['مساعد إداري',            'Admin Assistant',          'admin-assistant'],
+    ['منسق أمن وسلامة',        'Safety Coordinator',       'safety-coord'],
+    ['اختصاصية اجتماعية',      'Social Specialist',        'social-specialist'],
+    ['اختصاصية نفسية',         'Psychologist',             'psych-specialist'],
+    ['اختصاصي مصادر تعلم',    'Learning Resources',       'learning-resources'],
+    ['اختصاصية مختبر',         'Lab Specialist',           'lab-specialist'],
+    // Teachers — merged (no duplicates)
+    ['معلمة - تربية إسلامية',  'Teacher - Islamic Ed.',    'teacher-islamic'],
+    ['معلمة - لغة عربية',      'Teacher - Arabic',         'teacher-arabic'],
+    ['معلمة - لغة إنجليزية',   'Teacher - English',        'teacher-english'],
+    ['معلمة - رياضيات',        'Teacher - Math',           'teacher-math'],
+    ['معلمة - علوم',           'Teacher - Science',        'teacher-science'],
+    ['معلمة - دراسات اجتماعية','Teacher - Social Studies', 'teacher-social'],
+    ['معلمة - تقنية معلومات',  'Teacher - IT',             'teacher-it'],
+    ['معلمة - لغة فرنسية',     'Teacher - French',         'teacher-french'],
+    ['معلمة - دراما',          'Teacher - Drama',          'teacher-drama'],
+    ['معلمة - تربية موسيقية',  'Teacher - Music',          'teacher-music'],
+    ['معلمة - تربية فنية',     'Teacher - Art',            'teacher-art'],
+    ['معلمة - تربية رياضية',   'Teacher - PE',             'teacher-pe'],
+    ['معلمة - جيوجيتسو',       'Teacher - Jujitsu',        'teacher-jujitsu'],
+    ['معلمة - تربية خاصة',     'Teacher - Special Ed.',    'teacher-special'],
   ],
   departments: [
-    ['الإدارة والدعم',          'admin-support'],
-    ['اللغة العربية',           'arabic'],
-    ['اللغة الإنجليزية',        'english'],
-    ['الرياضيات',               'math'],
-    ['العلوم',                  'science'],
-    ['التربية الإسلامية',       'islamic'],
-    ['الدراسات الاجتماعية',     'social'],
-    ['تقنية المعلومات',         'it'],
-    ['التربية البدنية',         'pe'],
-    ['الفنون',                  'arts'],
+    ['الإدارة والدعم',    'Administration & Support', 'admin-support'],
+    ['اللغة العربية',     'Arabic Language',           'arabic'],
+    ['اللغة الإنجليزية',  'English Language',          'english'],
+    ['الرياضيات',         'Mathematics',               'math'],
+    ['العلوم',            'Science',                   'science'],
+    ['التربية الإسلامية', 'Islamic Education',         'islamic'],
+    ['الدراسات الاجتماعية','Social Studies',           'social'],
+    ['تقنية المعلومات',   'Information Technology',    'it'],
+    ['التربية البدنية',   'Physical Education',        'pe'],
+    ['الفنون',            'Arts',                      'arts'],
   ],
   permTypes: {
     personal: [
-      ['ظرف عائلي',              'family'],
-      ['موعد مستشفى',            'hospital'],
-      ['ساعة السعادة',           'happiness-hour'],
-      ['مدرسة أبنائي',           'children-school'],
-      ['موعد طبي خارج المدرسة',  'medical'],
-      ['معاملة حكومية',          'government'],
-      ['ظرف طارئ',               'emergency'],
-      ['مناسبة اجتماعية',        'social-event'],
-      ['التزام شخصي',            'personal-commitment'],
-      ['أخرى',                   'other-personal'],
+      ['ظرف عائلي',             'Family Matter',            'family'],
+      ['موعد مستشفى',           'Hospital Appointment',     'hospital'],
+      ['ساعة السعادة',          'Happiness Hour',           'happiness-hour'],
+      ['مدرسة أبنائي',          "Children's School",        'children-school'],
+      ['موعد طبي خارج المدرسة', 'Medical Appointment',      'medical'],
+      ['معاملة حكومية',         'Government Transaction',   'government'],
+      ['ظرف طارئ',              'Emergency',                'emergency'],
+      ['مناسبة اجتماعية',       'Social Occasion',          'social-event'],
+      ['التزام شخصي',           'Personal Commitment',      'personal-commitment'],
+      ['أخرى',                  'Other',                    'other-personal'],
     ],
     official: [
-      ['دورة تدريبية',           'training'],
-      ['زيارة ميدانية',          'field-visit'],
-      ['ساعات الرضاعة',          'breastfeeding'],
-      ['ورشة عمل',               'workshop'],
-      ['اجتماع رسمي',            'official-meeting'],
-      ['مهمة وزارية',            'ministry-mission'],
-      ['مؤتمر / ملتقى تربوي',   'conference'],
-      ['تحكيم / لجنة وزارية',   'committee'],
-      ['انتداب رسمي',            'secondment'],
-      ['زيارة إشرافية',          'supervision-visit'],
-      ['أخرى رسمية',             'other-official'],
+      ['دورة تدريبية',          'Training Course',          'training'],
+      ['زيارة ميدانية',         'Field Visit',              'field-visit'],
+      ['ساعات الرضاعة',         'Breastfeeding Hours',      'breastfeeding'],
+      ['ورشة عمل',              'Workshop',                 'workshop'],
+      ['اجتماع رسمي',           'Official Meeting',         'official-meeting'],
+      ['مهمة وزارية',           'Ministry Mission',         'ministry-mission'],
+      ['مؤتمر / ملتقى تربوي',  'Conference',               'conference'],
+      ['تحكيم / لجنة وزارية',  'Committee / Jury',         'committee'],
+      ['انتداب رسمي',           'Official Secondment',      'secondment'],
+      ['زيارة إشرافية',         'Supervisory Visit',        'supervision-visit'],
+      ['أخرى رسمية',            'Other (Official)',         'other-official'],
     ],
   },
   // كشف الموظفين الفعلي — مدرسة مريجب 2025/2026
@@ -1396,12 +1395,12 @@ const DATA = {
     { name:'ناعمة عبدالله الكعبي',      job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
     { name:'شمسة عزيز',                job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
     { name:'فريال فياض أحمد',          job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    { name:'Robyn Canau',              job:'Teacher - English',       dept:'اللغة الإنجليزية' },
+    { name:'Robyn Canau',              job:'معلمة - لغة إنجليزية',       dept:'اللغة الإنجليزية' },
     { name:'بشرى إمام خادم',           job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
     { name:'أمنة الشامسي',             job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
     // الرياضيات
-    { name:'Sheejamol Babu',           job:'Teacher - Math',          dept:'الرياضيات' },
-    { name:'Rahila Naseeha',           job:'Teacher - Math',          dept:'الرياضيات' },
+    { name:'Sheejamol Babu',           job:'معلمة - رياضيات',          dept:'الرياضيات' },
+    { name:'Rahila Naseeha',           job:'معلمة - رياضيات',          dept:'الرياضيات' },
     { name:'سامية يحيى',               job:'معلمة - رياضيات',        dept:'الرياضيات' },
     { name:'نمارق عبدالله',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
     { name:'أمامة الفلاسي',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
@@ -1418,7 +1417,7 @@ const DATA = {
     { name:'موزة سيف',                 job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
     // العلوم
     { name:'مها محمد النعيمي',          job:'معلمة - علوم',           dept:'العلوم' },
-    { name:'Anita Raja',               job:'Teacher - Science',       dept:'العلوم' },
+    { name:'Anita Raja',               job:'معلمة - علوم',       dept:'العلوم' },
     { name:'دارين محمد',               job:'معلمة - علوم',           dept:'العلوم' },
     { name:'صالحة السبوسي',            job:'معلمة - علوم',           dept:'العلوم' },
     { name:'فاطمة صبحي',              job:'معلمة - علوم',           dept:'العلوم' },
@@ -1438,8 +1437,8 @@ const DATA = {
     { name:'العنود عبدربه البريكي',    job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
     { name:'حمدة سيف الظاهري',        job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
     // جيوجيتسو
-    { name:'Diana Menezes',            job:'Teacher - Jujitsu',       dept:'التربية البدنية' },
-    { name:'Jaqueline',                job:'Teacher - Jujitsu',       dept:'التربية البدنية' },
+    { name:'Diana Menezes',            job:'معلمة - جيوجيتسو',       dept:'التربية البدنية' },
+    { name:'Jaqueline',                job:'معلمة - جيوجيتسو',       dept:'التربية البدنية' },
   ],
 
   recentRequests: [],   // تبدأ البيانات من 25 مايو 2026
@@ -1490,30 +1489,46 @@ function init() {
 }
 
 function populateSelects() {
-  // Job titles
+  refreshSelects();
+}
+
+function getLang() { return document.body.classList.contains('lang-en') ? 'en' : 'ar'; }
+
+function refreshSelects() {
+  const en = getLang() === 'en';
+  // Job titles — [ar, en, val]
   const jobSel = $('f_job');
-  DATA.jobTitles.forEach(([ar, val]) => {
+  const jobVal = jobSel.value;
+  jobSel.innerHTML = '';
+  DATA.jobTitles.forEach(([ar, eng, val]) => {
     const o = document.createElement('option');
-    o.value = val; o.textContent = ar;
+    o.value = val; o.textContent = en ? eng : ar;
     jobSel.appendChild(o);
   });
-  // Departments
+  if (jobVal) jobSel.value = jobVal;
+
+  // Departments — [ar, en, val]
   const deptSel = $('f_dept');
-  DATA.departments.forEach(([ar, val]) => {
+  const deptVal = deptSel.value;
+  deptSel.innerHTML = '';
+  DATA.departments.forEach(([ar, eng, val]) => {
     const o = document.createElement('option');
-    o.value = val; o.textContent = ar;
+    o.value = val; o.textContent = en ? eng : ar;
     deptSel.appendChild(o);
   });
+  if (deptVal) deptSel.value = deptVal;
+
   // Permission types
-  fillTypes('personal');
+  fillTypes(state.category);
 }
 
 function fillTypes(cat) {
+  const en  = getLang() === 'en';
   const sel = $('f_type');
   sel.innerHTML = '';
-  DATA.permTypes[cat].forEach(([ar, val]) => {
+  DATA.permTypes[cat].forEach(([ar, eng, val]) => {
     const o = document.createElement('option');
-    o.value = val; o.textContent = ar;
+    o.value = val; o.textContent = en ? eng : ar;
     sel.appendChild(o);
   });
 }
@@ -2155,6 +2170,9 @@ function toggleLang() {
   document.querySelectorAll('.ar').forEach(el => {
     el.style.display = goingEn ? 'none' : '';
   });
+
+  // Refresh all selects with correct language
+  refreshSelects();
 }
 
 /* ── GOOGLE SHEETS LOGGING ────────────────────────────── */
