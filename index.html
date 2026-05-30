@@ -66,28 +66,47 @@ body {
   border-bottom: 1px solid var(--line);
   display: flex; align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  height: 56px;
+  padding: 0 14px;
+  height: 52px;
   box-shadow: var(--shadow);
+  gap: 8px;
 }
 .topbar-brand {
-  display: flex; align-items: center; gap: 10px;
-  font-weight: 700; font-size: 15px; color: var(--brown);
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: 13px; color: var(--brown);
+  flex-shrink: 0;
 }
 .topbar-brand .dot {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
   background: var(--gold); flex-shrink: 0;
 }
-.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.topbar-actions {
+  display: flex; align-items: center; gap: 6px;
+  flex: 1; justify-content: flex-end;
+  min-width: 0;
+}
 .topbar-nav {
-  display: flex; gap: 4px;
+  display: flex; gap: 2px;
+  overflow: hidden;
 }
 .topbar-nav a {
-  font-size: 12px; color: var(--brown-m); text-decoration: none;
-  padding: 5px 10px; border-radius: 8px; transition: background .15s;
+  font-size: 11px; color: var(--brown-m); text-decoration: none;
+  padding: 5px 8px; border-radius: 8px; transition: background .15s;
   white-space: nowrap;
 }
 .topbar-nav a:hover { background: var(--card2); color: var(--brown); }
+/* Mobile: hide nav labels, keep icons compact */
+@media (max-width: 480px) {
+  .topbar { padding: 0 10px; height: 50px; }
+  .topbar-brand { font-size: 12px; }
+  .topbar-brand .dot { display: none; }
+  .topbar-nav a { font-size: 11px; padding: 4px 6px; }
+  .bell-wrap { width: 36px; height: 36px; }
+  .bell-icon { font-size: 18px; }
+}
+@media (max-width: 360px) {
+  .topbar-nav { display: none; }
+}
 
 /* ── GOLD TOP STRIP ── */
 .gold-strip {
@@ -99,7 +118,7 @@ body {
 .hero {
   background: var(--card);
   border-bottom: 1px solid var(--line);
-  padding: 52px 24px 48px;
+  padding: 44px 24px 44px;
   text-align: center;
   position: relative; overflow: hidden;
 }
@@ -409,9 +428,10 @@ body {
 .bell-wrap {
   position: relative; display: inline-flex;
   align-items: center; justify-content: center;
-  width: 44px; height: 44px;
+  width: 36px; height: 36px;
+  flex-shrink: 0;
 }
-.bell-icon { font-size: 22px; cursor: pointer; transition: transform .2s; }
+.bell-icon { font-size: 20px; cursor: pointer; transition: transform .2s; }
 .bell-icon.ring { animation: ring .5s ease 3; }
 @keyframes ring {
   0%,100%{transform:rotate(0)} 20%{transform:rotate(-18deg)} 60%{transform:rotate(18deg)} 80%{transform:rotate(-10deg)}
@@ -689,7 +709,7 @@ body { /* default ar */ }
       <span class="bell-icon" id="bell">🔔</span>
       <span class="bell-badge" id="notifCount">0</span>
     </div>
-    <button class="btn btn-secondary btn-sm" onclick="toggleLang()" id="langBtn">English</button>
+    <button class="btn btn-secondary btn-sm" onclick="toggleLang()" id="langBtn" style="padding:6px 10px;font-size:11px;flex-shrink:0">English</button>
   </div>
 </div>
 
@@ -1172,7 +1192,7 @@ body { /* default ar */ }
 
     <div class="confirm-q">
       <div class="ql">
-        <span class="ar">1. هل اطّلعت على سياسة وزارة التربية والتعليم للاستئذان؟</span>
+        <span class="ar">1. هل تم إدخال الاستئذان في المنظومة الرسمية لوزارة التربية والتعليم؟</span>
         <span class="en">1. Have you reviewed the Ministry of Education leave policy?</span>
       </div>
       <div class="confirm-btns">
