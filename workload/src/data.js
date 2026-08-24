@@ -132,7 +132,10 @@ window.APP = window.APP || {};
         { teacher:'Suhaila Alketbi', sections: R(6,1,7).concat(['6/ADV','7/4']) },
         { teacher:'Hessa Alahbabi',  sections: R(8,1,6).concat(['7/5','7/6','7/7']) }
       ] },
-    pe:         { coordinator:'', rows: [] },
+    pe:         { coordinator:'', rows: [
+        { teacher:'دعاء مصطفى', sections: R(5,1,7).concat(R(7,1,7)) },
+        { teacher:'سندس',       sections: R(6,1,7).concat(['6/ADV'], R(8,1,6)) }
+      ] },
     arts:       { coordinator:'', rows: [] },
     /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في
        المصدر فقُسِّمت 3 + 4 بحيث تبقى كل معلمة في صفّين متقاربين.               */
