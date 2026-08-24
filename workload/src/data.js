@@ -38,7 +38,7 @@ window.APP = window.APP || {};
     { id:'science',    nameAr:'العلوم',                                 nameEn:'Science',             periods:{general:6, advanced:7} },
     { id:'ai_tech',    nameAr:'الذكاء الاصطناعي والتكنولوجيا (CCDI)',   nameEn:'AI & Technology (CCDI)', periods:{general:2, advanced:2} },
     { id:'pe',         nameAr:'التربية البدنية والصحية',                nameEn:'Physical & Health Ed',periods:{general:2, advanced:2} },
-    { id:'arts',       nameAr:'الفنون (بصرية وموسيقية ومسرح)',          nameEn:'Arts',                periods:{general:2, advanced:1} },
+    { id:'arts',       nameAr:'الفنون (بصرية وسمعية ودراما)',            nameEn:'Arts',                periods:{general:2, advanced:1}, rotating:true },
     { id:'french',     nameAr:'اللغة الفرنسية (اللغة الثالثة)',          nameEn:'French — Third Language',  periods:{general:2, advanced:2}, grades:[6,7,8] },
     { id:'chinese',    nameAr:'اللغة الصينية (اللغة الثالثة)',           nameEn:'Chinese — Third Language', periods:{general:2, advanced:2}, grades:[5] }
   ];
@@ -138,15 +138,22 @@ window.APP = window.APP || {};
         { teacher:'دعاء مصطفى', sections: R(5,1,7).concat(R(7,1,7)) },
         { teacher:'سندس',       sections: R(6,1,7).concat(['6/ADV'], R(8,1,6)) }
       ] },
-    /* الفنون — معلمة واحدة تُدرّس جميع صفوف المدرسة (28 شعبة) بالتبادل بين
-       الفنون البصرية والموسيقية والدراما. الاسم لم يُزوَّد بعد.                 */
+    /* الفنون — ثلاث معلمات بتخصّصات مختلفة وتناوب أسبوعي على الشعب نفسها.
+       حصتا الشعبة تُتقاسَمان بين معلمات التخصّصات المتاحة لذلك الصف،
+       فالنصاب المعروض هو حصّة كل معلمة من التناوب (المجموع 55 حصة).
+       الدراما للصفوف العليا (السابع والثامن) فقط.                             */
     arts:       { coordinator:'',
-      note:'تُدرَّس بالتبادل بين الفنون البصرية والموسيقية والدراما على مدار العام لجميع صفوف المدرسة.',
+      note:'تناوب أسبوعي: حصتا الفنون لكل شعبة تُتقاسَم بين معلمات التخصّصات. البصرية والسمعية لجميع الصفوف، والدراما للصفين السابع والثامن.',
       rows: [
-        { teacher:'(معلمة الفنون — لم يُحدَّد الاسم)',
-          sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)),
-          note:'جميع صفوف المدرسة — تدريس تبادلي بين الفنون البصرية والموسيقية والدراما' }
+        { teacher:'أمل القبيسي', role:'الفنون البصرية',
+          sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) },
+        { teacher:'جيهان', role:'الفنون السمعية',
+          sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) },
+        { teacher:'صابرين', role:'الدراما',
+          sections: R(7,1,7).concat(R(8,1,6)),
+          note:'الصفوف العليا فقط (السابع والثامن)' }
       ] },
+
     /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في
        المصدر فقُسِّمت 3 + 4 بحيث تبقى كل معلمة في صفّين متقاربين.               */
     french:     { coordinator:'',

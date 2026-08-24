@@ -78,12 +78,34 @@ window.APP = window.APP || {};
   /* التحليل الكامل لمادة واحدة */
   function analyze(subject) {
     const d = DIST[subject.id] || { rows: [] };
-    const rows = (d.rows || []).map(r => {
-      const secs = (r.sections || []).filter(id => sectionById[id]);
-      const load = secs.reduce((s, id) => s + periodsOf(subject, id), 0);
-      return { teacher: r.teacher, note: r.note || '', isNew: !!r.isNew,
-               vacancy: !!r.vacancy, sections: secs, load: load };
+    const rotating = !!subject.rotating;
+
+    const rows = (d.rows || []).map(r => ({
+      teacher: r.teacher, note: r.note || '', role: r.role || '',
+      isNew: !!r.isNew, vacancy: !!r.vacancy,
+      sections: (r.sections || []).filter(id => sectionById[id])
+    }));
+
+    /* في المواد التبادلية تُتقاسَم حصص الشعبة بين معلمات التخصّصات */
+    const share = {};
+    rows.forEach(r => r.sections.forEach(id => { share[id] = (share[id] || 0) + 1; }));
+    rows.forEach(r => {
+      r.load = r.sections.reduce((s, id) =>
+        s + periodsOf(subject, id) / (rotating ? (share[id] || 1) : 1), 0);
     });
+
+    /* تقريب حصص التناوب إلى أعداد صحيحة يبقى مجموعها مطابقاً للمطلوب */
+    if (rotating) {
+      const exactTotal = Object.keys(share)
+        .reduce((s, id) => s + periodsOf(subject, id), 0);
+      const floors = rows.map(r => Math.floor(r.load));
+      let rem = exactTotal - floors.reduce((x, y) => x + y, 0);
+      const byFrac = rows.map((r, i) => ({ i: i, f: r.load - Math.floor(r.load) }))
+        .sort((x, y) => y.f - x.f);
+      const out = floors.slice();
+      for (let k = 0; k < byFrac.length && rem > 0; k++) { out[byFrac[k].i]++; rem--; }
+      rows.forEach((r, i) => { r.exactLoad = r.load; r.load = out[i]; });
+    }
 
     const applicable = applicableSections(subject);
     const totalRequired = applicable.reduce((s, sec) => s + periodsOf(subject, sec.id), 0);
@@ -107,7 +129,7 @@ window.APP = window.APP || {};
     /* الشعب غير المسندة + المكرّرة */
     const seen = {}, covered = {}, dup = [];
     rows.forEach(r => r.sections.forEach(id => {
-      if (seen[id]) dup.push(id); else seen[id] = r.teacher;
+      if (seen[id] && !rotating) dup.push(id); else seen[id] = r.teacher;
       if (!r.vacancy) covered[id] = r.teacher;
     }));
     const uncovered = applicable.filter(s => !covered[s.id]).map(s => s.id);
@@ -115,7 +137,7 @@ window.APP = window.APP || {};
       .reduce((s, r) => s + r.load, 0);
 
     return {
-      subject, rows, totalRequired, assigned,
+      subject, rows, totalRequired, assigned, rotating,
       avg, max, min, deptFairness, uncovered, duplicates: dup, vacancyPeriods,
       coordinator: d.coordinator || '', note: d.note || '',
       sectionsCount: applicable.length,
@@ -165,6 +187,7 @@ window.APP = window.APP || {};
           '<td class="c-num">' + (i + 1) + '</td>' +
           '<td class="c-name' + (r.vacancy ? ' is-vac' : '') + '">' + esc(r.teacher) +
             (r.isNew ? '<span class="tag-new">جديدة</span>' : '') +
+            (r.role ? '<span class="row-role">' + esc(r.role) + '</span>' : '') +
             (r.note ? '<span class="row-note">' + esc(r.note) + '</span>' : '') + '</td>' +
           '<td class="c-grade">' + esc(gradeNames(r.sections) || '—') + '</td>' +
           '<td class="c-sec">' + (formatSections(r.sections).map(esc).join('<br>') || '—') + '</td>' +
@@ -198,6 +221,11 @@ window.APP = window.APP || {};
         over.map(r => esc(r.teacher) + ' — ' + r.load + ' حصة').join(' · ') +
         ' &nbsp;(المعيار ' + std + ' حصة). القسم يحتاج تقريباً ' +
         (Math.ceil(a.assigned / std)) + ' معلمة لتغطية ' + a.assigned + ' حصة.</div>');
+    const under = a.rows.filter(r => !r.vacancy && r.load > 0 && r.load < std / 2);
+    if (under.length)
+      warn.push('<div class="note-box"><b>نصاب منخفض:</b> ' +
+        under.map(r => esc(r.teacher) + ' — ' + r.load + ' حصة').join(' · ') +
+        ' &nbsp;(المعيار ' + std + ' حصة) — يُستكمل بشعب إضافية أو بمهام مدرسية أخرى.</div>');
     if (a.note) warn.push('<div class="note-box">' + esc(a.note) + '</div>');
 
     return '' +
@@ -224,6 +252,7 @@ window.APP = window.APP || {};
     '<span><b>الموزّع:</b> ' + a.assigned + '</span>' +
     '<span><b>متوسط النصاب:</b> ' + (a.avg ? (Math.round(a.avg * 10) / 10) : '—') + '</span>' +
     '<span><b>عدالة القسم:</b> ' + pct(a.deptFairness) + '</span>' +
+    (a.rotating ? '<span><b>التوزيع:</b> تبادلي أسبوعي</span>' : '') +
   '</div>' +
   '<table class="grid">' +
     '<thead><tr>' +
@@ -327,7 +356,7 @@ window.APP = window.APP || {};
     rows.push(['', '', '', '', '', '', '']);
     rows.push([H('م'), H('اسم المعلمة'), H('المرحلة'), H('الشعب'), H('النصاب'), H('نسبة العدالة'), H('التوقيع')]);
     a.rows.forEach((r, i) => rows.push([
-      i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر: الحاجة إلى معلمة إضافية' : ''),
+      i + 1, r.teacher + (r.role ? ' — ' + r.role : '') + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر: الحاجة إلى معلمة إضافية' : ''),
       gradeNames(r.sections), formatSections(r.sections).join(' · '),
       { v: r.load, style: 'num' },
       { v: r.fairness == null ? '—' : Math.round(r.fairness * 10) / 10 + '%', style: 'num' },
@@ -401,7 +430,7 @@ window.APP = window.APP || {};
     const lines = ['﻿' + ['المادة', 'م', 'اسم المعلمة', 'المرحلة', 'الشعب', 'النصاب', 'نسبة العدالة'].map(q).join(',')];
     list.forEach(s => {
       const a = analyze(s);
-      a.rows.forEach((r, i) => lines.push([s.nameAr, i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر' : ''), gradeNames(r.sections),
+      a.rows.forEach((r, i) => lines.push([s.nameAr, i + 1, r.teacher + (r.role ? ' — ' + r.role : '') + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر' : ''), gradeNames(r.sections),
         formatSections(r.sections).join(' · '), r.load,
         r.fairness == null ? '' : Math.round(r.fairness * 10) / 10 + '%'].map(q).join(',')));
       lines.push([s.nameAr, '', 'المجموع', '', '', a.assigned,

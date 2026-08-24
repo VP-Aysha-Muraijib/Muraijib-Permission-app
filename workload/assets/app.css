@@ -110,6 +110,7 @@ table.grid tbody tr:nth-child(even) td{background:#FCFAF7}
 }
 .ed-new{display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--brown-m); white-space:nowrap}
 .ed-new input{width:15px; height:15px; accent-color:var(--mauve)}
+.row-role{display:block; font-weight:600; font-size:11.5px; color:var(--mauve); margin-top:2px}
 .row-note{display:block; font-weight:500; font-size:11.5px; color:var(--red); margin-top:3px}
 .f-ok{color:var(--green); background:var(--green-bg) !important}
 .f-mid{color:var(--amber); background:var(--amber-bg) !important}
