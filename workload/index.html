@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توزيع الأنصبة التدريسية — مدرسة مريجب ح2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<header class="topbar no-print">
+  <div class="brand">
+    <b id="school">مدرسة مريجب للتعليم الأساسي ح2</b>
+    <span>توزيع الأنصبة التدريسية · العام الدراسي <span id="year">2026 - 2027</span></span>
+  </div>
+  <button class="btn primary" id="btn-print">طباعة / حفظ PDF</button>
+  <button class="btn" id="btn-xlsx">تصدير Excel</button>
+  <button class="btn" id="btn-csv">تصدير CSV</button>
+  <button class="btn danger" id="btn-reset">استعادة الأصل</button>
+</header>
+
+<div class="wrap">
+  <nav id="nav" class="no-print"></nav>
+  <main id="pages"></main>
+</div>
+
+<dialog id="editor">
+  <div class="ed-head">
+    <h3 id="ed-title">تعديل التوزيع</h3>
+    <button class="btn sm" id="ed-add">+ إضافة معلمة</button>
+  </div>
+  <div class="ed-scroll"><div id="ed-body"></div></div>
+  <div class="ed-foot">
+    <div class="grow">
+      <label for="ed-coord">منسّقة القسم:</label>
+      <input id="ed-coord" placeholder="اسم المنسّقة">
+    </div>
+    <button class="btn" id="ed-cancel">إلغاء</button>
+    <button class="btn primary" id="ed-save">حفظ</button>
+  </div>
+</dialog>
+
+<script src="src/data.js"></script>
+<script src="src/xlsx.js"></script>
+<script src="src/app.js"></script>
+<script>window.APP.boot();</script>
+</body>
+</html>
