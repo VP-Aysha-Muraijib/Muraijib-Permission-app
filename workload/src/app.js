@@ -191,6 +191,13 @@ window.APP = window.APP || {};
         a.uncovered.reduce((s, id) => s + periodsOf(subject, id), 0) + ' حصة.</div>');
     if (a.duplicates.length)
       warn.push('<div class="warn"><b>شعب مكرّرة:</b> ' + esc(sectionLabels(a.duplicates)) + '</div>');
+    const std = A.SCHOOL.standardLoad || 24;
+    const over = a.rows.filter(r => !r.vacancy && r.load > (A.SCHOOL.overloadThreshold || 30));
+    if (over.length)
+      warn.push('<div class="warn"><b>نصاب مرتفع جداً:</b> ' +
+        over.map(r => esc(r.teacher) + ' — ' + r.load + ' حصة').join(' · ') +
+        ' &nbsp;(المعيار ' + std + ' حصة). القسم يحتاج تقريباً ' +
+        (Math.ceil(a.assigned / std)) + ' معلمة لتغطية ' + a.assigned + ' حصة.</div>');
     if (a.note) warn.push('<div class="note-box">' + esc(a.note) + '</div>');
 
     return '' +
