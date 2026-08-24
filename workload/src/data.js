@@ -103,8 +103,8 @@ window.APP = window.APP || {};
     science: {
       coordinator: '',
       rows: [
-        { teacher:'صالحة', sections: R(5,1,4) },
-        { teacher:'هند',   sections: ['5/5','5/6','5/7','6/ADV'] },
+        { teacher:'هند زيدان',    sections: ['5/1','5/2','5/3','6/ADV'] },
+        { teacher:'صالحة السبوسي', sections: ['5/4','5/5','5/6','5/7'] },
         { teacher:'دارين', sections: R(6,1,4) },
         { teacher:'فاطمة', sections: ['6/5','7/5','7/6','7/7'] },
         { teacher:'أنيثا', sections: R(7,1,4) },
