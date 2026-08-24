@@ -31,9 +31,17 @@ window.APP = window.APP || {};
   const sectionById = {};
   A.SECTIONS.forEach(s => sectionById[s.id] = s);
 
+  /* الشعب التي تُدرَّس فيها المادة (بعض المواد لا تُدرَّس في كل الصفوف) */
+  function appliesTo(subject, sec) {
+    return !subject.grades || subject.grades.indexOf(sec.grade) >= 0;
+  }
+  function applicableSections(subject) {
+    return A.SECTIONS.filter(sec => appliesTo(subject, sec));
+  }
+
   function periodsOf(subject, sectionId) {
     const sec = sectionById[sectionId];
-    if (!sec) return 0;
+    if (!sec || !appliesTo(subject, sec)) return 0;
     return sec.track === 'advanced' ? subject.periods.advanced : subject.periods.general;
   }
 
@@ -73,19 +81,21 @@ window.APP = window.APP || {};
     const rows = (d.rows || []).map(r => {
       const secs = (r.sections || []).filter(id => sectionById[id]);
       const load = secs.reduce((s, id) => s + periodsOf(subject, id), 0);
-      return { teacher: r.teacher, note: r.note || '', isNew: !!r.isNew, sections: secs, load: load };
+      return { teacher: r.teacher, note: r.note || '', isNew: !!r.isNew,
+               vacancy: !!r.vacancy, sections: secs, load: load };
     });
 
-    const totalRequired = A.SECTIONS.reduce((s, sec) => s + periodsOf(subject, sec.id), 0);
-    const assigned = rows.reduce((s, r) => s + r.load, 0);
-    const withLoad = rows.filter(r => r.load > 0);
+    const applicable = applicableSections(subject);
+    const totalRequired = applicable.reduce((s, sec) => s + periodsOf(subject, sec.id), 0);
+    const assigned = rows.reduce((s, r) => s + (r.vacancy ? 0 : r.load), 0);
+    const withLoad = rows.filter(r => r.load > 0 && !r.vacancy);
     const avg = withLoad.length ? assigned / withLoad.length : 0;
     const loads = withLoad.map(r => r.load);
     const max = loads.length ? Math.max.apply(null, loads) : 0;
     const min = loads.length ? Math.min.apply(null, loads) : 0;
 
     rows.forEach(r => {
-      r.fairness = (avg > 0 && r.load > 0)
+      r.fairness = (avg > 0 && r.load > 0 && !r.vacancy)
         ? Math.max(0, 1 - Math.abs(r.load - avg) / avg) * 100
         : null;
     });
@@ -95,17 +105,23 @@ window.APP = window.APP || {};
       : (loads.length === 1 ? 100 : null);
 
     /* الشعب غير المسندة + المكرّرة */
-    const seen = {}, dup = [];
+    const seen = {}, covered = {}, dup = [];
     rows.forEach(r => r.sections.forEach(id => {
       if (seen[id]) dup.push(id); else seen[id] = r.teacher;
+      if (!r.vacancy) covered[id] = r.teacher;
     }));
-    const uncovered = A.SECTIONS.filter(s => !seen[s.id]).map(s => s.id);
+    const uncovered = applicable.filter(s => !covered[s.id]).map(s => s.id);
+    const vacancyPeriods = rows.filter(r => r.vacancy)
+      .reduce((s, r) => s + r.load, 0);
 
     return {
       subject, rows, totalRequired, assigned,
-      avg, max, min, deptFairness, uncovered, duplicates: dup,
+      avg, max, min, deptFairness, uncovered, duplicates: dup, vacancyPeriods,
       coordinator: d.coordinator || '', note: d.note || '',
-      sectionsCount: A.SECTIONS.length
+      sectionsCount: applicable.length,
+      gradesLabel: subject.grades
+        ? subject.grades.map(g => A.GRADE_NAME[g]).join(' · ')
+        : 'الصفوف 5 - 8'
     };
   }
 
@@ -147,12 +163,12 @@ window.APP = window.APP || {};
       ? a.rows.map((r, i) =>
           '<tr>' +
           '<td class="c-num">' + (i + 1) + '</td>' +
-          '<td class="c-name">' + esc(r.teacher) +
+          '<td class="c-name' + (r.vacancy ? ' is-vac' : '') + '">' + esc(r.teacher) +
             (r.isNew ? '<span class="tag-new">جديدة</span>' : '') +
             (r.note ? '<span class="row-note">' + esc(r.note) + '</span>' : '') + '</td>' +
           '<td class="c-grade">' + esc(gradeNames(r.sections) || '—') + '</td>' +
           '<td class="c-sec">' + (formatSections(r.sections).map(esc).join('<br>') || '—') + '</td>' +
-          '<td class="c-load">' + r.load + '</td>' +
+          '<td class="c-load' + (r.vacancy ? ' is-vac' : '') + '">' + r.load + '</td>' +
           '<td class="c-fair ' + fairClass(r.fairness) + '">' + pct(r.fairness) + '</td>' +
           '<td class="c-sign"></td>' +
           '</tr>').join('')
@@ -161,7 +177,8 @@ window.APP = window.APP || {};
 
     const totals = a.rows.length
       ? '<tr class="tr-total">' +
-        '<td colspan="4">المجموع — ' + a.rows.filter(r => r.load > 0).length + ' معلمة</td>' +
+        '<td colspan="4">المجموع — ' + a.rows.filter(r => r.load > 0 && !r.vacancy).length + ' معلمة' +
+          (a.vacancyPeriods ? ' &nbsp;·&nbsp; شاغر (*): ' + a.vacancyPeriods + ' حصة' : '') + '</td>' +
         '<td class="c-load">' + a.assigned + '</td>' +
         '<td class="c-fair ' + fairClass(a.deptFairness) + '">' + pct(a.deptFairness) + '</td>' +
         '<td></td></tr>'
@@ -194,6 +211,7 @@ window.APP = window.APP || {};
     '<br><span>للعام الدراسي ' + esc(A.SCHOOL.year) + '</span></h2>' +
   '<div class="meta-strip">' +
     '<span><b>حصص الشعبة:</b> ' + perGen + (perAdv !== perGen ? ' (المتقدّم ' + perAdv + ')' : '') + '</span>' +
+    '<span><b>الصفوف:</b> ' + esc(a.gradesLabel) + '</span>' +
     '<span><b>عدد الشعب:</b> ' + a.sectionsCount + '</span>' +
     '<span><b>إجمالي الحصص المطلوبة:</b> ' + a.totalRequired + '</span>' +
     '<span><b>الموزّع:</b> ' + a.assigned + '</span>' +
@@ -232,7 +250,7 @@ window.APP = window.APP || {};
       $('#ed-title').textContent = 'تعديل توزيع — ' + subject.nameAr;
       $('#ed-body').innerHTML = d.rows.map((r, i) => {
         const t = taken(i);
-        const grid = A.SECTIONS.map(sec => {
+        const grid = applicableSections(subject).map(sec => {
           const on = (r.sections || []).indexOf(sec.id) >= 0;
           const busy = !on && t[sec.id];
           return '<label class="chip' + (on ? ' on' : '') + (busy ? ' busy' : '') + '"' +
@@ -247,6 +265,8 @@ window.APP = window.APP || {};
             '<input class="ed-name" data-row="' + i + '" value="' + esc(r.teacher || '') + '" placeholder="اسم المعلمة">' +
             '<label class="ed-new"><input type="checkbox" class="ed-isnew" data-row="' + i + '"' +
               (r.isNew ? ' checked' : '') + '> جديدة</label>' +
+            '<label class="ed-new"><input type="checkbox" class="ed-isvac" data-row="' + i + '"' +
+              (r.vacancy ? ' checked' : '') + '> شاغر (*)</label>' +
             '<span class="ed-load">النصاب: <b>' + load + '</b></span>' +
             '<button class="btn sm danger" data-del="' + i + '">حذف</button>' +
           '</div>' +
@@ -270,6 +290,8 @@ window.APP = window.APP || {};
         if (!el.checked && at >= 0) arr.splice(at, 1);
         arr.sort(cmpSection);
         draw();
+      } else if (el.classList.contains('ed-isvac')) {
+        d.rows[Number(el.getAttribute('data-row'))].vacancy = el.checked;
       } else if (el.classList.contains('ed-isnew')) {
         d.rows[Number(el.getAttribute('data-row'))].isNew = el.checked;
       } else if (el.classList.contains('ed-name')) {
@@ -298,7 +320,8 @@ window.APP = window.APP || {};
     rows.push(['', '', '', '', '', '', '']);
     rows.push([H('م'), H('اسم المعلمة'), H('المرحلة'), H('الشعب'), H('النصاب'), H('نسبة العدالة'), H('التوقيع')]);
     a.rows.forEach((r, i) => rows.push([
-      i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : ''), gradeNames(r.sections), formatSections(r.sections).join(' · '),
+      i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر: الحاجة إلى معلمة إضافية' : ''),
+      gradeNames(r.sections), formatSections(r.sections).join(' · '),
       { v: r.load, style: 'num' },
       { v: r.fairness == null ? '—' : Math.round(r.fairness * 10) / 10 + '%', style: 'num' },
       ''
@@ -371,7 +394,7 @@ window.APP = window.APP || {};
     const lines = ['﻿' + ['المادة', 'م', 'اسم المعلمة', 'المرحلة', 'الشعب', 'النصاب', 'نسبة العدالة'].map(q).join(',')];
     list.forEach(s => {
       const a = analyze(s);
-      a.rows.forEach((r, i) => lines.push([s.nameAr, i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : ''), gradeNames(r.sections),
+      a.rows.forEach((r, i) => lines.push([s.nameAr, i + 1, r.teacher + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر' : ''), gradeNames(r.sections),
         formatSections(r.sections).join(' · '), r.load,
         r.fairness == null ? '' : Math.round(r.fairness * 10) / 10 + '%'].map(q).join(',')));
       lines.push([s.nameAr, '', 'المجموع', '', '', a.assigned,
@@ -404,7 +427,7 @@ window.APP = window.APP || {};
     $('#school').textContent = A.SCHOOL.nameAr;
   }
 
-  A._internal = { analyze, formatSections, gradeNames, sectionLabels, periodsOf,
+  A._internal = { analyze, formatSections, gradeNames, sectionLabels, periodsOf, applicableSections,
                   sheetFor, summarySheet, setDist: d => { DIST = d; }, getDist: () => DIST };
   A.boot = boot;
 })(window.APP);

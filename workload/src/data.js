@@ -37,7 +37,8 @@ window.APP = window.APP || {};
     { id:'ai_tech',    nameAr:'الذكاء الاصطناعي والتكنولوجيا (CCDI)',   nameEn:'AI & Technology (CCDI)', periods:{general:2, advanced:2} },
     { id:'pe',         nameAr:'التربية البدنية والصحية',                nameEn:'Physical & Health Ed',periods:{general:2, advanced:2} },
     { id:'arts',       nameAr:'الفنون (بصرية وموسيقية ومسرح)',          nameEn:'Arts',                periods:{general:2, advanced:1} },
-    { id:'third_lang', nameAr:'اللغة الثالثة',                          nameEn:'Third Language',      periods:{general:2, advanced:2} }
+    { id:'french',     nameAr:'اللغة الفرنسية (اللغة الثالثة)',          nameEn:'French — Third Language',  periods:{general:2, advanced:2}, grades:[6,7,8] },
+    { id:'chinese',    nameAr:'اللغة الصينية (اللغة الثالثة)',           nameEn:'Chinese — Third Language', periods:{general:2, advanced:2}, grades:[5] }
   ];
 
   /* مساعد: توليد مدى شعب */
@@ -90,7 +91,9 @@ window.APP = window.APP || {};
         { teacher:'شمسة',                sections: R(7,1,5) },
         { teacher:'آمنة',                sections: ['6/4','6/5','6/6','6/7'] },
         { teacher:'فريال فياض',          sections: ['8/3','8/4','6/ADV'], note:'منسقة القسم' },
-        { teacher:'روبين',               sections: R(5,1,5) }
+        { teacher:'روبين',               sections: R(5,1,5) },
+        { teacher:'*', vacancy:true, sections: ['8/5','8/6'],
+          note:'الحاجة إلى معلمة إضافية لتغطية هاتين الشعبتين' }
       ]
     },
 
@@ -122,7 +125,21 @@ window.APP = window.APP || {};
       ] },
     pe:         { coordinator:'', rows: [] },
     arts:       { coordinator:'', rows: [] },
-    third_lang: { coordinator:'', rows: [] }
+    /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في
+       المصدر فقُسِّمت 3 + 4 بحيث تبقى كل معلمة في صفّين متقاربين.               */
+    french:     { coordinator:'',
+      note:'تُدرَّس للصفوف السادس والسابع والثامن. أرقام شعب الصف السابع وُزّعت بالتسلسل لعدم تحديدها في المصدر.',
+      rows: [
+        { teacher:'هيبة',  sections: R(6,1,7).concat(['6/ADV','7/1','7/2','7/3']) },
+        { teacher:'حكيمة', sections: R(8,1,6).concat(['7/4','7/5','7/6','7/7']) }
+      ] },
+
+    /* اللغة الصينية — الصف الخامس فقط (7 شعب). اسم المعلمة لم يُزوَّد بعد. */
+    chinese:    { coordinator:'',
+      note:'تُدرَّس للصف الخامس فقط. اسم المعلمة لم يُزوَّد بعد — يُضاف من زر «تعديل».',
+      rows: [
+        { teacher:'(معلمة اللغة الصينية — لم يُحدَّد الاسم)', sections: R(5,1,7) }
+      ] }
   };
 
 })(window.APP);
