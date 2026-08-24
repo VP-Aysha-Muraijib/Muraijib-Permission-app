@@ -212,9 +212,11 @@ dialog#editor::backdrop{background:rgba(43,31,23,.5)}
   table.grid thead th{padding:7px 5px; font-size:12px}
   table.grid td{padding:6px 7px}
   .c-load{font-size:14px}
+  .c-sec{line-height:1.7}
+  .doc-title{margin:14px 0 4px}
   .c-fair{font-size:11.5px}
-  .warn,.note-box{font-size:10.5px; padding:7px 11px; margin-top:9px}
-  .sheet-foot{margin-top:22px; font-size:11.5px}
+  .warn,.note-box{font-size:10.5px; padding:6px 11px; margin-top:7px; line-height:1.6}
+  .sheet-foot{margin-top:16px; font-size:11.5px}
   .sign-role{font-size:12px}
   table.grid,tr,thead{break-inside:avoid}
 }
