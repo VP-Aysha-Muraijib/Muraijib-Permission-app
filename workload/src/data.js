@@ -62,7 +62,8 @@ window.APP = window.APP || {};
     },
 
     arabic: {
-      coordinator: 'حليمة البلوشي — رئيسة المواد العربية',
+      coordinator: '',
+      subjectsHead: 'حليمة البلوشي',
       rows: [
         { teacher:'شيخة الشامسي',  sections: R(8,1,4) },
         { teacher:'منى الظاهري',   sections: ['8/5','8/6','6/1','6/2'] },

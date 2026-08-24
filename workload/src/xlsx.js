@@ -135,7 +135,7 @@ window.APP = window.APP || {};
     return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
       '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
       '<sheetViews><sheetView' + (sheet.rtl !== false ? ' rightToLeft="1"' : '') +
-      ' workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="19"/>' +
+      ' workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="21"/>' +
       (cols ? '<cols>' + cols + '</cols>' : '') +
       '<sheetData>' + rows + '</sheetData>' + merges +
       '<pageMargins left="0.4" right="0.4" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>' +
@@ -148,22 +148,22 @@ window.APP = window.APP || {};
     '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
     '<fonts count="5">' +
       '<font><sz val="11"/><name val="Arial"/></font>' +
-      '<font><b/><sz val="12"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>' +
+      '<font><b/><sz val="12.5"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>' +
       '<font><b/><sz val="11"/><name val="Arial"/></font>' +
-      '<font><sz val="11"/><color rgb="FF9A3412"/><name val="Arial"/></font>' +
-      '<font><b/><sz val="14"/><color rgb="FF3D2B1F"/><name val="Arial"/></font>' +
+      '<font><sz val="11"/><color rgb="FF8C2F12"/><name val="Arial"/></font>' +
+      '<font><b/><sz val="15"/><color rgb="FF2B1F17"/><name val="Arial"/></font>' +
     '</fonts>' +
     '<fills count="6">' +
       '<fill><patternFill patternType="none"/></fill>' +
       '<fill><patternFill patternType="gray125"/></fill>' +
-      '<fill><patternFill patternType="solid"><fgColor rgb="FF8B6B6B"/><bgColor indexed="64"/></patternFill></fill>' +
-      '<fill><patternFill patternType="solid"><fgColor rgb="FFEDE5DC"/><bgColor indexed="64"/></patternFill></fill>' +
-      '<fill><patternFill patternType="solid"><fgColor rgb="FFF0DFA8"/><bgColor indexed="64"/></patternFill></fill>' +
-      '<fill><patternFill patternType="solid"><fgColor rgb="FFFDECEC"/><bgColor indexed="64"/></patternFill></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FF4A3728"/><bgColor indexed="64"/></patternFill></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFF7F3ED"/><bgColor indexed="64"/></patternFill></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFEFE2BE"/><bgColor indexed="64"/></patternFill></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFFBEBE7"/><bgColor indexed="64"/></patternFill></fill>' +
     '</fills>' +
     '<borders count="2"><border/>' +
-      '<border><left style="thin"><color rgb="FFBBB0A6"/></left><right style="thin"><color rgb="FFBBB0A6"/></right>' +
-      '<top style="thin"><color rgb="FFBBB0A6"/></top><bottom style="thin"><color rgb="FFBBB0A6"/></bottom></border>' +
+      '<border><left style="thin"><color rgb="FFC9BCB0"/></left><right style="thin"><color rgb="FFC9BCB0"/></right>' +
+      '<top style="thin"><color rgb="FFC9BCB0"/></top><bottom style="thin"><color rgb="FFC9BCB0"/></bottom></border>' +
     '</borders>' +
     '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
     '<cellXfs count="7">' +

@@ -139,7 +139,7 @@ window.APP = window.APP || {};
     return {
       subject, rows, totalRequired, assigned, rotating,
       avg, max, min, deptFairness, uncovered, duplicates: dup, vacancyPeriods,
-      coordinator: d.coordinator || '', note: d.note || '',
+      coordinator: d.coordinator || '', subjectsHead: d.subjectsHead || '', note: d.note || '',
       sectionsCount: applicable.length,
       gradesLabel: subject.grades
         ? subject.grades.map(g => A.GRADE_NAME[g]).join(' · ')
@@ -236,14 +236,15 @@ window.APP = window.APP || {};
     '<button class="btn sm" data-act="csv-one" data-s="' + subject.id + '">CSV</button>' +
   '</div>' +
   '<header class="sheet-head">' +
-    '<div class="sh-side">' +
-      '<div class="sh-school">' + esc(A.SCHOOL.nameAr) + '</div>' +
-      '<div class="sh-school en">' + esc(A.SCHOOL.nameEn) + '</div>' +
-    '</div>' +
-    '<div class="sh-crest">وزارة التربية والتعليم<br><span>United Arab Emirates</span></div>' +
+    '<div class="letterhead-img" role="img" aria-label="وزارة التربية والتعليم — ' +
+      esc(A.SCHOOL.nameAr) + '"></div>' +
+    '<div class="rule-double"></div>' +
   '</header>' +
-  '<h2 class="sheet-title">توزيع المراحل الدراسية على معلمات ' + esc(subject.nameAr) +
-    '<br><span>للعام الدراسي ' + esc(A.SCHOOL.year) + '</span></h2>' +
+  '<div class="doc-title">' +
+    '<h2>توزيع المراحل الدراسية على معلمات ' + esc(subject.nameAr) + '</h2>' +
+    '<div class="doc-year">للعام الدراسيّ ' + esc(A.SCHOOL.year) + '</div>' +
+    '<div class="doc-rule"></div>' +
+  '</div>' +
   '<div class="meta-strip">' +
     '<span><b>حصص الشعبة:</b> ' + perGen + (perAdv !== perGen ? ' (المتقدّم ' + perAdv + ')' : '') + '</span>' +
     '<span><b>الصفوف:</b> ' + esc(a.gradesLabel) + '</span>' +
@@ -264,8 +265,15 @@ window.APP = window.APP || {};
   '</table>' +
   warn.join('') +
   '<footer class="sheet-foot">' +
-    '<div>منسّقة القسم: ' + esc(a.coordinator || '..............................') + '</div>' +
-    '<div>مديرة المدرسة: ' + esc(A.SCHOOL.principal) + '</div>' +
+    '<div class="sign"><span class="sign-role">منسّقة القسم</span>' +
+      '<span class="sign-name">' + esc(a.coordinator || '') + '</span>' +
+      '<span class="sign-line"></span></div>' +
+    '<div class="sign"><span class="sign-role">رئيسة المواد</span>' +
+      '<span class="sign-name">' + esc(a.subjectsHead || '') + '</span>' +
+      '<span class="sign-line"></span></div>' +
+    '<div class="sign"><span class="sign-role">مديرة المدرسة</span>' +
+      '<span class="sign-name">' + esc(A.SCHOOL.principal) + '</span>' +
+      '<span class="sign-line"></span></div>' +
   '</footer>' +
 '</section>';
   }
@@ -380,7 +388,7 @@ window.APP = window.APP || {};
         { v: a.uncovered.reduce((s, id) => s + periodsOf(subject, id), 0), style: 'warn' },
         { v: '', style: 'warn' }, { v: '', style: 'warn' }, { v: '', style: 'warn' }]);
     rows.push(['', '', '', '', '', '', '']);
-    rows.push(['منسّقة القسم', a.coordinator || '', '', 'مديرة المدرسة', A.SCHOOL.principal, '', '']);
+    rows.push(['منسّقة القسم', a.coordinator || '', 'رئيسة المواد', a.subjectsHead || '', 'مديرة المدرسة', A.SCHOOL.principal, '']);
 
     return {
       name: subject.nameAr, rtl: true, landscape: true,
