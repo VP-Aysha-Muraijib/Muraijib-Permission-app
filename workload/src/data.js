@@ -34,7 +34,7 @@ window.APP = window.APP || {};
     { id:'english',    nameAr:'اللغة الإنجليزية',                       nameEn:'English Language',    periods:{general:5, advanced:5} },
     { id:'math',       nameAr:'الرياضيات',                              nameEn:'Mathematics',         periods:{general:7, advanced:7} },
     { id:'science',    nameAr:'العلوم',                                 nameEn:'Science',             periods:{general:6, advanced:7} },
-    { id:'ai_tech',    nameAr:'الذكاء الاصطناعي والتكنولوجيا',          nameEn:'AI & Technology',     periods:{general:2, advanced:2} },
+    { id:'ai_tech',    nameAr:'الذكاء الاصطناعي والتكنولوجيا (CCDI)',   nameEn:'AI & Technology (CCDI)', periods:{general:2, advanced:2} },
     { id:'pe',         nameAr:'التربية البدنية والصحية',                nameEn:'Physical & Health Ed',periods:{general:2, advanced:2} },
     { id:'arts',       nameAr:'الفنون (بصرية وموسيقية ومسرح)',          nameEn:'Arts',                periods:{general:2, advanced:1} },
     { id:'third_lang', nameAr:'اللغة الثالثة',                          nameEn:'Third Language',      periods:{general:2, advanced:2} }
@@ -110,7 +110,16 @@ window.APP = window.APP || {};
 
     /* أقسام بانتظار البيانات — الصفحات جاهزة والشعب مُدرجة */
     math:       { coordinator:'', rows: [ { teacher:'Maha', sections: [], isNew:true } ] },
-    ai_tech:    { coordinator:'', rows: [] },
+    /* CCDI — الذكاء الاصطناعي والتكنولوجيا (الحوسبة والتصميم الإبداعي والابتكار)
+       شعب الصف السابع السبع موزّعة 3 + 1 + 3؛ أرقام الشعب لم تُحدَّد في المصدر
+       فوُزّعت بالتسلسل — قابلة للتعديل من زر «تعديل».                            */
+    ai_tech:    { coordinator:'',
+      note:'المادة تشمل الذكاء الاصطناعي وCCDI معاً. أرقام شعب الصف السابع وُزّعت بالتسلسل (3 + 1 + 3) لعدم تحديدها في المصدر.',
+      rows: [
+        { teacher:'Hessa Alsubousi', sections: R(5,1,7).concat(['7/1','7/2','7/3']) },
+        { teacher:'Suhaila Alketbi', sections: R(6,1,7).concat(['6/ADV','7/4']) },
+        { teacher:'Hessa Alahbabi',  sections: R(8,1,6).concat(['7/5','7/6','7/7']) }
+      ] },
     pe:         { coordinator:'', rows: [] },
     arts:       { coordinator:'', rows: [] },
     third_lang: { coordinator:'', rows: [] }
