@@ -12,7 +12,8 @@ window.APP = window.APP || {};
     year:   '2026 - 2027',
     standardLoad: 24,        // النصاب المعياري للمعلمة
     overloadThreshold: 30,   // ما فوقه يُعدّ نصاباً مرتفعاً جداً ويُرفع به تنبيه
-    principal: 'د. اليازية الظاهري'
+    principal: 'د. اليازية الظاهري',
+    deputy: 'عائشة النعيمي'
   };
 
   /* الشعب: الخامس 7 · السادس 7 + متقدم · السابع 7 · الثامن 6 = 28 شعبة */
@@ -63,7 +64,6 @@ window.APP = window.APP || {};
 
     arabic: {
       coordinator: '',
-      subjectsHead: 'حليمة البلوشي',
       rows: [
         { teacher:'شيخة الشامسي',  sections: R(8,1,4) },
         { teacher:'منى الظاهري',   sections: ['8/5','8/6','6/1','6/2'] },

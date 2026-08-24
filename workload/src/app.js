@@ -139,7 +139,7 @@ window.APP = window.APP || {};
     return {
       subject, rows, totalRequired, assigned, rotating,
       avg, max, min, deptFairness, uncovered, duplicates: dup, vacancyPeriods,
-      coordinator: d.coordinator || '', subjectsHead: d.subjectsHead || '', note: d.note || '',
+      coordinator: d.coordinator || '', note: d.note || '',
       sectionsCount: applicable.length,
       gradesLabel: subject.grades
         ? subject.grades.map(g => A.GRADE_NAME[g]).join(' · ')
@@ -268,8 +268,8 @@ window.APP = window.APP || {};
     '<div class="sign"><span class="sign-role">منسّقة القسم</span>' +
       '<span class="sign-name">' + esc(a.coordinator || '') + '</span>' +
       '<span class="sign-line"></span></div>' +
-    '<div class="sign"><span class="sign-role">رئيسة المواد</span>' +
-      '<span class="sign-name">' + esc(a.subjectsHead || '') + '</span>' +
+    '<div class="sign"><span class="sign-role">نائب مدير أكاديمي</span>' +
+      '<span class="sign-name">' + esc(A.SCHOOL.deputy || '') + '</span>' +
       '<span class="sign-line"></span></div>' +
     '<div class="sign"><span class="sign-role">مديرة المدرسة</span>' +
       '<span class="sign-name">' + esc(A.SCHOOL.principal) + '</span>' +
@@ -388,7 +388,7 @@ window.APP = window.APP || {};
         { v: a.uncovered.reduce((s, id) => s + periodsOf(subject, id), 0), style: 'warn' },
         { v: '', style: 'warn' }, { v: '', style: 'warn' }, { v: '', style: 'warn' }]);
     rows.push(['', '', '', '', '', '', '']);
-    rows.push(['منسّقة القسم', a.coordinator || '', 'رئيسة المواد', a.subjectsHead || '', 'مديرة المدرسة', A.SCHOOL.principal, '']);
+    rows.push(['منسّقة القسم', a.coordinator || '', 'نائب مدير أكاديمي', A.SCHOOL.deputy || '', 'مديرة المدرسة', A.SCHOOL.principal, '']);
 
     return {
       name: subject.nameAr, rtl: true, landscape: true,
