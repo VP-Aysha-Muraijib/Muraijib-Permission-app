@@ -163,10 +163,10 @@ window.APP = window.APP || {};
 
     /* اللغة الصينية — الصف الخامس فقط (7 شعب). اسم المعلمة لم يُزوَّد بعد. */
     chinese:    { coordinator:'',
-      note:'تُدرَّس للصف الخامس فقط. اسم المعلمة لم يُزوَّد بعد — يُضاف من زر «تعديل».',
-      noteEn:'Grade 5 only. The teacher name has not been provided yet — add it from the Edit button.',
+      note:'تُدرَّس للصف الخامس فقط (جميع الشعب السبع).',
+      noteEn:'Grade 5 only — all seven classes.',
       rows: [
-        { teacher:'(معلمة اللغة الصينية — لم يُحدَّد الاسم)', teacherEn:'(Chinese teacher — name to be confirmed)', sections: R(5,1,7) }
+        { teacher:'Rui Zhang', teacherEn:'Rui Zhang', sections: R(5,1,7) }
       ] }
   };
 
