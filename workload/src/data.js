@@ -88,14 +88,14 @@ window.APP = window.APP || {};
     english: {
       coordinator: 'فريال فياض',
       rows: [
-        { teacher:'ناعمة الكعبي',        sections: ['7/6','7/7','8/1','8/2'] },
-        { teacher:'دعاء',                sections: ['5/6','5/7','6/1','6/2','6/3'], isNew:true },
-        { teacher:'شمسة',                sections: R(7,1,5) },
-        { teacher:'آمنة',                sections: ['6/4','6/5','6/6','6/7'] },
-        { teacher:'فريال فياض',          sections: ['8/3','8/4','6/ADV'], note:'منسقة القسم' },
-        { teacher:'روبين',               sections: R(5,1,5) },
-        { teacher:'*', vacancy:true, sections: ['8/5','8/6'],
-          note:'الحاجة إلى معلمة إضافية لتغطية هاتين الشعبتين' }
+        { teacher:'ناعمة الكعبي', sections: R(8,1,4) },
+        { teacher:'دعاء',         sections: ['5/6','5/7','6/1','6/2','6/3'], isNew:true },
+        { teacher:'شمسة عزيز',    sections: R(7,1,4) },
+        { teacher:'آمنة',         sections: ['6/4','6/5','6/6','6/7'] },
+        { teacher:'فريال فياض',   sections: ['6/ADV','8/5','8/6'], note:'منسقة القسم' },
+        { teacher:'روبين',        sections: R(5,1,5) },
+        { teacher:'*', vacancy:true, sections: ['7/5','7/6','7/7'],
+          note:'المعلمة الإضافية — الحاجة إلى معلمة لتغطية هذه الشعب' }
       ]
     },
 
