@@ -154,11 +154,11 @@ window.APP = window.APP || {};
     /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في
        المصدر فقُسِّمت 3 + 4 بحيث تبقى كل معلمة في صفّين متقاربين.               */
     french:     { coordinator:'',
-      note:'تُدرَّس للصفوف السادس والسابع والثامن. أرقام شعب الصف السابع وُزّعت بالتسلسل لعدم تحديدها في المصدر.',
-      noteEn:'Taught in Grades 6, 7 and 8. Grade 7 class numbers were assigned in sequence as the source did not specify them.',
+      note:'تُدرَّس للصفوف السادس والسابع والثامن. الصف السابع لحكيمة والثامن لهيبة، والسادس مقسوم بينهما بالتساوي.',
+      noteEn:'Taught in Grades 6, 7 and 8. Grade 7 to Hakima and Grade 8 to Hiba; Grade 6 is split evenly between them.',
       rows: [
-        { teacher:'هيبة',  teacherEn:'Hiba', sections: R(6,1,7).concat(['6/ADV','7/1','7/2','7/3']) },
-        { teacher:'حكيمة', teacherEn:'Hakima', sections: R(8,1,6).concat(['7/4','7/5','7/6','7/7']) }
+        { teacher:'هيبة',  teacherEn:'Hiba',   sections: R(6,1,4).concat(R(8,1,6)) },
+        { teacher:'حكيمة', teacherEn:'Hakima', sections: ['6/5','6/6','6/7','6/ADV'].concat(R(7,1,7)) }
       ] },
 
     /* اللغة الصينية — الصف الخامس فقط (7 شعب). اسم المعلمة لم يُزوَّد بعد. */
