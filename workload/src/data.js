@@ -79,10 +79,9 @@ window.APP = window.APP || {};
       coordinator: '',
       note: 'تم توزيع مرحلة الصف السابع بين المعلمات.',
       rows: [
-        { teacher:'الهن العفاري', sections: R(6,1,7).concat(['6/ADV','7/3','7/4']) },
-        { teacher:'زلفة الظاهري', sections: R(8,1,6).concat(['7/1','7/2']),
-          note:'المستند يذكر نصاباً (22) بينما الشعب المسندة = 16 حصة' },
-        { teacher:'مريم العتيبة', sections: R(5,1,7).concat(['7/5','7/6','7/7']) }
+        { teacher:'الهن العفاري', sections: R(6,1,7).concat(['6/ADV','7/1']) },
+        { teacher:'مريم العتيبة', sections: R(5,1,7).concat(['7/2','7/3']) },
+        { teacher:'زلفة الظاهري', sections: R(8,1,6).concat(['7/4','7/5','7/6','7/7']) }
       ]
     },
 
