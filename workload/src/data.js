@@ -89,15 +89,12 @@ window.APP = window.APP || {};
     english: {
       coordinator: 'شمسة عزيز', coordinatorEn: 'Shamsa Aziz',
       rows: [
-        { teacher:'ناعمة الكعبي', teacherEn:'Naema Al Kaabi', sections: R(8,1,4) },
-        { teacher:'دعاء',         teacherEn:'Doa', sections: ['5/6','5/7','6/1','6/2','6/3'], isNew:true },
-        { teacher:'شمسة عزيز',    teacherEn:'Shamsa Aziz', sections: R(7,1,4) },
-        { teacher:'آمنة',         teacherEn:'Amna', sections: ['6/4','6/5','6/6','6/7'] },
-        { teacher:'فريال فياض',   teacherEn:'Ferial Fayyad', sections: ['6/ADV','8/5','8/6'] },
-        { teacher:'روبين',        teacherEn:'Robyn', sections: R(5,1,5) },
-        { teacher:'*', vacancy:true, sections: ['7/5','7/6','7/7'],
-          note:'المعلمة الإضافية — الحاجة إلى معلمة لتغطية هذه الشعب',
-          noteEn:'Additional teacher required to cover these classes' }
+        { teacher:'ناعمة الكعبي',  teacherEn:'Naema Al Kaabi', sections: R(8,1,4) },
+        { teacher:'دعاء',          teacherEn:'Doa',            sections: ['5/4','5/5','5/6','5/7','6/2','6/3'], isNew:true },
+        { teacher:'شمسة عزيز',     teacherEn:'Shamsa Aziz',    sections: R(7,1,4) },
+        { teacher:'آمنة الشامسي',  teacherEn:'Amna Al Shamsi', sections: ['6/4','6/5','6/6','6/7'] },
+        { teacher:'فريال فياض',    teacherEn:'Ferial Fayyad',  sections: ['6/1','6/ADV','8/5','8/6'] },
+        { teacher:'روبين',         teacherEn:'Robyn',          sections: ['5/1','5/2','5/3','7/5','7/6','7/7'] }
       ]
     },
 
