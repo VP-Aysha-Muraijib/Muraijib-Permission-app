@@ -90,11 +90,11 @@ window.APP = window.APP || {};
       coordinator: 'شمسة عزيز', coordinatorEn: 'Shamsa Aziz',
       rows: [
         { teacher:'ناعمة الكعبي',  teacherEn:'Naema Al Kaabi', sections: R(8,1,4) },
-        { teacher:'دعاء',          teacherEn:'Doa',            sections: R(6,1,5), isNew:true },
-        { teacher:'شمسة عزيز',     teacherEn:'Shamsa Aziz',    sections: ['7/5','7/6','7/7','8/5','8/6'] },
+        { teacher:'دعاء',          teacherEn:'Doa',            sections: R(6,1,6), isNew:true },
+        { teacher:'شمسة عزيز',     teacherEn:'Shamsa Aziz',    sections: ['5/7','7/5','7/6','7/7'] },
         { teacher:'آمنة الشامسي',  teacherEn:'Amna Al Shamsi', sections: R(7,1,4) },
-        { teacher:'فريال فياض',    teacherEn:'Ferial Fayyad',  sections: ['5/6','5/7','6/6','6/7','6/ADV'] },
-        { teacher:'روبين',         teacherEn:'Robyn',          sections: R(5,1,5) }
+        { teacher:'فريال فياض',    teacherEn:'Ferial Fayyad',  sections: ['6/7','6/ADV','8/5','8/6'] },
+        { teacher:'روبين',         teacherEn:'Robyn',          sections: R(5,1,6) }
       ]
     },
 
