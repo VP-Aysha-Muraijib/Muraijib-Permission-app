@@ -116,16 +116,6 @@ window.APP = window.APP || {};
     const max = loads.length ? Math.max.apply(null, loads) : 0;
     const min = loads.length ? Math.min.apply(null, loads) : 0;
 
-    rows.forEach(r => {
-      r.fairness = (avg > 0 && r.load > 0 && !r.vacancy)
-        ? Math.max(0, 1 - Math.abs(r.load - avg) / avg) * 100
-        : null;
-    });
-
-    const deptFairness = (avg > 0 && loads.length > 1)
-      ? Math.max(0, 1 - (max - min) / avg) * 100
-      : (loads.length === 1 ? 100 : null);
-
     /* الشعب غير المسندة + المكرّرة */
     const seen = {}, covered = {}, dup = [];
     rows.forEach(r => r.sections.forEach(id => {
@@ -138,7 +128,7 @@ window.APP = window.APP || {};
 
     return {
       subject, rows, totalRequired, assigned, rotating,
-      avg, max, min, deptFairness, uncovered, duplicates: dup, vacancyPeriods,
+      avg, max, min, uncovered, duplicates: dup, vacancyPeriods,
       coordinator: d.coordinator || '', note: d.note || '',
       sectionsCount: applicable.length,
       gradesLabel: subject.grades
@@ -150,13 +140,6 @@ window.APP = window.APP || {};
   const pct = v => v == null ? '—' : (Math.round(v * 10) / 10).toFixed(1) + '%';
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-
-  function fairClass(v) {
-    if (v == null) return '';
-    if (v >= 95) return 'f-ok';
-    if (v >= 85) return 'f-mid';
-    return 'f-low';
-  }
 
   /* ══ العرض ═══════════════════════════════════════════════════════════ */
   function render() {
@@ -192,10 +175,9 @@ window.APP = window.APP || {};
           '<td class="c-grade">' + esc(gradeNames(r.sections) || '—') + '</td>' +
           '<td class="c-sec">' + (formatSections(r.sections).map(esc).join('<br>') || '—') + '</td>' +
           '<td class="c-load' + (r.vacancy ? ' is-vac' : '') + '">' + r.load + '</td>' +
-          '<td class="c-fair ' + fairClass(r.fairness) + '">' + pct(r.fairness) + '</td>' +
           '<td class="c-sign"></td>' +
           '</tr>').join('')
-      : '<tr class="empty-row"><td colspan="7">لم تُزوَّد بيانات هذا القسم بعد — ' +
+      : '<tr class="empty-row"><td colspan="6">لم تُزوَّد بيانات هذا القسم بعد — ' +
         'اضغطي «تعديل» لإضافة المعلمات وتوزيع الشعب.</td></tr>';
 
     const totals = a.rows.length
@@ -203,7 +185,6 @@ window.APP = window.APP || {};
         '<td colspan="4">المجموع — ' + a.rows.filter(r => r.load > 0 && !r.vacancy).length + ' معلمة' +
           (a.vacancyPeriods ? ' &nbsp;·&nbsp; شاغر (*): ' + a.vacancyPeriods + ' حصة' : '') + '</td>' +
         '<td class="c-load">' + a.assigned + '</td>' +
-        '<td class="c-fair ' + fairClass(a.deptFairness) + '">' + pct(a.deptFairness) + '</td>' +
         '<td></td></tr>'
       : '';
 
@@ -252,14 +233,13 @@ window.APP = window.APP || {};
     '<span><b>إجمالي الحصص المطلوبة:</b> ' + a.totalRequired + '</span>' +
     '<span><b>الموزّع:</b> ' + a.assigned + '</span>' +
     '<span><b>متوسط النصاب:</b> ' + (a.avg ? (Math.round(a.avg * 10) / 10) : '—') + '</span>' +
-    '<span><b>عدالة القسم:</b> ' + pct(a.deptFairness) + '</span>' +
     (a.rotating ? '<span><b>التوزيع:</b> تبادلي أسبوعي</span>' : '') +
   '</div>' +
   '<table class="grid">' +
     '<thead><tr>' +
       '<th class="c-num">م</th><th class="c-name">اسم المعلمة</th><th class="c-grade">المرحلة</th>' +
       '<th class="c-sec">الشعب</th><th class="c-load">النصاب</th>' +
-      '<th class="c-fair">نسبة العدالة</th><th class="c-sign">التوقيع</th>' +
+      '<th class="c-sign">التوقيع</th>' +
     '</tr></thead>' +
     '<tbody>' + body + totals + '</tbody>' +
   '</table>' +
@@ -359,41 +339,38 @@ window.APP = window.APP || {};
     const a = analyze(subject);
     const H = v => ({ v: v, style: 'head' });
     const rows = [];
-    rows.push([{ v: 'توزيع المراحل الدراسية على معلمات ' + subject.nameAr + ' — ' + A.SCHOOL.year, style: 'title' }, '', '', '', '', '', '']);
-    rows.push([{ v: A.SCHOOL.nameAr + ' · ' + A.SCHOOL.nameEn, style: 'title' }, '', '', '', '', '', '']);
-    rows.push(['', '', '', '', '', '', '']);
-    rows.push([H('م'), H('اسم المعلمة'), H('المرحلة'), H('الشعب'), H('النصاب'), H('نسبة العدالة'), H('التوقيع')]);
+    rows.push([{ v: 'توزيع المراحل الدراسية على معلمات ' + subject.nameAr + ' — ' + A.SCHOOL.year, style: 'title' }, '', '', '', '', '']);
+    rows.push([{ v: A.SCHOOL.nameAr + ' · ' + A.SCHOOL.nameEn, style: 'title' }, '', '', '', '', '']);
+    rows.push(['', '', '', '', '', '']);
+    rows.push([H('م'), H('اسم المعلمة'), H('المرحلة'), H('الشعب'), H('النصاب'), H('التوقيع')]);
     a.rows.forEach((r, i) => rows.push([
       i + 1, r.teacher + (r.role ? ' — ' + r.role : '') + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر: الحاجة إلى معلمة إضافية' : ''),
       gradeNames(r.sections), formatSections(r.sections).join(' · '),
       { v: r.load, style: 'num' },
-      { v: r.fairness == null ? '—' : Math.round(r.fairness * 10) / 10 + '%', style: 'num' },
       ''
     ]));
     rows.push([
       { v: 'المجموع', style: 'total' }, { v: '', style: 'total' }, { v: '', style: 'total' },
-      { v: '', style: 'total' }, { v: a.assigned, style: 'total' },
-      { v: a.deptFairness == null ? '—' : Math.round(a.deptFairness * 10) / 10 + '%', style: 'total' },
-      { v: '', style: 'total' }
+      { v: '', style: 'total' }, { v: a.assigned, style: 'total' }, { v: '', style: 'total' }
     ]);
-    rows.push(['', '', '', '', '', '', '']);
+    rows.push(['', '', '', '', '', '']);
     rows.push(['حصص الشعبة', subject.periods.general +
       (subject.periods.advanced !== subject.periods.general ? ' (متقدّم ' + subject.periods.advanced + ')' : ''),
-      'إجمالي الحصص المطلوبة', a.totalRequired, 'الموزّع', a.assigned, '']);
-    rows.push(['متوسط النصاب', Math.round(a.avg * 10) / 10, 'أعلى نصاب', a.max, 'أقل نصاب', a.min, '']);
+      'إجمالي الحصص المطلوبة', a.totalRequired, 'الموزّع', a.assigned]);
+    rows.push(['متوسط النصاب', Math.round(a.avg * 10) / 10, 'أعلى نصاب', a.max, 'أقل نصاب', a.min]);
     if (a.uncovered.length)
       rows.push([{ v: 'شعب غير مسندة', style: 'warn' },
         { v: sectionLabels(a.uncovered), style: 'warn' },
         { v: 'العجز بالحصص', style: 'warn' },
         { v: a.uncovered.reduce((s, id) => s + periodsOf(subject, id), 0), style: 'warn' },
-        { v: '', style: 'warn' }, { v: '', style: 'warn' }, { v: '', style: 'warn' }]);
-    rows.push(['', '', '', '', '', '', '']);
-    rows.push(['منسّقة القسم', a.coordinator || '', 'نائب مدير أكاديمي', A.SCHOOL.deputy || '', 'مديرة المدرسة', A.SCHOOL.principal, '']);
+        { v: '', style: 'warn' }, { v: '', style: 'warn' }]);
+    rows.push(['', '', '', '', '', '']);
+    rows.push(['منسّقة القسم', a.coordinator || '', 'نائب مدير أكاديمي', A.SCHOOL.deputy || '', 'مديرة المدرسة', A.SCHOOL.principal]);
 
     return {
       name: subject.nameAr, rtl: true, landscape: true,
-      cols: [5, 26, 22, 44, 10, 14, 16],
-      merges: ['A1:G1', 'A2:G2'],
+      cols: [5, 28, 22, 46, 10, 16],
+      merges: ['A1:F1', 'A2:F2'],
       rows: rows
     };
   }
@@ -401,9 +378,9 @@ window.APP = window.APP || {};
   function summarySheet() {
     const H = v => ({ v: v, style: 'head' });
     const rows = [];
-    rows.push([{ v: 'ملخّص توزيع الأنصبة — ' + A.SCHOOL.nameAr + ' · ' + A.SCHOOL.year, style: 'title' }, '', '', '', '', '', '']);
-    rows.push(['', '', '', '', '', '', '']);
-    rows.push([H('المادة'), H('حصص الشعبة'), H('المطلوب'), H('الموزّع'), H('غير موزّع'), H('عدد المعلمات'), H('عدالة القسم')]);
+    rows.push([{ v: 'ملخّص توزيع الأنصبة — ' + A.SCHOOL.nameAr + ' · ' + A.SCHOOL.year, style: 'title' }, '', '', '', '', '']);
+    rows.push(['', '', '', '', '', '']);
+    rows.push([H('المادة'), H('حصص الشعبة'), H('المطلوب'), H('الموزّع'), H('غير موزّع'), H('عدد المعلمات')]);
     let tReq = 0, tAsg = 0, tT = 0;
     A.SUBJECTS.forEach(s => {
       const a = analyze(s);
@@ -412,13 +389,12 @@ window.APP = window.APP || {};
       rows.push([s.nameAr, s.periods.general, { v: a.totalRequired, style: 'num' },
         { v: a.assigned, style: 'num' },
         gap ? { v: gap, style: 'warn' } : { v: 0, style: 'num' },
-        { v: a.rows.filter(r => r.load > 0).length, style: 'num' },
-        { v: a.deptFairness == null ? '—' : Math.round(a.deptFairness * 10) / 10 + '%', style: 'num' }]);
+        { v: a.rows.filter(r => r.load > 0).length, style: 'num' }]);
     });
     rows.push([{ v: 'الإجمالي', style: 'total' }, { v: '', style: 'total' },
       { v: tReq, style: 'total' }, { v: tAsg, style: 'total' },
-      { v: tReq - tAsg, style: 'total' }, { v: tT, style: 'total' }, { v: '', style: 'total' }]);
-    return { name: 'الملخّص', rtl: true, cols: [30, 12, 12, 12, 12, 14, 14], merges: ['A1:G1'], rows: rows };
+      { v: tReq - tAsg, style: 'total' }, { v: tT, style: 'total' }]);
+    return { name: 'الملخّص', rtl: true, cols: [34, 12, 12, 12, 12, 14], merges: ['A1:F1'], rows: rows };
   }
 
   function exportXlsx(only) {
@@ -435,14 +411,12 @@ window.APP = window.APP || {};
   function exportCsv(only) {
     const list = only ? A.SUBJECTS.filter(s => s.id === only) : A.SUBJECTS;
     const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-    const lines = ['﻿' + ['المادة', 'م', 'اسم المعلمة', 'المرحلة', 'الشعب', 'النصاب', 'نسبة العدالة'].map(q).join(',')];
+    const lines = ['﻿' + ['المادة', 'م', 'اسم المعلمة', 'المرحلة', 'الشعب', 'النصاب'].map(q).join(',')];
     list.forEach(s => {
       const a = analyze(s);
       a.rows.forEach((r, i) => lines.push([s.nameAr, i + 1, r.teacher + (r.role ? ' — ' + r.role : '') + (r.isNew ? ' (معلمة جديدة)' : '') + (r.vacancy ? ' — شاغر' : ''), gradeNames(r.sections),
-        formatSections(r.sections).join(' · '), r.load,
-        r.fairness == null ? '' : Math.round(r.fairness * 10) / 10 + '%'].map(q).join(',')));
-      lines.push([s.nameAr, '', 'المجموع', '', '', a.assigned,
-        a.deptFairness == null ? '' : Math.round(a.deptFairness * 10) / 10 + '%'].map(q).join(','));
+        formatSections(r.sections).join(' · '), r.load].map(q).join(',')));
+      lines.push([s.nameAr, '', 'المجموع', '', '', a.assigned].map(q).join(','));
     });
     const bytes = new TextEncoder().encode(lines.join('\r\n'));
     A.downloadBlob(bytes, (only ? 'توزيع-' + list[0].nameAr : 'توزيع-أنصبة-مريجب') + '.csv', 'text/csv;charset=utf-8');
