@@ -91,10 +91,10 @@ window.APP = window.APP || {};
       rows: [
         { teacher:'ناعمة الكعبي',  teacherEn:'Naema Al Kaabi', sections: ['6/7','8/1','8/2','8/3'] },
         { teacher:'دعاء',          teacherEn:'Doa',            sections: R(6,1,6), isNew:true },
-        { teacher:'شمسة عزيز',     teacherEn:'Shamsa Aziz',    sections: ['5/7','7/5','7/6','7/7'] },
+        { teacher:'شمسة عزيز',     teacherEn:'Shamsa Aziz',    sections: ['5/6','5/7','7/6','7/7'] },
         { teacher:'آمنة الشامسي',  teacherEn:'Amna Al Shamsi', sections: R(7,1,4) },
-        { teacher:'فريال فياض',    teacherEn:'Ferial Fayyad',  sections: ['6/ADV','8/4','8/5','8/6'] },
-        { teacher:'روبين',         teacherEn:'Robyn',          sections: R(5,1,6) }
+        { teacher:'فريال فياض',    teacherEn:'Ferial Fayyad',  sections: ['7/5','8/4','8/5','8/6'] },
+        { teacher:'روبين',         teacherEn:'Robyn',          sections: R(5,1,5).concat(['6/ADV']) }
       ]
     },
 
@@ -141,14 +141,14 @@ window.APP = window.APP || {};
        فالنصاب المعروض هو حصّة كل معلمة من التناوب (المجموع 55 حصة).
        الدراما للصفوف العليا (السابع والثامن) فقط.                             */
     arts:       { coordinator:'أمل القبيسي', coordinatorTitle:'منسّقة الأنشطة',
-      note:'تناوب أسبوعي: حصتا الفنون لكل شعبة تُتقاسَم بين معلمات التخصّصات. البصرية والسمعية لجميع الصفوف، والدراما للصفين السابع والثامن.',
+      note:'تناوب أسبوعي على جميع مراحل المدرسة. النصاب موحّد 24 حصة لكل معلمة (72 حصة إجمالاً)، ومخصّص مادة الفنون في الخطة الدراسية 55 حصة أسبوعياً.',
       rows: [
-        { teacher:'أمل القبيسي', role:'الفنون البصرية',
+        { teacher:'أمل القبيسي', role:'الفنون البصرية', loadOverride:24,
           sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) },
-        { teacher:'جيهان', role:'الفنون السمعية',
+        { teacher:'جيهان', role:'الفنون السمعية', loadOverride:24,
           sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) },
-        { teacher:'صابرين', role:'الدراما',
-          sections: R(7,1,7).concat(R(8,1,6)) }
+        { teacher:'صابرين', role:'الدراما', loadOverride:24,
+          sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) }
       ] },
 
     /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في

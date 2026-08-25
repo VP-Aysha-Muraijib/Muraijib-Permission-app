@@ -143,8 +143,10 @@ window.APP = window.APP || {};
       note: (en && r.noteEn) ? r.noteEn : (r.note || ''),
       role: (en && r.roleEn) ? r.roleEn : (r.role || ''),
       isNew: !!r.isNew, vacancy: !!r.vacancy,
+      loadOverride: (r.loadOverride != null) ? r.loadOverride : null,
       sections: (r.sections || []).filter(id => sectionById[id])
     }));
+    const hasOverride = rows.some(r => r.loadOverride != null);
 
     /* في المواد التبادلية تُتقاسَم حصص الشعبة بين معلمات التخصّصات */
     const share = {};
@@ -155,7 +157,7 @@ window.APP = window.APP || {};
     });
 
     /* تقريب حصص التناوب إلى أعداد صحيحة يبقى مجموعها مطابقاً للمطلوب */
-    if (rotating) {
+    if (rotating && !hasOverride) {
       const exactTotal = Object.keys(share)
         .reduce((s, id) => s + periodsOf(subject, id), 0);
       const floors = rows.map(r => Math.floor(r.load));
@@ -166,6 +168,7 @@ window.APP = window.APP || {};
       for (let k = 0; k < byFrac.length && rem > 0; k++) { out[byFrac[k].i]++; rem--; }
       rows.forEach((r, i) => { r.exactLoad = r.load; r.load = out[i]; });
     }
+    rows.forEach(r => { if (r.loadOverride != null) r.load = r.loadOverride; });
 
     /* وسم صفّ المنسّقة */
     rows.forEach(r => { r.isCoord = !!coordinator && r.teacher === coordinator; });
