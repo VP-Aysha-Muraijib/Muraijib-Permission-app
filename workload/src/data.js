@@ -12,8 +12,8 @@ window.APP = window.APP || {};
     year:   '2026 - 2027',
     standardLoad: 24,        // النصاب المعياري للمعلمة
     overloadThreshold: 30,   // ما فوقه يُعدّ نصاباً مرتفعاً جداً ويُرفع به تنبيه
-    principal: 'د. اليازية الظاهري',
-    deputy: 'عائشة النعيمي'
+    principal: 'د. اليازية الظاهري',   principalEn: 'Dr. Alyazia Al Dhaheri',
+    deputy:    'عائشة النعيمي',        deputyEn:    'Aisha Al Nuaimi'
   };
 
   /* الشعب: الخامس 7 · السادس 7 + متقدم · السابع 7 · الثامن 6 = 28 شعبة */
@@ -27,21 +27,22 @@ window.APP = window.APP || {};
     return out;
   })();
 
-  A.GRADE_NAME = { 5:'الصف الخامس', 6:'الصف السادس', 7:'الصف السابع', 8:'الصف الثامن' };
+  A.GRADE_NAME    = { 5:'الصف الخامس', 6:'الصف السادس', 7:'الصف السابع', 8:'الصف الثامن' };
+  A.GRADE_NAME_EN = { 5:'Grade 5', 6:'Grade 6', 7:'Grade 7', 8:'Grade 8' };
 
   /* عدد الحصص الأسبوعية لكل شعبة — الخطة الدراسية الوزارية 2026/2027 (صفوف 5-8) */
   A.SUBJECTS = [
     { id:'islamic',    nameAr:'التربية الإسلامية',                     nameEn:'Islamic Education',   periods:{general:3, advanced:3} },
     { id:'arabic',     nameAr:'اللغة العربية',                          nameEn:'Arabic Language',     periods:{general:5, advanced:5} },
     { id:'social',     nameAr:'الدراسات الاجتماعية والتربية الأخلاقية', nameEn:'Social & Moral Studies', periods:{general:2, advanced:2} },
-    { id:'english',    nameAr:'اللغة الإنجليزية',                       nameEn:'English Language',    periods:{general:5, advanced:5} },
-    { id:'math',       nameAr:'الرياضيات',                              nameEn:'Mathematics',         periods:{general:7, advanced:7} },
-    { id:'science',    nameAr:'العلوم',                                 nameEn:'Science',             periods:{general:6, advanced:7} },
+    { id:'english',    nameAr:'اللغة الإنجليزية',                       nameEn:'English Language',    periods:{general:5, advanced:5}, lang:'en' },
+    { id:'math',       nameAr:'الرياضيات',                              nameEn:'Mathematics',         periods:{general:7, advanced:7}, lang:'en' },
+    { id:'science',    nameAr:'العلوم',                                 nameEn:'Science',             periods:{general:6, advanced:7}, lang:'en' },
     { id:'ai_tech',    nameAr:'الذكاء الاصطناعي والتكنولوجيا (CCDI)',   nameEn:'AI & Technology (CCDI)', periods:{general:2, advanced:2} },
     { id:'pe',         nameAr:'التربية البدنية والصحية',                nameEn:'Physical & Health Ed',periods:{general:2, advanced:2} },
     { id:'arts',       nameAr:'الفنون (بصرية وسمعية ودراما)',            nameEn:'Arts',                periods:{general:2, advanced:1}, rotating:true },
-    { id:'french',     nameAr:'اللغة الفرنسية (اللغة الثالثة)',          nameEn:'French — Third Language',  periods:{general:2, advanced:2}, grades:[6,7,8] },
-    { id:'chinese',    nameAr:'اللغة الصينية (اللغة الثالثة)',           nameEn:'Chinese — Third Language', periods:{general:2, advanced:2}, grades:[5] }
+    { id:'french',     nameAr:'اللغة الفرنسية (اللغة الثالثة)',          nameEn:'French — Third Language',  periods:{general:2, advanced:2}, lang:'en', grades:[6,7,8] },
+    { id:'chinese',    nameAr:'اللغة الصينية (اللغة الثالثة)',           nameEn:'Chinese — Third Language', periods:{general:2, advanced:2}, lang:'en', grades:[5] }
   ];
 
   /* مساعد: توليد مدى شعب */
@@ -63,7 +64,7 @@ window.APP = window.APP || {};
     },
 
     arabic: {
-      coordinator: '',
+      coordinator: 'شيخة الشامسي',
       rows: [
         { teacher:'شيخة الشامسي',  sections: R(8,1,4) },
         { teacher:'منى الظاهري',   sections: ['8/5','8/6','6/1','6/2'] },
@@ -76,7 +77,7 @@ window.APP = window.APP || {};
     },
 
     social: {
-      coordinator: '',
+      coordinator: 'الهن الأحبابي',
       note: 'تم توزيع مرحلة الصف السابع بين المعلمات.',
       rows: [
         { teacher:'الهن العفاري', sections: R(6,1,7).concat(['6/ADV','7/1']) },
@@ -86,35 +87,35 @@ window.APP = window.APP || {};
     },
 
     english: {
-      coordinator: 'فريال فياض',
+      coordinator: 'شمسة عزيز', coordinatorEn: 'Shamsa Aziz',
       rows: [
-        { teacher:'ناعمة الكعبي', sections: R(8,1,4) },
-        { teacher:'دعاء',         sections: ['5/6','5/7','6/1','6/2','6/3'], isNew:true },
-        { teacher:'شمسة عزيز',    sections: R(7,1,4) },
-        { teacher:'آمنة',         sections: ['6/4','6/5','6/6','6/7'] },
-        { teacher:'فريال فياض',   sections: ['6/ADV','8/5','8/6'], note:'منسقة القسم' },
-        { teacher:'روبين',        sections: R(5,1,5) },
+        { teacher:'ناعمة الكعبي', teacherEn:'Naema Al Kaabi', sections: R(8,1,4) },
+        { teacher:'دعاء',         teacherEn:'Doa', sections: ['5/6','5/7','6/1','6/2','6/3'], isNew:true },
+        { teacher:'شمسة عزيز',    teacherEn:'Shamsa Aziz', sections: R(7,1,4) },
+        { teacher:'آمنة',         teacherEn:'Amna', sections: ['6/4','6/5','6/6','6/7'] },
+        { teacher:'فريال فياض',   teacherEn:'Ferial Fayyad', sections: ['6/ADV','8/5','8/6'] },
+        { teacher:'روبين',        teacherEn:'Robyn', sections: R(5,1,5) },
         { teacher:'*', vacancy:true, sections: ['7/5','7/6','7/7'],
-          note:'المعلمة الإضافية — الحاجة إلى معلمة لتغطية هذه الشعب' }
+          note:'المعلمة الإضافية — الحاجة إلى معلمة لتغطية هذه الشعب',
+          noteEn:'Additional teacher required to cover these classes' }
       ]
     },
 
     science: {
-      coordinator: '',
+      coordinator: 'أنيثا', coordinatorEn: 'Anitha',
       rows: [
-        { teacher:'هند زيدان',    sections: ['5/1','5/2','5/3','6/ADV'] },
-        { teacher:'صالحة السبوسي', sections: ['5/4','5/5','5/6','5/7'] },
-        { teacher:'دارين', sections: R(6,1,4) },
-        { teacher:'فاطمة', sections: ['6/5','7/5','7/6','7/7'] },
-        { teacher:'أنيثا', sections: R(7,1,4) },
-        { teacher:'مها',   sections: R(8,1,4) },
-        { teacher:'رُدينة', sections: ['6/6','6/7','8/5','8/6'], isNew:true,
-          note:'معلمة جديدة — أُسندت إليها الشعب التي كانت مُعلَّمة بـ X في المقترح الأصلي' }
+        { teacher:'هند زيدان',    teacherEn:'Hind Zaidan', sections: ['5/1','5/2','5/3','6/ADV'] },
+        { teacher:'صالحة السبوسي', teacherEn:'Saleha Alsubousi', sections: ['5/4','5/5','5/6','5/7'] },
+        { teacher:'دارين', teacherEn:'Darin', sections: R(6,1,4) },
+        { teacher:'فاطمة', teacherEn:'Fatima', sections: ['6/5','7/5','7/6','7/7'] },
+        { teacher:'أنيثا', teacherEn:'Anitha', sections: R(7,1,4) },
+        { teacher:'مها',   teacherEn:'Maha', sections: R(8,1,4) },
+        { teacher:'رُدينة', teacherEn:'Rodaina', sections: ['6/6','6/7','8/5','8/6'], isNew:true }
       ]
     },
 
     /* أقسام بانتظار البيانات — الصفحات جاهزة والشعب مُدرجة */
-    math:       { coordinator:'', rows: [
+    math:       { coordinator:'Ms. Rahila', rows: [
         { teacher:'Ms. Namarig', sections: R(5,1,4) },
         { teacher:'Ms. Maha',    sections: ['5/5','5/6','5/7'], isNew:true },
         { teacher:'Ms. Oumama',  sections: R(6,1,4) },
@@ -127,7 +128,7 @@ window.APP = window.APP || {};
     /* CCDI — الذكاء الاصطناعي والتكنولوجيا (الحوسبة والتصميم الإبداعي والابتكار)
        شعب الصف السابع السبع موزّعة 3 + 1 + 3؛ أرقام الشعب لم تُحدَّد في المصدر
        فوُزّعت بالتسلسل — قابلة للتعديل من زر «تعديل».                            */
-    ai_tech:    { coordinator:'',
+    ai_tech:    { coordinator:'Suhaila Alketbi',
       note:'المادة تشمل الذكاء الاصطناعي وCCDI معاً. أرقام شعب الصف السابع وُزّعت بالتسلسل (3 + 1 + 3) لعدم تحديدها في المصدر.',
       rows: [
         { teacher:'Hessa Alsubousi', sections: R(5,1,7).concat(['7/1','7/2','7/3']) },
@@ -142,7 +143,7 @@ window.APP = window.APP || {};
        حصتا الشعبة تُتقاسَمان بين معلمات التخصّصات المتاحة لذلك الصف،
        فالنصاب المعروض هو حصّة كل معلمة من التناوب (المجموع 55 حصة).
        الدراما للصفوف العليا (السابع والثامن) فقط.                             */
-    arts:       { coordinator:'',
+    arts:       { coordinator:'أمل القبيسي', coordinatorTitle:'منسّقة الأنشطة',
       note:'تناوب أسبوعي: حصتا الفنون لكل شعبة تُتقاسَم بين معلمات التخصّصات. البصرية والسمعية لجميع الصفوف، والدراما للصفين السابع والثامن.',
       rows: [
         { teacher:'أمل القبيسي', role:'الفنون البصرية',
@@ -150,24 +151,25 @@ window.APP = window.APP || {};
         { teacher:'جيهان', role:'الفنون السمعية',
           sections: R(5,1,7).concat(R(6,1,7), ['6/ADV'], R(7,1,7), R(8,1,6)) },
         { teacher:'صابرين', role:'الدراما',
-          sections: R(7,1,7).concat(R(8,1,6)),
-          note:'الصفوف العليا فقط (السابع والثامن)' }
+          sections: R(7,1,7).concat(R(8,1,6)) }
       ] },
 
     /* اللغة الفرنسية — الصفوف 6 إلى 8 (21 شعبة). أرقام شعب السابع لم تُحدَّد في
        المصدر فقُسِّمت 3 + 4 بحيث تبقى كل معلمة في صفّين متقاربين.               */
     french:     { coordinator:'',
       note:'تُدرَّس للصفوف السادس والسابع والثامن. أرقام شعب الصف السابع وُزّعت بالتسلسل لعدم تحديدها في المصدر.',
+      noteEn:'Taught in Grades 6, 7 and 8. Grade 7 class numbers were assigned in sequence as the source did not specify them.',
       rows: [
-        { teacher:'هيبة',  sections: R(6,1,7).concat(['6/ADV','7/1','7/2','7/3']) },
-        { teacher:'حكيمة', sections: R(8,1,6).concat(['7/4','7/5','7/6','7/7']) }
+        { teacher:'هيبة',  teacherEn:'Hiba', sections: R(6,1,7).concat(['6/ADV','7/1','7/2','7/3']) },
+        { teacher:'حكيمة', teacherEn:'Hakima', sections: R(8,1,6).concat(['7/4','7/5','7/6','7/7']) }
       ] },
 
     /* اللغة الصينية — الصف الخامس فقط (7 شعب). اسم المعلمة لم يُزوَّد بعد. */
     chinese:    { coordinator:'',
       note:'تُدرَّس للصف الخامس فقط. اسم المعلمة لم يُزوَّد بعد — يُضاف من زر «تعديل».',
+      noteEn:'Grade 5 only. The teacher name has not been provided yet — add it from the Edit button.',
       rows: [
-        { teacher:'(معلمة اللغة الصينية — لم يُحدَّد الاسم)', sections: R(5,1,7) }
+        { teacher:'(معلمة اللغة الصينية — لم يُحدَّد الاسم)', teacherEn:'(Chinese teacher — name to be confirmed)', sections: R(5,1,7) }
       ] }
   };
 
