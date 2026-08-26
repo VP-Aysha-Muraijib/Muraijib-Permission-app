@@ -76,13 +76,14 @@ const html = `<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Noto+Sans+Arabic:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>${css}
 :root {
   --font-arabic-loaded: 'Tajawal';
   --font-arabic: 'Tajawal', system-ui, sans-serif;
   --font-latin-loaded: 'Inter';
   --font-latin: 'Inter', system-ui, sans-serif;
+  --font-doc-arabic: 'Noto Sans Arabic';
 }
 html { direction: rtl; }
 </style>

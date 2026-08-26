@@ -20,6 +20,15 @@ export interface Signatory {
 export interface BrandAssets {
   /** شعار الوزارة المعتمد — data URI ليعمل في الويب والملف المستقل معًا. */
   ministryLogo: string | null;
+  /**
+   * شعار الميثاق الوطني للتعليم.
+   *
+   * لا يُرسم ولا يُقارَب: يبقى `null` وتُطبع الوثيقة بدونه حتى يُزوَّد الملف
+   * الرسمي، فيوضع هنا بصيغة data URI ويظهر تلقائيًا في ترويسة كل ورقة.
+   */
+  charterLogo: string | null;
+  charterNameAr: string;
+  charterNameEn: string;
   ministryNameAr: string;
   ministryNameEn: string;
   schoolLogo: string | null;
@@ -33,6 +42,9 @@ export interface BrandAssets {
 
 export const BRAND: BrandAssets = {
   ministryLogo: MINISTRY_LOGO_DATA_URI,
+  charterLogo: null,
+  charterNameAr: 'الميثاق الوطني للتعليم',
+  charterNameEn: 'National Charter for Education',
   ministryNameAr: 'وزارة التربية والتعليم',
   ministryNameEn: 'Ministry of Education',
   schoolLogo: null,

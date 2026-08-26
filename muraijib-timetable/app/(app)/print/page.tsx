@@ -51,8 +51,13 @@ const PAPERS: Array<{
   { id: 'a3-landscape', label: 'A3 عرضي', css: 'A3 landscape', widthMm: 420, heightMm: 297 },
 ];
 
-/** هامش الطباعة — مريح للتجليد وقراءة الحواف دون إهدار عرض الجدول. */
-const PAGE_MARGIN_MM = 12;
+/**
+ * هامش الطباعة.
+ *
+ * ضيّق عمدًا: كل مِلّيمتر يُعاد إلى الجدول، وهو محتوى الورقة. أفقيًا أوسع
+ * قليلًا ليتنفّس العمودان الطرفيان ولا يلتصقا بحافة الورقة.
+ */
+const PAGE_MARGIN = '7mm 8mm';
 
 export default function PrintCenterPage() {
   const params = useSearchParams();
@@ -139,7 +144,10 @@ export default function PrintCenterPage() {
   return (
     <div className="mx-auto max-w-[100rem]">
       {/* حجم الورق يُحقن كقاعدة @page حقيقية — لا محاكاة بصرية فقط. */}
-      <style>{`@media print { @page { size: ${paperSpec.css}; margin: ${PAGE_MARGIN_MM}mm; } }`}</style>
+      {/* `@page` لا تُلفّ داخل `@media print`: القاعدة تخصّ الوسائط المقسَّمة
+          إلى صفحات أصلًا، ولفّها يجعلها تسقط في مسارات تصدير PDF التي لا
+          تُفعّل وسيط الطباعة — فتخرج الورقة على مقاس افتراضي لا على A4. */}
+      <style>{`@page { size: ${paperSpec.css}; margin: ${PAGE_MARGIN}; }`}</style>
 
       <div className="no-print">
         <PageHeader
@@ -270,7 +278,7 @@ export default function PrintCenterPage() {
                   {sheets.slice(0, 4).map((sheet, i) => (
                     <div
                       key={i}
-                      className="doc flex flex-col bg-white p-[12mm] shadow-raised"
+                      className="doc flex flex-col bg-white px-[8mm] py-[7mm] shadow-raised"
                       style={{ minHeight: `${paperSpec.heightMm}mm` }}
                     >
                       {sheet}

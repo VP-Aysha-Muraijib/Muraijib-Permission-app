@@ -1,53 +1,41 @@
 import type { Lesson } from '@/lib/domain/types';
 import type { SnapshotIndex } from '@/lib/engine/snapshot';
 import { slotKey } from '@/lib/engine/snapshot';
-import { buildGrid, periodOf } from '@/lib/engine/grid';
+import { buildGrid, periodOf, type GridRow } from '@/lib/engine/grid';
 import { BRAND } from '@/lib/brand';
 
 /**
- * القالب الرسمي الموحّد للوثائق المطبوعة.
+ * النظام البصري للوثائق المطبوعة.
  *
- * كل جدول في المنظومة نسخة من هذا القالب لا تصميم مستقل يشبهه: الترويسة
- * والمقاسات والحدود والمسافات كلها معرَّفة هنا مرة واحدة، ولا يمرَّر إلى
- * القالب سوى البيانات. الفرق بين ورقة وأخرى محصور في اسم المعلمة والمادة
- * والنصاب وعدد الشعب والحصص — وما عدا ذلك ثابت بحكم البناء لا بحكم الانضباط.
+ * المبدأ الحاكم: الجدول هو المحتوى، والترويسة تدعمه ولا تنافسه. لذلك تُقاس
+ * الترويسة بالمِلّيمتر لا بالذوق، وتُحصر الأوزان في 400/500/600 — الوزن الثقيل
+ * هو ما يجعل الصفحة تبدو لوحة تحكّم لا وثيقة — ويُترك اللون الخمري لخطّين
+ * رفيعين لا أكثر.
  *
- * لذلك أيضًا ارتفاع الترويسة وشريط البيانات مثبَّت بالبكسل والنصوص تُقصّ عند
- * الحد: اسم معلمة أطول أو مادتان بدل مادة لا يجوز أن يزحزحا الشبكة سطرًا
- * واحدًا، وإلا اختلفت الأوراق حين تُرصّ متجاورة.
+ * كل ورقة في المنظومة نسخة من هذا القالب لا تصميم مستقل يشبهه: المقاسات
+ * والحدود والمسافات معرَّفة هنا مرة واحدة، ولا يُمرَّر إلى القالب سوى البيانات.
+ * وارتفاعا الترويسة وشريط البيانات مثبَّتان بالبكسل مع قصّ النصوص عند الحد،
+ * فاسم معلمة أطول أو مادتان بدل مادة لا يزحزحان الشبكة سطرًا واحدًا.
  */
 
-/* ── سلّم الأحجام ──
-   مصدر واحد لكل مقاس نصّي في الوثيقة. تغييره هنا يغيّر كل الأوراق معًا،
-   ووجوده هنا يمنع تسرّب مقاسات مرتجلة إلى ورقة دون أخرى. */
-const T = {
-  ministryAr: 'text-[16px] font-bold',
-  ministryEn: 'latin text-[10.5px] text-[color:var(--doc-muted)]',
-  schoolAr: 'text-[13.5px] font-semibold',
-  schoolEn: 'latin text-[10px] text-[color:var(--doc-muted)]',
-  titleAr: 'text-[18px] font-bold',
-  titleEn: 'latin text-[11px] text-[color:var(--doc-muted)]',
-  yearLabelAr: 'text-[11px] text-[color:var(--doc-muted)]',
-  yearLabelEn: 'latin text-[9.5px] text-[color:var(--doc-muted)]',
-  yearValue: 'latin text-[16px] font-bold tabular-nums',
-  nameAr: 'text-[18px] font-semibold',
-  nameEn: 'latin text-[11px] text-[color:var(--doc-muted)]',
-  metaLabel: 'text-[11px] text-[color:var(--doc-muted)]',
-  metaLabelEn: 'latin text-[9.5px]',
-  metaValue: 'text-[15px] font-semibold',
-} as const;
+/* ── الارتفاعات ──
+   محسوبة على ورقة A4 عرضية بهامش 7mm رأسيًا: الارتفاع القابل للطباعة 196mm.
+   1mm ≈ 3.78px. الترويسة 19mm وشريط البيانات 13.5mm — أي 17% للهوية مجتمعةً
+   والباقي للجدول والاعتماد. */
+const HEADER_H = 'h-[72px]';
+const INFO_H = 'h-[51px]';
+const LOGO_H = 'h-[32px]';
+const GRID_GAP = 'pt-[17px]';
 
-/* ── مقاسات ثابتة ──
-   ارتفاعات صريحة لا محتوى يحدّدها، فتتطابق كل الأوراق مهما طالت البيانات. */
-const HEADER_H = 'h-[62px]';
-const INFO_H = 'h-[44px]';
-const LOGO_H = 'h-[42px]';
+const line = 'border-[0.6px] border-[color:var(--doc-line)]';
 
-const cellBorder = 'border border-[color:var(--doc-line)]';
+/* ────────── ١ · الترويسة المؤسسية ────────── */
 
-/* ────────── ١ · الترويسة ────────── */
-
-export function TeacherTimetableHeader({
+/**
+ * ثلاث مناطق أفقية منخفضة الارتفاع: الهوية المؤسسية يمينًا، وهوية الوثيقة في
+ * المنتصف، والعام الأكاديمي — ومعه شعار الميثاق الوطني حين يُزوَّد — يسارًا.
+ */
+export function InstitutionalHeader({
   titleAr,
   titleEn,
   yearLabel,
@@ -58,49 +46,64 @@ export function TeacherTimetableHeader({
 }) {
   return (
     <header
-      className={`${HEADER_H} flex shrink-0 items-center justify-between gap-6 border-b border-[color:var(--doc-line-strong)]`}
+      className={`${HEADER_H} flex shrink-0 items-center justify-between gap-6 border-b-[0.6px] border-[color:var(--doc-line)]`}
     >
-      {/* يمينًا: الجهة المؤسسية */}
-      <div className="flex min-w-0 shrink-0 items-center gap-2.5">
-        {BRAND.ministryLogo ? (
+      {/* يمينًا: الوزارة فالمدرسة */}
+      <div className="flex min-w-0 shrink-0 items-center gap-2">
+        {BRAND.ministryLogo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={BRAND.ministryLogo}
             alt={BRAND.ministryNameAr}
             className={`${LOGO_H} w-auto shrink-0 object-contain`}
           />
-        ) : (
-          <span
-            className={`${LOGO_H} flex w-[64px] shrink-0 items-center justify-center rounded-sm border border-dashed border-[color:var(--doc-line)] text-[9px] text-[color:var(--doc-muted)]`}
-          >
-            شعار الوزارة
-          </span>
         )}
-        <div className="min-w-0 text-right leading-[1.2]">
-          <p className={`truncate ${T.ministryAr}`}>{BRAND.ministryNameAr}</p>
-          <p className={`truncate ${T.ministryEn}`}>{BRAND.ministryNameEn}</p>
-          <p className={`truncate ${T.schoolAr}`}>{BRAND.schoolNameAr}</p>
-          <p className={`truncate ${T.schoolEn}`}>{BRAND.schoolNameEn}</p>
+        <div className="min-w-0 text-right leading-[1.3]">
+          <p className="truncate text-[12.5px] font-semibold">{BRAND.ministryNameAr}</p>
+          <p className="latin truncate text-[9px] text-[color:var(--doc-muted)]">
+            {BRAND.ministryNameEn}
+          </p>
+          <p className="truncate text-[11px] font-medium">{BRAND.schoolNameAr}</p>
+          <p className="latin truncate text-[9px] text-[color:var(--doc-muted)]">
+            {BRAND.schoolNameEn}
+          </p>
         </div>
       </div>
 
       {/* المنتصف: هوية الوثيقة */}
-      <div className="min-w-0 flex-1 text-center leading-[1.25]">
-        <h1 className={`truncate ${T.titleAr}`}>{titleAr}</h1>
-        {titleEn && <p className={`truncate ${T.titleEn}`}>{titleEn}</p>}
+      <div className="min-w-0 flex-1 text-center leading-[1.3]">
+        <h1 className="truncate text-[17px] font-semibold">{titleAr}</h1>
+        {/* الخمري هنا خطّ قصير لا أكثر — لمسة انتماء لا عنصر جذب. */}
+        <span
+          aria-hidden
+          className="mx-auto mb-[3px] mt-[5px] block h-[1.5px] w-[26px] bg-[color:var(--doc-accent)]"
+        />
+        {titleEn && (
+          <p className="latin truncate text-[10px] text-[color:var(--doc-muted)]">{titleEn}</p>
+        )}
       </div>
 
-      {/* يسارًا: العام الأكاديمي */}
-      <div className="shrink-0 text-left leading-[1.25]">
-        <p className={T.yearLabelAr}>العام الأكاديمي</p>
-        <p className={T.yearLabelEn}>Academic Year</p>
-        <p className={T.yearValue}>{yearLabel}</p>
+      {/* يسارًا: العام الأكاديمي، ومعه الميثاق الوطني حين يُزوَّد شعاره */}
+      <div className="flex shrink-0 items-center gap-2.5">
+        <div className="text-left leading-[1.3]">
+          <p className="text-[9.5px] text-[color:var(--doc-muted)]">العام الأكاديمي</p>
+          <p className="latin text-[8.5px] text-[color:var(--doc-muted)]">Academic Year</p>
+          <p className="latin text-[15px] font-semibold">{yearLabel}</p>
+        </div>
+        {BRAND.charterLogo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={BRAND.charterLogo}
+            alt={BRAND.charterNameAr}
+            className={`${LOGO_H} w-auto shrink-0 object-contain`}
+          />
+        )}
       </div>
     </header>
   );
 }
 
-/* ────────── ٢ · شريط بيانات صاحب الوثيقة ────────── */
+/* ────────── ٢ · شريط بيانات المعلمة ────────── */
 
 export interface InfoItem {
   label: string;
@@ -110,7 +113,7 @@ export interface InfoItem {
   latin?: boolean;
 }
 
-export function TeacherTimetableInfoBar({
+export function TeacherInfoStrip({
   nameAr,
   nameEn,
   items,
@@ -121,11 +124,13 @@ export function TeacherTimetableInfoBar({
 }) {
   return (
     <section
-      className={`${INFO_H} flex shrink-0 items-center justify-between gap-6 border-b border-[color:var(--doc-line)]`}
+      className={`${INFO_H} flex shrink-0 items-center justify-between gap-6 border-b-[0.6px] border-[color:var(--doc-line)]`}
     >
-      <div className="min-w-0 leading-[1.2]">
-        {nameAr && <p className={`truncate ${T.nameAr}`}>{nameAr}</p>}
-        {nameEn && <p className={`truncate ${T.nameEn}`}>{nameEn}</p>}
+      <div className="min-w-0 leading-[1.3]">
+        {nameAr && <p className="truncate text-[16.5px] font-semibold">{nameAr}</p>}
+        {nameEn && (
+          <p className="latin truncate text-[9.5px] text-[color:var(--doc-muted)]">{nameEn}</p>
+        )}
       </div>
 
       {items && items.length > 0 && (
@@ -135,18 +140,18 @@ export function TeacherTimetableInfoBar({
               key={item.label}
               className={
                 i > 0
-                  ? 'ms-4 border-s border-[color:var(--doc-line)] ps-4 leading-[1.2]'
-                  : 'leading-[1.2]'
+                  ? 'ms-4 border-s-[0.6px] border-[color:var(--doc-line)] ps-4 leading-[1.3]'
+                  : 'leading-[1.3]'
               }
             >
               {/* الفجوة عبر flex لا عبر هامش: الوسم اللاتيني معزول اتجاهيًا،
                   فهامشه المنطقي ينقلب ويلتصق بالعربية. */}
-              <dt className={`flex items-baseline gap-1 ${T.metaLabel}`}>
+              <dt className="flex items-baseline gap-1 text-[9px] text-[color:var(--doc-muted)]">
                 <span>{item.label}</span>
-                {item.labelEn && <span className={T.metaLabelEn}>{item.labelEn}</span>}
+                {item.labelEn && <span className="latin">{item.labelEn}</span>}
               </dt>
               <dd
-                className={`truncate ${T.metaValue} ${item.latin ? 'latin tabular-nums' : ''}`}
+                className={`truncate text-[13.5px] font-semibold ${item.latin ? 'latin' : ''}`}
                 title={item.value}
               >
                 {item.value}
@@ -162,14 +167,41 @@ export function TeacherTimetableInfoBar({
 /* ────────── ٣ · الشبكة ────────── */
 
 /**
- * أيام الأسبوع عمود رأسي في أقصى اليمين، والحصص أعمدة أفقية في الأعلى تحت
- * كلٍّ منها وقتها — الاتجاه المعتمد في جداول المدرسة الورقية.
- *
- * الأعمدة بنسب مئوية ثابتة و`table-fixed`، والصفوف توزّع ارتفاع الورقة
- * بالتساوي، فتخرج كل الأوراق بعرض عمود وارتفاع صف متطابقين تمامًا مهما
- * اختلف طول ما بداخلها.
+ * «الحصة الأولى» في رأس عمود ضيّق تُقرأ مرتين: مرة للكلمة المكرّرة في كل عمود
+ * ومرة للترتيب. تُختصر إلى «الأولى» ويُكتب «الحصص» مرة واحدة في زاوية الشبكة.
  */
-export function TeacherTimetableGrid({
+function shortPeriodLabel(row: GridRow): string {
+  return row.labelAr.replace(/^الحصة\s+/, '');
+}
+
+/**
+ * أسماء الفواصل الزمنية تُضغط لتسع عمودًا ضيقًا بلا التفاف:
+ * «الصلاة والفسحة» ← «صلاة + فسحة». قاعدة عامة على أداة التعريف وواو العطف،
+ * لا قائمة أسماء مكتوبة بأعيانها.
+ */
+function shortBreakLabel(labelAr: string): string[] {
+  const parts = labelAr.split(' و').map((part) => part.replace(/^ال/, ''));
+  return parts.map((part, i) => (i === 0 ? part : `+ ${part}`));
+}
+
+/**
+ * عمود الفاصل أضيق من أن يسع «13:05 – 13:20» في سطر، فتتسرّب النهاية فوق
+ * العمود المجاور. يُكتب الطرفان سطرين — أضيق وأوضح من شرطة تفصلهما.
+ */
+function splitTimeRange(timeRange: string): string[] {
+  return timeRange.split(/\s*[–-]\s*/).filter(Boolean);
+}
+
+/**
+ * رقم الشعبة نصّ لاتيني في الغالب («5/1») فيُعزل اتجاهيًا، لكن بعض الشعب
+ * تحمل وصفًا عربيًا («6/متقدّم») والعزل يقلبها إلى «متقدّم/6». يُفحص المحتوى
+ * لا السياق.
+ */
+function isLatinRun(text: string): boolean {
+  return !/[\u0600-\u06FF]/.test(text);
+}
+
+export function TimetableGrid({
   index,
   lessons,
   context,
@@ -186,8 +218,9 @@ export function TeacherTimetableGrid({
 
   const lessonCols = grid.rows.filter((r) => r.kind === 'lesson').length;
   const breakCols = grid.rows.length - lessonCols;
-  const dayPct = 10;
-  const breakPct = 4.5;
+  /* الفواصل أضيق كثيرًا من الحصص، وعمود اليوم ثابت، والباقي يُقسَّم بالتساوي. */
+  const dayPct = 9.5;
+  const breakPct = 4.4;
   const lessonPct = (100 - dayPct - breakCols * breakPct) / Math.max(1, lessonCols);
 
   return (
@@ -206,11 +239,11 @@ export function TeacherTimetableGrid({
         <tr>
           <th
             scope="col"
-            className={`${cellBorder} bg-[color:var(--doc-band)] px-1 py-1.5 leading-[1.25]`}
+            className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5 leading-[1.3]`}
           >
-            <span className="block text-[12.5px] font-bold">اليوم</span>
-            <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
-              Day
+            <span className="block text-[11.5px] font-semibold">الحصص</span>
+            <span className="latin block text-[8.5px] font-normal text-[color:var(--doc-muted)]">
+              Periods
             </span>
           </th>
 
@@ -219,11 +252,11 @@ export function TeacherTimetableGrid({
               <th
                 key={row.index}
                 scope="col"
-                className={`${cellBorder} bg-[color:var(--doc-head)] px-1 py-1.5 leading-[1.25]`}
+                className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5 leading-[1.3]`}
               >
-                <span className="block text-[12.5px] font-semibold">{row.labelAr}</span>
+                <span className="block text-[12px] font-semibold">{shortPeriodLabel(row)}</span>
                 {row.timeRange && (
-                  <span className="latin block text-[9.5px] font-normal tabular-nums text-[color:var(--doc-muted)]">
+                  <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
                     {row.timeRange}
                   </span>
                 )}
@@ -232,16 +265,24 @@ export function TeacherTimetableGrid({
               <th
                 key={row.index}
                 scope="col"
-                className={`${cellBorder} bg-[color:var(--doc-band)] px-0.5 py-1.5 leading-[1.25]`}
+                className={`${line} bg-[color:var(--doc-break)] px-0.5 py-1.5 leading-[1.3]`}
               >
-                <span className="block text-[9.5px] font-medium text-[color:var(--doc-muted)]">
-                  {row.labelAr}
-                </span>
-                {row.timeRange && (
-                  <span className="latin block text-[8px] tabular-nums text-[color:var(--doc-muted)]">
-                    {row.timeRange}
+                {shortBreakLabel(row.labelAr).map((part) => (
+                  <span
+                    key={part}
+                    className="block whitespace-nowrap text-[8.5px] font-medium text-[color:var(--doc-muted)]"
+                  >
+                    {part}
                   </span>
-                )}
+                ))}
+                {splitTimeRange(row.timeRange).map((t) => (
+                  <span
+                    key={t}
+                    className="latin block whitespace-nowrap text-[7.5px] text-[color:var(--doc-muted)]"
+                  >
+                    {t}
+                  </span>
+                ))}
               </th>
             ),
           )}
@@ -253,11 +294,11 @@ export function TeacherTimetableGrid({
           <tr key={day.id}>
             <th
               scope="row"
-              className={`${cellBorder} bg-[color:var(--doc-head)] px-1 py-2 leading-[1.25]`}
+              className={`${line} bg-[color:var(--doc-day)] px-1 py-1.5 leading-[1.3]`}
             >
-              <span className="block text-[15px] font-bold">{day.nameAr}</span>
+              <span className="block text-[13.5px] font-semibold">{day.nameAr}</span>
               {day.nameEn && (
-                <span className="latin block text-[9.5px] font-normal text-[color:var(--doc-muted)]">
+                <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
                   {day.nameEn}
                 </span>
               )}
@@ -275,7 +316,7 @@ export function TeacherTimetableGrid({
                 return (
                   <td
                     key={row.index}
-                    className={`${cellBorder} bg-[color:var(--doc-band)]`}
+                    className={`${line} bg-[color:var(--doc-break)]`}
                     aria-label={period?.labelAr ?? 'لا توجد حصة'}
                   />
                 );
@@ -284,8 +325,8 @@ export function TeacherTimetableGrid({
               const lesson = bySlot.get(slotKey(day.id, row.index));
               if (!lesson) {
                 return (
-                  <td key={row.index} className={`${cellBorder} px-1`}>
-                    <span className="text-[13px] text-[color:var(--doc-muted)]">ــ</span>
+                  <td key={row.index} className={`${line} px-1`}>
+                    <span className="text-[12px] text-[color:var(--doc-muted)]">ــ</span>
                   </td>
                 );
               }
@@ -294,9 +335,9 @@ export function TeacherTimetableGrid({
               const section = index.sectionById.get(lesson.sectionId);
               const teacher = lesson.teacherId ? index.teacherById.get(lesson.teacherId) : null;
 
-              /* في جدول المعلمة يتصدّر رقم الشعبة، وفي جدول الشعبة يتصدّر اسم
-                 المادة. السطر الثاني ثانوي دائمًا، وبلا إنجليزية داخل الخلية:
-                 تكرارها في ثمانٍ وثلاثين خلية يزدحم ولا يضيف. */
+              /* في جدول المعلمة يتصدّر رقم الشعبة وحده — المادة معروفة من شريط
+                 البيانات — وفي جدول الشعبة تتصدّر المادة ويليها اسم المعلمة.
+                 لا إنجليزية داخل الخلية: تكرارها في كل خلية يزدحم ولا يضيف. */
               const headline =
                 context === 'teacher' ? (section?.label ?? 'ــ') : (subject?.nameAr ?? 'ــ');
               const sub =
@@ -307,16 +348,22 @@ export function TeacherTimetableGrid({
                   : (teacher?.nameAr ?? '');
 
               return (
-                <td key={row.index} className={`${cellBorder} px-1 leading-[1.3]`}>
-                  <span className="block text-[15px] font-bold">
+                <td key={row.index} className={`${line} px-1 leading-[1.3]`}>
+                  <span
+                    className={
+                      context === 'teacher'
+                        ? 'block text-[16px] font-semibold'
+                        : 'block text-[12.5px] font-semibold'
+                    }
+                  >
                     {lesson.variant && <span className="ms-0.5">{lesson.variant.icon}</span>}
-                    {context === 'teacher' ? <span className="latin">{headline}</span> : headline}
+                    {isLatinRun(headline) ? <span className="latin">{headline}</span> : headline}
                   </span>
                   {sub && (
-                    <span className="block text-[11px] text-[color:var(--doc-muted)]">{sub}</span>
+                    <span className="block text-[10px] text-[color:var(--doc-muted)]">{sub}</span>
                   )}
                   {lesson.variant && (
-                    <span className="block text-[9.5px] text-[color:var(--doc-muted)]">
+                    <span className="block text-[9px] text-[color:var(--doc-muted)]">
                       {lesson.variant.labelAr}
                     </span>
                   )}
@@ -330,21 +377,21 @@ export function TeacherTimetableGrid({
   );
 }
 
-/* ────────── ٤ · خانات الاعتماد ────────── */
+/* ────────── ٤ · الاعتماد والتذييل ────────── */
 
-export function TeacherTimetableSignatures() {
+export function DocumentSignatures() {
   if (BRAND.signatories.length === 0) return null;
   return (
     <section className="mt-4 shrink-0 break-inside-avoid">
       <div className="flex items-end justify-around gap-8">
         {BRAND.signatories.map((s) => (
-          <div key={s.roleAr} className="min-w-0 flex-1 text-center leading-[1.25]">
-            <p className="truncate text-[10.5px] text-[color:var(--doc-muted)]">{s.roleAr}</p>
+          <div key={s.roleAr} className="min-w-0 flex-1 text-center leading-[1.3]">
+            <p className="truncate text-[9.5px] text-[color:var(--doc-muted)]">{s.roleAr}</p>
             {s.roleEn && (
-              <p className="latin truncate text-[9px] text-[color:var(--doc-muted)]">{s.roleEn}</p>
+              <p className="latin truncate text-[8.5px] text-[color:var(--doc-muted)]">{s.roleEn}</p>
             )}
-            <p className="mt-1 truncate text-[12.5px] font-semibold">{s.nameAr}</p>
-            <p className="mx-auto mt-4 w-3/4 border-t border-dotted border-[color:var(--doc-line-strong)] pt-1 text-[9px] text-[color:var(--doc-muted)]">
+            <p className="mt-0.5 truncate text-[12px] font-semibold">{s.nameAr}</p>
+            <p className="mx-auto mt-3.5 w-3/4 border-t-[0.6px] border-[color:var(--doc-line)] pt-1 text-[8.5px] text-[color:var(--doc-muted)]">
               التوقيع
             </p>
           </div>
@@ -354,7 +401,7 @@ export function TeacherTimetableSignatures() {
   );
 }
 
-export function TeacherTimetableFooter({
+export function DocumentFooter({
   versionLabel,
   issuedAt,
   hidden,
@@ -365,7 +412,7 @@ export function TeacherTimetableFooter({
 }) {
   if (hidden) return null;
   return (
-    <footer className="mt-2 flex shrink-0 items-center justify-between border-t border-[color:var(--doc-line)] pt-1 text-[9px] text-[color:var(--doc-muted)]">
+    <footer className="mt-2 flex shrink-0 items-center justify-between border-t-[0.6px] border-[color:var(--doc-line)] pt-1 text-[8.5px] text-[color:var(--doc-muted)]">
       <span>تاريخ الإصدار: {issuedAt}</span>
       <span>رقم النسخة: {versionLabel}</span>
       <span className="latin">{BRAND.systemNameAr}</span>
@@ -383,14 +430,16 @@ export interface DocumentChrome {
 }
 
 /**
- * غلاف الورقة الرسمية: ترويسة، فشريط بيانات، فالمحتوى الذي يملأ ما تبقّى من
- * ارتفاع الصفحة، فخانات الاعتماد، فالتذييل. تُبنى منه كل أوراق المنظومة —
- * جداول المعلمات والشعب والتقارير — فلا تتفرّق هوية الطباعة بين نوع وآخر.
+ * الورقة الرسمية: خط خمري رفيع في الحافة العليا، فترويسة، فشريط بيانات،
+ * فالجدول الذي يملأ ما تبقّى من ارتفاع الصفحة، فالاعتماد فالتذييل.
  *
- * `fill` تُطفأ للتقارير الطويلة: جدول بمئة صف يملأ ورقته بنفسه، وتمديده
- * قسرًا يفسد توزيع صفوفه.
+ * تُبنى منه كل أوراق المنظومة — جداول المعلمات والشعب والتقارير — فلا تتفرّق
+ * هوية الطباعة بين نوع وآخر.
+ *
+ * `fill` تُطفأ للتقارير الطويلة: جدول بمئة صف يملأ ورقته بنفسه، وتمديده قسرًا
+ * يفسد توزيع صفوفه.
  */
-export function TeacherTimetablePrintLayout({
+export function TeacherTimetablePrintPage({
   titleAr,
   titleEn,
   chrome,
@@ -411,15 +460,15 @@ export function TeacherTimetablePrintLayout({
 }) {
   return (
     <section className="doc print-page print-block grow">
-      <TeacherTimetableHeader titleAr={titleAr} titleEn={titleEn} yearLabel={chrome.yearLabel} />
-      <TeacherTimetableInfoBar nameAr={nameAr} nameEn={nameEn} items={info} />
-      {fill ? (
-        <div className="sheet-fill pt-2">{children}</div>
-      ) : (
-        <div className="pt-2">{children}</div>
-      )}
-      <TeacherTimetableSignatures />
-      <TeacherTimetableFooter
+      <span
+        aria-hidden
+        className="block h-[1.5px] shrink-0 bg-[color:var(--doc-accent)]"
+      />
+      <InstitutionalHeader titleAr={titleAr} titleEn={titleEn} yearLabel={chrome.yearLabel} />
+      <TeacherInfoStrip nameAr={nameAr} nameEn={nameEn} items={info} />
+      <div className={fill ? `sheet-fill ${GRID_GAP}` : GRID_GAP}>{children}</div>
+      <DocumentSignatures />
+      <DocumentFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
         hidden={chrome.hideFooter}

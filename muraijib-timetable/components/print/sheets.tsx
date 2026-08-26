@@ -7,8 +7,8 @@ import { slotKey } from '@/lib/engine/snapshot';
 import { computeTeacherWorkload, computeAllWorkloads } from '@/lib/engine/workload';
 import type { HealthReport } from '@/lib/engine/conflicts';
 import {
-  TeacherTimetableGrid,
-  TeacherTimetablePrintLayout,
+  TeacherTimetablePrintPage,
+  TimetableGrid,
   type InfoItem,
 } from './teacher-timetable';
 import { LOAD_LABEL } from '@/components/workload-cell';
@@ -17,7 +17,7 @@ import type { DisplayLang } from '@/lib/i18n';
 /**
  * أوراق المنظومة.
  *
- * لا تصميم هنا: كل ورقة استدعاء للقالب الرسمي الموحّد في `teacher-timetable`
+ * لا تصميم هنا: كل ورقة استدعاء للنظام البصري الموحّد في `teacher-timetable`
  * مع بياناتها وحدها. أي مقاس أو لون أو مسافة تُكتب في هذا الملف تكون بذلك
  * فرقًا بصريًا بين ورقة وأخرى — وهو ما يجب ألّا يوجد.
  */
@@ -31,7 +31,7 @@ export interface SheetChrome {
 }
 
 /* حدود وخلفيات جداول التقارير — تُعرَّف مرة لتبقى هي نفسها في كل تقرير. */
-const cell = 'border border-[color:var(--doc-line)]';
+const cell = 'border-[0.6px] border-[color:var(--doc-line)]';
 const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 text-[12px] font-semibold`;
 const bodyCell = `${cell} px-2 py-1 text-[11.5px]`;
 
@@ -58,7 +58,7 @@ export function TeacherSheet({
     .join('، ');
 
   return (
-    <TeacherTimetablePrintLayout
+    <TeacherTimetablePrintPage
       titleAr="جدول المعلمة"
       titleEn="Teacher Timetable"
       chrome={chrome}
@@ -76,13 +76,13 @@ export function TeacherSheet({
       ]}
     >
       {/* مادة واحدة مذكورة في شريط البيانات لا تُكرَّر في ثمانٍ وثلاثين خلية. */}
-      <TeacherTimetableGrid
+      <TimetableGrid
         index={index}
         lessons={lessons}
         context="teacher"
         showSubjectInCells={subjectIds.length > 1}
       />
-    </TeacherTimetablePrintLayout>
+    </TeacherTimetablePrintPage>
   );
 }
 
@@ -122,7 +122,7 @@ export function ClassSheet({
   }
 
   return (
-    <TeacherTimetablePrintLayout
+    <TeacherTimetablePrintPage
       titleAr="جدول الصف"
       titleEn="Class Timetable"
       chrome={chrome}
@@ -130,8 +130,8 @@ export function ClassSheet({
       nameEn={grade?.nameEn ? `${grade.nameEn} — Section ${section.label}` : undefined}
       info={info}
     >
-      <TeacherTimetableGrid index={index} lessons={lessons} context="class" />
-    </TeacherTimetablePrintLayout>
+      <TimetableGrid index={index} lessons={lessons} context="class" />
+    </TeacherTimetablePrintPage>
   );
 }
 
@@ -148,7 +148,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
   );
 
   return (
-    <TeacherTimetablePrintLayout
+    <TeacherTimetablePrintPage
       titleAr="الجدول المدرسي العام"
       titleEn="Master Timetable"
       chrome={chrome}
@@ -169,7 +169,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
           <tr>
             <th
               rowSpan={2}
-              className={`${cell} w-[6%] bg-[color:var(--doc-band)] px-1 py-1 text-[11px] font-bold`}
+              className={`${cell} w-[6%] bg-[color:var(--doc-day)] px-1 py-1 text-[11px] font-semibold`}
             >
               الشعبة
             </th>
@@ -177,7 +177,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
               <th
                 key={day.id}
                 colSpan={day.periods.filter((p) => p.kind === 'lesson').length}
-                className={`${cell} bg-[color:var(--doc-band)] px-1 py-1 text-[11px] font-bold`}
+                className={`${cell} bg-[color:var(--doc-day)] px-1 py-1 text-[11px] font-semibold`}
               >
                 {day.nameAr}
               </th>
@@ -198,7 +198,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
           {sections.map((section) => (
             <tr key={section.id}>
               <th
-                className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-bold`}
+                className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-semibold`}
               >
                 {section.label}
               </th>
@@ -213,7 +213,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
                   >
                     {lesson ? (
                       <>
-                        <span className="block text-[9px] font-bold">
+                        <span className="block text-[9px] font-semibold">
                           {subject?.code ?? subject?.nameAr}
                         </span>
                         <span className="block text-[8px] text-[color:var(--doc-muted)]">
@@ -234,7 +234,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
       <p className="mt-2 text-[9px] text-[color:var(--doc-muted)]">
         رموز المواد: {index.snapshot.subjects.map((s) => `${s.code} = ${s.nameAr}`).join(' · ')}
       </p>
-    </TeacherTimetablePrintLayout>
+    </TeacherTimetablePrintPage>
   );
 }
 
@@ -244,7 +244,7 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
   const loads = computeAllWorkloads(index).sort((a, b) => a.remaining - b.remaining);
 
   return (
-    <TeacherTimetablePrintLayout
+    <TeacherTimetablePrintPage
       titleAr="تقرير أنصبة المعلمات"
       titleEn="Teaching Load Report"
       chrome={chrome}
@@ -296,7 +296,7 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
           })}
         </tbody>
       </table>
-    </TeacherTimetablePrintLayout>
+    </TeacherTimetablePrintPage>
   );
 }
 
@@ -320,7 +320,7 @@ export function ConflictsSheet({
   };
 
   return (
-    <TeacherTimetablePrintLayout
+    <TeacherTimetablePrintPage
       titleAr="تقرير فحص الجدول"
       titleEn="Timetable Health Report"
       chrome={chrome}
@@ -371,6 +371,6 @@ export function ConflictsSheet({
           </tbody>
         </table>
       )}
-    </TeacherTimetablePrintLayout>
+    </TeacherTimetablePrintPage>
   );
 }
