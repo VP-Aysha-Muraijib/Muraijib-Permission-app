@@ -33,7 +33,10 @@ const line = 'border-[0.6px] border-[color:var(--doc-line)]';
 
 /**
  * ثلاث مناطق أفقية منخفضة الارتفاع: الهوية المؤسسية يمينًا، وهوية الوثيقة في
- * المنتصف، والعام الأكاديمي — ومعه شعار الميثاق الوطني حين يُزوَّد — يسارًا.
+ * المنتصف، والعام الأكاديمي يسارًا.
+ *
+ * شعار واحد لا مجموعة: اللوكاب الرسمي الموحّد للوزارة كما هو. المدرسة جهة
+ * تابعة لا علامة مستقلة، فاسمها نصّ تحت اسم الوزارة لا شعار ثانٍ.
  */
 export function InstitutionalHeader({
   titleAr,
@@ -83,21 +86,11 @@ export function InstitutionalHeader({
         )}
       </div>
 
-      {/* يسارًا: العام الأكاديمي، ومعه الميثاق الوطني حين يُزوَّد شعاره */}
-      <div className="flex shrink-0 items-center gap-2.5">
-        <div className="text-left leading-[1.3]">
-          <p className="text-[9.5px] text-[color:var(--doc-muted)]">العام الأكاديمي</p>
-          <p className="latin text-[8.5px] text-[color:var(--doc-muted)]">Academic Year</p>
-          <p className="latin text-[15px] font-semibold">{yearLabel}</p>
-        </div>
-        {BRAND.charterLogo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={BRAND.charterLogo}
-            alt={BRAND.charterNameAr}
-            className={`${LOGO_H} w-auto shrink-0 object-contain`}
-          />
-        )}
+      {/* يسارًا: العام الأكاديمي */}
+      <div className="shrink-0 text-left leading-[1.3]">
+        <p className="text-[9.5px] text-[color:var(--doc-muted)]">العام الأكاديمي</p>
+        <p className="latin text-[8.5px] text-[color:var(--doc-muted)]">Academic Year</p>
+        <p className="latin text-[15px] font-semibold">{yearLabel}</p>
       </div>
     </header>
   );
