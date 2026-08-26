@@ -6,10 +6,21 @@ import { buildGrid } from '@/lib/engine/grid';
 import { slotKey } from '@/lib/engine/snapshot';
 import { computeTeacherWorkload, computeAllWorkloads } from '@/lib/engine/workload';
 import type { HealthReport } from '@/lib/engine/conflicts';
-import { PrintFooter, PrintHeader, PrintIdentity, PrintSignatures } from './print-header';
-import { PrintGrid } from './print-grid';
+import {
+  TeacherTimetableGrid,
+  TeacherTimetablePrintLayout,
+  type InfoItem,
+} from './teacher-timetable';
 import { LOAD_LABEL } from '@/components/workload-cell';
 import type { DisplayLang } from '@/lib/i18n';
+
+/**
+ * أوراق المنظومة.
+ *
+ * لا تصميم هنا: كل ورقة استدعاء للقالب الرسمي الموحّد في `teacher-timetable`
+ * مع بياناتها وحدها. أي مقاس أو لون أو مسافة تُكتب في هذا الملف تكون بذلك
+ * فرقًا بصريًا بين ورقة وأخرى — وهو ما يجب ألّا يوجد.
+ */
 
 export interface SheetChrome {
   yearLabel: string;
@@ -19,10 +30,7 @@ export interface SheetChrome {
   lang: DisplayLang;
 }
 
-/** `doc` يحمل ألوان الوثيقة الرسمية، وهي مستقلة عن ألوان الواجهة. */
-const page = 'doc print-page print-block grow';
-
-/* حدود وخلفيات موحّدة لكل جداول التقارير — تُعرَّف مرة لتبقى الورقة متسقة. */
+/* حدود وخلفيات جداول التقارير — تُعرَّف مرة لتبقى هي نفسها في كل تقرير. */
 const cell = 'border border-[color:var(--doc-line)]';
 const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 text-[12px] font-semibold`;
 const bodyCell = `${cell} px-2 py-1 text-[11.5px]`;
@@ -43,43 +51,38 @@ export function TeacherSheet({
 
   const lessons = index.byTeacher.get(teacherId) ?? [];
   const load = computeTeacherWorkload(index, teacherId);
-  const subjects = [...new Set(lessons.map((l) => l.subjectId))]
+  const subjectIds = [...new Set(lessons.map((l) => l.subjectId))];
+  const subjects = subjectIds
     .map((id) => index.subjectById.get(id)?.nameAr)
     .filter(Boolean)
     .join('، ');
 
   return (
-    <section className={page}>
-      <PrintHeader titleAr="جدول المعلمة" titleEn="Teacher Timetable" yearLabel={chrome.yearLabel} />
-      <PrintIdentity
-        nameAr={teacher.nameAr}
-        nameEn={teacher.nameEn}
-        meta={[
-          { label: 'المادة', labelEn: 'Subject', value: subjects || 'ــ' },
-          {
-            label: 'النصاب',
-            labelEn: 'Load',
-            value: `${load.assigned} / ${load.required}`,
-            latin: true,
-          },
-          {
-            label: 'عدد الشعب',
-            labelEn: 'Sections',
-            value: String(new Set(lessons.map((l) => l.sectionId)).size),
-            latin: true,
-          },
-        ]}
+    <TeacherTimetablePrintLayout
+      titleAr="جدول المعلمة"
+      titleEn="Teacher Timetable"
+      chrome={chrome}
+      nameAr={teacher.nameAr}
+      nameEn={teacher.nameEn}
+      info={[
+        { label: 'المادة', labelEn: 'Subject', value: subjects || 'ــ' },
+        { label: 'النصاب', labelEn: 'Load', value: `${load.assigned} / ${load.required}`, latin: true },
+        {
+          label: 'عدد الشعب',
+          labelEn: 'Sections',
+          value: String(new Set(lessons.map((l) => l.sectionId)).size),
+          latin: true,
+        },
+      ]}
+    >
+      {/* مادة واحدة مذكورة في شريط البيانات لا تُكرَّر في ثمانٍ وثلاثين خلية. */}
+      <TeacherTimetableGrid
+        index={index}
+        lessons={lessons}
+        context="teacher"
+        showSubjectInCells={subjectIds.length > 1}
       />
-      <div className="sheet-fill">
-        <PrintGrid index={index} lessons={lessons} context="teacher" lang={chrome.lang} />
-      </div>
-      <PrintSignatures />
-      <PrintFooter
-        versionLabel={chrome.versionLabel}
-        issuedAt={chrome.issuedAt}
-        hidden={chrome.hideFooter}
-      />
-    </section>
+    </TeacherTimetablePrintLayout>
   );
 }
 
@@ -103,39 +106,32 @@ export function ClassSheet({
     ? index.teacherById.get(section.classTeacherId)?.nameAr
     : null;
 
+  const info: InfoItem[] = [
+    { label: 'عدد الحصص', labelEn: 'Lessons', value: String(lessons.length), latin: true },
+  ];
+  if (section.studentCount) {
+    info.push({
+      label: 'عدد الطالبات',
+      labelEn: 'Students',
+      value: String(section.studentCount),
+      latin: true,
+    });
+  }
+  if (classTeacher) {
+    info.push({ label: 'رائدة الفصل', labelEn: 'Class Teacher', value: classTeacher });
+  }
+
   return (
-    <section className={page}>
-      <PrintHeader titleAr="جدول الصف" titleEn="Class Timetable" yearLabel={chrome.yearLabel} />
-      <PrintIdentity
-        nameAr={`${grade?.nameAr ?? ''} — الشعبة ${section.label}`.trim()}
-        nameEn={grade?.nameEn ? `${grade.nameEn} — Section ${section.label}` : undefined}
-        meta={[
-          { label: 'عدد الحصص', labelEn: 'Lessons', value: String(lessons.length), latin: true },
-          ...(section.studentCount
-            ? [
-                {
-                  label: 'عدد الطالبات',
-                  labelEn: 'Students',
-                  value: String(section.studentCount),
-                  latin: true,
-                },
-              ]
-            : []),
-          ...(classTeacher
-            ? [{ label: 'رائدة الفصل', labelEn: 'Class Teacher', value: classTeacher }]
-            : []),
-        ]}
-      />
-      <div className="sheet-fill">
-        <PrintGrid index={index} lessons={lessons} context="class" lang={chrome.lang} />
-      </div>
-      <PrintSignatures />
-      <PrintFooter
-        versionLabel={chrome.versionLabel}
-        issuedAt={chrome.issuedAt}
-        hidden={chrome.hideFooter}
-      />
-    </section>
+    <TeacherTimetablePrintLayout
+      titleAr="جدول الصف"
+      titleEn="Class Timetable"
+      chrome={chrome}
+      nameAr={`${grade?.nameAr ?? ''} — الشعبة ${section.label}`.trim()}
+      nameEn={grade?.nameEn ? `${grade.nameEn} — Section ${section.label}` : undefined}
+      info={info}
+    >
+      <TeacherTimetableGrid index={index} lessons={lessons} context="class" />
+    </TeacherTimetablePrintLayout>
   );
 }
 
@@ -152,30 +148,29 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
   );
 
   return (
-    <section className={page}>
-      <PrintHeader
-        titleAr="الجدول المدرسي العام"
-        titleEn="Master Timetable"
-        yearLabel={chrome.yearLabel}
-      />
-      <PrintIdentity
-        nameAr="جميع الشعب"
-        nameEn="All Classes"
-        meta={[
-          { label: 'عدد الشعب', labelEn: 'Sections', value: String(sections.length), latin: true },
-          {
-            label: 'عدد الحصص',
-            labelEn: 'Lessons',
-            value: String(index.snapshot.lessons.length),
-            latin: true,
-          },
-        ]}
-      />
-
+    <TeacherTimetablePrintLayout
+      titleAr="الجدول المدرسي العام"
+      titleEn="Master Timetable"
+      chrome={chrome}
+      nameAr="جميع الشعب"
+      nameEn="All Classes"
+      info={[
+        { label: 'عدد الشعب', labelEn: 'Sections', value: String(sections.length), latin: true },
+        {
+          label: 'عدد الحصص',
+          labelEn: 'Lessons',
+          value: String(index.snapshot.lessons.length),
+          latin: true,
+        },
+      ]}
+    >
       <table className="w-full table-fixed border-collapse text-center">
         <thead>
           <tr>
-            <th rowSpan={2} className={`${cell} bg-[color:var(--doc-band)] w-[6%] px-1 py-1 text-[11px] font-bold`}>
+            <th
+              rowSpan={2}
+              className={`${cell} w-[6%] bg-[color:var(--doc-band)] px-1 py-1 text-[11px] font-bold`}
+            >
               الشعبة
             </th>
             {grid.days.map((day) => (
@@ -202,7 +197,9 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
         <tbody>
           {sections.map((section) => (
             <tr key={section.id}>
-              <th className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-bold`}>
+              <th
+                className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-bold`}
+              >
                 {section.label}
               </th>
               {grid.columns.map((column) => {
@@ -237,14 +234,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
       <p className="mt-2 text-[9px] text-[color:var(--doc-muted)]">
         رموز المواد: {index.snapshot.subjects.map((s) => `${s.code} = ${s.nameAr}`).join(' · ')}
       </p>
-
-      <PrintSignatures />
-      <PrintFooter
-        versionLabel={chrome.versionLabel}
-        issuedAt={chrome.issuedAt}
-        hidden={chrome.hideFooter}
-      />
-    </section>
+    </TeacherTimetablePrintLayout>
   );
 }
 
@@ -254,24 +244,23 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
   const loads = computeAllWorkloads(index).sort((a, b) => a.remaining - b.remaining);
 
   return (
-    <section className={page}>
-      <PrintHeader
-        titleAr="تقرير أنصبة المعلمات"
-        titleEn="Teaching Load Report"
-        yearLabel={chrome.yearLabel}
-      />
-      <PrintIdentity
-        meta={[
-          { label: 'عدد المعلمات', labelEn: 'Teachers', value: String(loads.length), latin: true },
-          {
-            label: 'إجمالي الحصص',
-            labelEn: 'Total lessons',
-            value: String(index.snapshot.lessons.length),
-            latin: true,
-          },
-        ]}
-      />
-
+    <TeacherTimetablePrintLayout
+      titleAr="تقرير أنصبة المعلمات"
+      titleEn="Teaching Load Report"
+      chrome={chrome}
+      nameAr="جميع المعلمات"
+      nameEn="All Teachers"
+      fill={false}
+      info={[
+        { label: 'عدد المعلمات', labelEn: 'Teachers', value: String(loads.length), latin: true },
+        {
+          label: 'إجمالي الحصص',
+          labelEn: 'Total lessons',
+          value: String(index.snapshot.lessons.length),
+          latin: true,
+        },
+      ]}
+    >
       <table className="w-full border-collapse">
         <thead>
           <tr>
@@ -307,14 +296,7 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
           })}
         </tbody>
       </table>
-
-      <PrintSignatures />
-      <PrintFooter
-        versionLabel={chrome.versionLabel}
-        issuedAt={chrome.issuedAt}
-        hidden={chrome.hideFooter}
-      />
-    </section>
+    </TeacherTimetablePrintLayout>
   );
 }
 
@@ -338,29 +320,28 @@ export function ConflictsSheet({
   };
 
   return (
-    <section className={page}>
-      <PrintHeader
-        titleAr="تقرير فحص الجدول"
-        titleEn="Timetable Health Report"
-        yearLabel={chrome.yearLabel}
-      />
-      <PrintIdentity
-        meta={[
-          {
-            label: 'درجة الجودة',
-            labelEn: 'Quality',
-            value: health.valid ? `${health.score}%` : 'غير صالح',
-            latin: health.valid,
-          },
-          {
-            label: 'عدد الملاحظات',
-            labelEn: 'Findings',
-            value: String(health.violations.length),
-            latin: true,
-          },
-        ]}
-      />
-
+    <TeacherTimetablePrintLayout
+      titleAr="تقرير فحص الجدول"
+      titleEn="Timetable Health Report"
+      chrome={chrome}
+      nameAr="الجدول المدرسي"
+      nameEn="School Timetable"
+      fill={false}
+      info={[
+        {
+          label: 'درجة الجودة',
+          labelEn: 'Quality',
+          value: health.valid ? `${health.score}%` : 'غير صالح',
+          latin: health.valid,
+        },
+        {
+          label: 'عدد الملاحظات',
+          labelEn: 'Findings',
+          value: String(health.violations.length),
+          latin: true,
+        },
+      ]}
+    >
       {health.violations.length === 0 ? (
         <p className={`${cell} px-3 py-6 text-center text-[13px]`}>
           لا توجد ملاحظات — اجتاز الجدول جميع الفحوص.
@@ -390,13 +371,6 @@ export function ConflictsSheet({
           </tbody>
         </table>
       )}
-
-      <PrintSignatures />
-      <PrintFooter
-        versionLabel={chrome.versionLabel}
-        issuedAt={chrome.issuedAt}
-        hidden={chrome.hideFooter}
-      />
-    </section>
+    </TeacherTimetablePrintLayout>
   );
 }
