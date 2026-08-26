@@ -57,7 +57,9 @@ const PAPERS: Array<{
  * ضيّق عمدًا: كل مِلّيمتر يُعاد إلى الجدول، وهو محتوى الورقة. أفقيًا أوسع
  * قليلًا ليتنفّس العمودان الطرفيان ولا يلتصقا بحافة الورقة.
  */
-const PAGE_MARGIN = '7mm 8mm';
+const PAGE_MARGIN_Y_MM = 7;
+const PAGE_MARGIN_X_MM = 8;
+const PAGE_MARGIN = `${PAGE_MARGIN_Y_MM}mm ${PAGE_MARGIN_X_MM}mm`;
 
 export default function PrintCenterPage() {
   const params = useSearchParams();
@@ -147,7 +149,13 @@ export default function PrintCenterPage() {
       {/* `@page` لا تُلفّ داخل `@media print`: القاعدة تخصّ الوسائط المقسَّمة
           إلى صفحات أصلًا، ولفّها يجعلها تسقط في مسارات تصدير PDF التي لا
           تُفعّل وسيط الطباعة — فتخرج الورقة على مقاس افتراضي لا على A4. */}
-      <style>{`@page { size: ${paperSpec.css}; margin: ${PAGE_MARGIN}; }`}</style>
+      {/* ارتفاع صندوق المحتوى بالمِلّيمتر لا بـ `vh`: وحدة `vh` تُحسب على نافذة
+          العرض في بعض مسارات التصدير وعلى الورقة في غيرها، فتخرج الورقة
+          صفحتين. المقاس معروف هنا يقينًا — ارتفاع الورق ناقص الهامشين، وناقص
+          مِلّيمترًا احتياطيًا: المطابقة التامة لحدّ الصندوق تتجاوزه بكسرٍ عند
+          التقريب فينزل التذييل وحده إلى صفحة ثانية. */}
+      <style>{`@page { size: ${paperSpec.css}; margin: ${PAGE_MARGIN}; }
+        @media print { .print-page { --doc-page-fill: ${paperSpec.heightMm - 2 * PAGE_MARGIN_Y_MM - 1}mm; } }`}</style>
 
       <div className="no-print">
         <PageHeader

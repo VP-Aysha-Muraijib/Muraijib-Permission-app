@@ -32,7 +32,7 @@ export interface SheetChrome {
 }
 
 /* حدود وخلفيات جداول التقارير — تُعرَّف مرة لتبقى هي نفسها في كل تقرير. */
-const cell = 'border-[0.6px] border-[color:var(--doc-line)]';
+const cell = 'border-[0.5px] border-[color:var(--doc-line)]';
 const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 ${DOC_TYPE.reportHead}`;
 const bodyCell = `${cell} px-2 py-1 ${DOC_TYPE.reportBody}`;
 
@@ -127,7 +127,9 @@ export function ClassSheet({
       titleAr="جدول الصف"
       titleEn="Class Timetable"
       chrome={chrome}
-      nameAr={`${grade?.nameAr ?? ''} — الشعبة ${section.label}`.trim()}
+      nameLabel="الشعبة"
+      nameLabelEn="Section"
+      nameAr={`${grade?.nameAr ?? ''} — ${section.label}`.trim()}
       nameEn={grade?.nameEn ? `${grade.nameEn} — Section ${section.label}` : undefined}
       info={info}
     >
@@ -153,6 +155,8 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
       titleAr="الجدول المدرسي العام"
       titleEn="Master Timetable"
       chrome={chrome}
+      nameLabel="النطاق"
+      nameLabelEn="Scope"
       nameAr="جميع الشعب"
       nameEn="All Classes"
       info={[
@@ -249,9 +253,10 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
       titleAr="تقرير أنصبة المعلمات"
       titleEn="Teaching Load Report"
       chrome={chrome}
+      nameLabel="النطاق"
+      nameLabelEn="Scope"
       nameAr="جميع المعلمات"
       nameEn="All Teachers"
-      fill={false}
       info={[
         { label: 'عدد المعلمات', labelEn: 'Teachers', value: String(loads.length), latin: true },
         {
@@ -325,9 +330,10 @@ export function ConflictsSheet({
       titleAr="تقرير فحص الجدول"
       titleEn="Timetable Health Report"
       chrome={chrome}
+      nameLabel="النطاق"
+      nameLabelEn="Scope"
       nameAr="الجدول المدرسي"
       nameEn="School Timetable"
-      fill={false}
       info={[
         {
           label: 'درجة الجودة',
