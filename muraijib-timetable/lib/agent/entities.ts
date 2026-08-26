@@ -28,7 +28,7 @@ const GRADE_WORDS: Record<string, number> = {
 };
 
 export const toLatinDigits = (text: string) =>
-  text.replace(/[٠-٩]/g, (d) => AR_DIGIT_MAP[d] ?? d);
+  text.replace(/[\u0660-\u0669]/g, (d) => AR_DIGIT_MAP[d] ?? d);  // الأرقام الهندية
 
 /**
  * مطابقة الاسم على حدود الكلمات.
@@ -38,7 +38,7 @@ export const toLatinDigits = (text: string) =>
  */
 const tokenize = (text: string) =>
   normalizeAr(toLatinDigits(text))
-    .replace(/[.,،؟!:؛"'()]/g, ' ')
+    .replace(/[.,\u060C\u061F!:\u061B"'()]/g, ' ')  // علامات الترقيم العربية واللاتينية
     .split(/\s+/)
     .filter(Boolean);
 

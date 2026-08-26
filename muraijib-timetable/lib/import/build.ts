@@ -63,7 +63,7 @@ const AR_DIGITS: Record<string, string> = {
   '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
   '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
 };
-const digits = (text: string) => text.replace(/[٠-٩]/g, (d) => AR_DIGITS[d] ?? d);
+const digits = (text: string) => text.replace(/[\u0660-\u0669]/g, (d) => AR_DIGITS[d] ?? d);
 
 function matchDay(value: string) {
   const normalized = normalizeAr(value);

@@ -32,10 +32,10 @@ export function greetingAr(date = new Date()): string {
 /** بحث عربي متسامح: يتجاهل التشكيل وأشكال الألف والهاء/التاء المربوطة. */
 export function normalizeAr(text: string): string {
   return text
-    .replace(/[ً-ْـ]/g, '')
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
+    .replace(/[\u064B-\u0652\u0640]/g, '')  // التشكيل والتطويل
+    .replace(/[\u0623\u0625\u0622\u0671]/g, '\u0627')  // أشكال الألف
+    .replace(/\u0649/g, '\u064A')  // الألف المقصورة
+    .replace(/\u0629/g, '\u0647')  // التاء المربوطة
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();

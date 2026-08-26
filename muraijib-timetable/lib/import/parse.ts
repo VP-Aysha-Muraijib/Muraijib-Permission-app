@@ -24,7 +24,7 @@ export interface ParsedFile {
 
 const clean = (value: unknown) =>
   String(value ?? '')
-    .replace(/‏|‎/g, '')
+    .replace(/[\u200F\u200E]/g, '')  // علامات اتجاه غير مرئية تلتصق بالخلايا
     .trim();
 
 export async function parseFile(file: File): Promise<ParsedFile> {
