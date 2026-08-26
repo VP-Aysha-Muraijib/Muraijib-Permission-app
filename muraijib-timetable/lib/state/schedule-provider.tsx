@@ -46,6 +46,8 @@ interface ScheduleContextValue {
   canUndo: boolean;
   undo(): Promise<ApplyResult | null>;
 
+  /** حفظ البيانات المرجعية (معلمات/مواد/صفوف/إعدادات الأسبوع) — لا يمسّ الحصص. */
+  saveReference(patch: Partial<ScheduleSnapshot>, summaryAr: string): Promise<void>;
   refresh(): Promise<void>;
   restore(versionId: ID): Promise<ApplyResult>;
   replaceAll(snapshot: ScheduleSnapshot, reason: string): Promise<ApplyResult>;
@@ -159,6 +161,21 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
     return result;
   }, [undoStack, snapshot, profile, refresh]);
 
+  const saveReference = React.useCallback(
+    async (patch: Partial<ScheduleSnapshot>, summaryAr: string) => {
+      const store = getStore();
+      await store.saveReferenceData(patch);
+      await store.appendAudit({
+        actor: profile?.name ?? 'مستخدم',
+        action: 'edit-reference',
+        entity: 'reference',
+        summaryAr,
+      });
+      await refresh();
+    },
+    [profile, refresh],
+  );
+
   const restore = React.useCallback(
     async (versionId: ID) => {
       const result = await getStore().restoreVersion(versionId, profile?.name ?? 'مستخدم');
@@ -196,6 +213,7 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
     apply,
     canUndo: undoStack.length > 0,
     undo,
+    saveReference,
     refresh,
     restore,
     replaceAll,
