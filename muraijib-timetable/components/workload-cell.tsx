@@ -26,7 +26,9 @@ export function LoadBar({ load, className }: { load: TeacherWorkload; className?
   return (
     <div className={cn('min-w-[7rem]', className)}>
       <div className="mb-1 flex items-baseline justify-between gap-2">
-        <span className="tabular text-xs font-semibold text-ink">
+        {/* المسند/النصاب يُعزل باتجاهه: في سياق عربي ينعكس ترتيب طرفي الكسر
+            فيلتبس أيّهما المسند وأيّهما المطلوب. */}
+        <span className="ltr-run tabular text-xs font-semibold text-ink">
           {load.assigned} / {load.required}
         </span>
         <span

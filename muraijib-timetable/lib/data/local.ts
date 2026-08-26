@@ -20,7 +20,7 @@ import type {
 import { applyOps, localId } from '@/lib/engine/changeset';
 import { validateChangeSet } from '@/lib/engine/validator';
 import { scoreSnapshot } from '@/lib/engine/score';
-import { buildDemoSnapshot } from './demo';
+import { getSeed } from './seed';
 import type { ApplyResult, DataStore } from './store';
 
 const DB_NAME = 'muraijib-timetable';
@@ -70,24 +70,24 @@ async function writeAll(docs: Documents): Promise<void> {
 }
 
 function seed(): Documents {
-  const demo = buildDemoSnapshot();
-  const { lessons, locks, versionId, ...reference } = demo;
+  const { snapshot: initial, isDemo, reasonAr } = getSeed();
+  const { lessons, locks, versionId, ...reference } = initial;
   const version: ScheduleVersion = {
     id: versionId,
     label: 'v1.0',
     parentId: null,
-    reason: 'بيانات تجريبية أولية',
+    reason: reasonAr,
     createdBy: 'النظام',
     createdAt: new Date().toISOString(),
     isBaseline: true,
     isCurrent: true,
     lessonsChanged: lessons.length,
-    qualityScore: scoreSnapshot(demo).total,
+    qualityScore: scoreSnapshot(initial).total,
   };
 
   return {
     meta: {
-      isDemo: true,
+      isDemo,
       currentVersionId: versionId,
       profile: { id: 'local', name: 'نائب المدير', role: 'admin' },
     },
@@ -102,7 +102,9 @@ function seed(): Documents {
         actor: 'النظام',
         action: 'seed',
         entity: 'schedule',
-        summaryAr: 'تحميل بيانات تجريبية لعرض المنظومة قبل استيراد بيانات المدرسة.',
+        summaryAr: isDemo
+          ? 'تحميل بيانات تجريبية لعرض المنظومة قبل استيراد بيانات المدرسة.'
+          : `اعتماد الجدول المرجعي: ${lessons.length} حصة · ${reference.teachers.length} معلمة · ${reference.sections.length} شعبة.`,
       },
     ],
     scenarios: [],
@@ -327,7 +329,7 @@ export class LocalStore implements DataStore {
     return { ok: true, version, snapshot: { ...snapshot, versionId: newVersionId } };
   }
 
-  /** إعادة تحميل البيانات التجريبية — للتجريب فقط. */
+  /** إعادة التهيئة إلى بيانات البداية — يمحو كل ما أُدخل في هذا المتصفح. */
   async resetToDemo(): Promise<void> {
     await writeAll(seed());
   }

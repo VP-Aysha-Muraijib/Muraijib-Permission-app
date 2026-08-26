@@ -24,6 +24,20 @@ const nextShims = {
   },
 };
 
+/**
+ * بيانات المدرسة تُضمَّن في البناء إن وُجد standalone/seed.json.
+ * الملف مستثنى من المستودع: أسماء الكادر وجداولهم لا تُرفع إلى مستودع عام.
+ */
+const seedPath = path.join(root, 'standalone/seed.json');
+const hasSeed = fs.existsSync(seedPath);
+const seed = hasSeed ? fs.readFileSync(seedPath, 'utf8') : 'undefined';
+if (hasSeed) {
+  const parsed = JSON.parse(seed);
+  console.log(`⓪ بيانات مضمَّنة: ${parsed.lessons.length} حصة · ${parsed.teachers.length} معلمة`);
+} else {
+  console.log('⓪ بلا بيانات مضمَّنة — ستُهيَّأ النسخة ببيانات تجريبية');
+}
+
 console.log('① بناء JavaScript…');
 const result = await esbuild.build({
   entryPoints: ['standalone/main.tsx'],
@@ -39,6 +53,7 @@ const result = await esbuild.build({
   define: {
     'process.env.NODE_ENV': '"production"',
     'process.env.NEXT_PUBLIC_DATA_MODE': '"local"',
+    __MURAIJIB_SEED__: seed,
   },
   loader: { '.tsx': 'tsx', '.ts': 'ts' },
   alias: { '@': root },
@@ -69,6 +84,6 @@ html { direction: rtl; }
 <div id="app" dir="rtl" lang="ar"></div>
 <script>${js}</script>`;
 
-const file = path.join(out, 'muraijib-timetable.html');
+const file = path.join(out, hasSeed ? 'جدول مدرسة مريجب 2027.html' : 'muraijib-timetable.html');
 fs.writeFileSync(file, html);
 console.log(`✓ ${file} — ${(html.length / 1024 / 1024).toFixed(2)} ميغابايت`);

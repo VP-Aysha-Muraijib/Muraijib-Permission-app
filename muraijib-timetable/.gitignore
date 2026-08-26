@@ -12,3 +12,6 @@ standalone/dist/
 *baseline*.json
 raw-extract.json
 clean.json
+
+# بيانات المدرسة لا تُرفع إلى مستودع عام
+standalone/seed.json
