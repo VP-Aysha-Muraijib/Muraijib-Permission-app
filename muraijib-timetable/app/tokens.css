@@ -1,0 +1,67 @@
+/* ══════════════════════════════════════════════════════════════
+   Design Tokens — منظومة مريجب الذكية للجدول المدرسي
+
+   الهوية البصرية هنا **محايدة ومؤقتة**: لم تُخترع ألوان وزارية ولم يُعَد
+   رسم أي شعار. عند تزويد المشروع بالأصول الرسمية المعتمدة يُستبدل هذا
+   الملف وحده (وملف public/brand/) دون لمس أي مكوّن.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── الهوية ── */
+  --brand-primary:       #0B4A4F;
+  --brand-primary-ink:   #073237;
+  --brand-primary-soft:  #14666D;
+  --brand-primary-tint:  #E8F0EF;
+
+  --brand-accent:        #A9853C;
+  --brand-accent-soft:   #F6EEDC;
+
+  /* ── الأسطح ── */
+  --surface-canvas:      #F6F4EF;
+  --surface:             #FFFFFF;
+  --surface-raised:      #FFFFFF;
+  --surface-sunken:      #EFEDE6;
+
+  /* ── الحدود ── */
+  --border:              #E2DED4;
+  --border-strong:       #CFC9BB;
+
+  /* ── النص ── */
+  --text:                #17211F;
+  --text-muted:          #5C6663;
+  --text-faint:          #8A928F;
+  --text-invert:         #FFFFFF;
+
+  /* ── الدلالات ── */
+  --ok:                  #2F6B4F;
+  --ok-soft:             #E7F1EB;
+  --warn:                #8F6415;
+  --warn-soft:           #FAF0DC;
+  --danger:              #8E3B36;
+  --danger-soft:         #F8E9E7;
+  --info:                #2A5F7F;
+  --info-soft:           #E6F0F5;
+
+  /* ── الشكل ── */
+  --radius-sm:           6px;
+  --radius:              10px;
+  --radius-lg:           14px;
+  --radius-xl:           20px;
+
+  --shadow-card:         0 1px 2px rgba(23, 33, 31, .05), 0 1px 3px rgba(23, 33, 31, .04);
+  --shadow-raised:       0 2px 6px rgba(23, 33, 31, .07), 0 8px 24px rgba(23, 33, 31, .06);
+  --shadow-overlay:      0 12px 40px rgba(23, 33, 31, .16);
+
+  /* ── الخطوط ── */
+  --font-arabic:         'Tajawal', system-ui, sans-serif;
+  --font-numeric:        'Tajawal', system-ui, sans-serif;
+
+  /* ── القياسات ── */
+  --sidebar-width:       248px;
+  --topbar-height:       58px;
+}
+
+/* ألوان المواد تُقرأ من قاعدة البيانات لا من هنا — هذه احتياطية فقط. */
+:root {
+  --subject-fallback:    #6B7280;
+}

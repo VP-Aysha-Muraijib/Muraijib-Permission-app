@@ -1,0 +1,168 @@
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    background: var(--surface-canvas);
+    color: var(--text);
+    font-family: var(--font-arabic);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* الأرقام في الجداول يجب أن تصطف عموديًا — وإلا صار الجدول صعب القراءة. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* نطاقات لاتينية (سنة دراسية، توقيت، رقم نسخة) لا يجوز أن ينعكس ترتيبها
+     داخل النص العربي — تُعزل باتجاهها الأصلي. */
+  .ltr-run {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+
+  ::selection {
+    background: var(--brand-primary-tint);
+    color: var(--brand-primary-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand-primary-soft);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* شريط تمرير هادئ يناسب لوحة عمل تُستخدم ساعات طويلة. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid var(--surface-canvas);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-faint);
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-line rounded-lg shadow-card;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded font-medium
+           transition-colors select-none whitespace-nowrap
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-md { @apply h-9 px-4 text-sm; }
+  .btn-sm { @apply h-8 px-3 text-xs; }
+  .btn-lg { @apply h-11 px-6 text-base; }
+
+  .btn-primary { @apply btn bg-brand text-ink-invert hover:bg-brand-ink; }
+  .btn-secondary { @apply btn bg-surface border border-line-strong text-ink hover:bg-surface-sunken; }
+  .btn-ghost { @apply btn text-ink-muted hover:bg-surface-sunken hover:text-ink; }
+  .btn-danger { @apply btn bg-danger text-ink-invert hover:opacity-90; }
+
+  .input {
+    @apply h-9 w-full rounded border border-line bg-surface px-3 text-sm
+           placeholder:text-ink-faint focus:border-brand-soft focus:outline-none
+           focus:ring-2 focus:ring-brand-tint;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-2xs font-medium;
+  }
+
+  .table-head {
+    @apply text-2xs font-semibold uppercase tracking-wide text-ink-faint;
+  }
+}
+
+/* ══════════════ الطباعة ══════════════
+   الشاشة أداة تحرير، والورقة وثيقة رسمية. لذلك تختلفان عمدًا. */
+@media print {
+  :root {
+    --surface-canvas: #FFFFFF;
+  }
+
+  body {
+    background: #FFFFFF !important;
+    font-size: 11pt;
+  }
+
+  /* لا شيء من أدوات التحرير يظهر على الورق. */
+  .no-print,
+  nav[data-app-nav],
+  aside[data-app-sidebar],
+  header[data-app-topbar],
+  [data-agent-panel] {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* خلية الجدول لا تنقسم بين صفحتين. */
+  tr,
+  td,
+  th,
+  .print-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  .print-page {
+    break-after: page;
+    page-break-after: always;
+  }
+  .print-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* الحدود والألوان يجب أن تُطبع كما تُعرض. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+}
+
+.print-only {
+  display: none;
+}
