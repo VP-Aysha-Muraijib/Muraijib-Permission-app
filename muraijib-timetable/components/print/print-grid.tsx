@@ -2,13 +2,21 @@ import type { Lesson } from '@/lib/domain/types';
 import type { SnapshotIndex } from '@/lib/engine/snapshot';
 import { slotKey } from '@/lib/engine/snapshot';
 import { buildGrid, periodOf } from '@/lib/engine/grid';
-import { primary, secondary, type DisplayLang } from '@/lib/i18n';
+import { type DisplayLang } from '@/lib/i18n';
 
 /**
  * شبكة الجدول المطبوعة.
  *
- * تختلف عن شبكة الشاشة: حدود صريحة قابلة للطباعة بالأبيض والأسود، وبلا خلفيات
- * ملوّنة تستهلك الحبر، وبلا أي عنصر تفاعلي.
+ * الاتجاه هو المعتمد في جداول المدرسة الورقية: أيام الأسبوع عمود رأسي في أقصى
+ * اليمين، والحصص أعمدة أفقية في الأعلى تحت كلٍّ منها وقتها. هذا يجعل عدد
+ * الأعمدة محكومًا بعدد حصص اليوم لا بعدد الأيام، فتُستغَل ورقة A4 العرضية
+ * كاملة ويُقرأ يوم المعلمة في سطر واحد.
+ *
+ * الفسحة والصلاة والطابور أعمدة مستقلة في موضعها الزمني الصحيح، بخلفية أهدأ
+ * درجةً واحدة — تمييز يكفي للتمييز ولا يكفي لسرقة الانتباه من الحصص.
+ *
+ * لا خلفيات ملوّنة ولا ظلال ولا بطاقات: الورقة تُطبع بالأبيض والأسود على
+ * طابعات مدرسية، فبُنيت على التباين والحدود وحدها.
  */
 export function PrintGrid({
   index,
@@ -21,121 +29,162 @@ export function PrintGrid({
   lessons: Lesson[];
   context: 'teacher' | 'class';
   showTimes?: boolean;
+  /** محفوظ للتوافق — الوثيقة الرسمية ثنائية اللغة دائمًا. */
   lang?: DisplayLang;
 }) {
+  void lang;
   const grid = buildGrid(index.snapshot.week);
   const bySlot = new Map(lessons.map((l) => [slotKey(l.dayId, l.periodIndex), l]));
 
+  const lessonCols = grid.rows.filter((r) => r.kind === 'lesson').length;
+  const breakCols = grid.rows.length - lessonCols;
+  /* عمود اليوم ثابت النسبة، والفواصل أضيق، والباقي يُقسَّم بالتساوي على الحصص. */
+  const dayPct = 10;
+  const breakPct = 4.5;
+  const lessonPct = (100 - dayPct - breakCols * breakPct) / Math.max(1, lessonCols);
+
+  const cell = 'border border-[color:var(--doc-line)] align-middle';
+
   return (
-    <table className="w-full border-collapse text-center">
+    <table className="w-full table-fixed border-collapse text-center">
+      <colgroup>
+        <col style={{ width: `${dayPct}%` }} />
+        {grid.rows.map((row) => (
+          <col
+            key={row.index}
+            style={{ width: `${row.kind === 'lesson' ? lessonPct : breakPct}%` }}
+          />
+        ))}
+      </colgroup>
+
       <thead>
         <tr>
-          <th className="w-[16%] border border-black/70 bg-black/[.06] px-1 py-1 text-[9pt] font-bold">
-            الحصة
+          <th
+            className={`${cell} bg-[color:var(--doc-band)] px-1 py-1.5 leading-tight`}
+            scope="col"
+          >
+            <span className="block text-[13px] font-bold">اليوم</span>
+            <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
+              Day
+            </span>
           </th>
-          {grid.days.map((day) => (
-            <th
-              key={day.id}
-              className="border border-black/70 bg-black/[.06] px-1 py-1 text-[9pt] font-bold"
-            >
-              <span className="block">{primary(day.nameAr, day.nameEn, lang)}</span>
-              {secondary(day.nameAr, day.nameEn, lang) && (
-                <span className="block text-[7pt] font-normal text-black/60">
-                  {secondary(day.nameAr, day.nameEn, lang)}
-                </span>
-              )}
-              {grid.daysWithOwnTimes.has(day.id) && (
-                <span className="block text-[6.5pt] font-normal text-black/70">توقيت مختلف</span>
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {grid.rows.map((row) => {
-          if (row.kind !== 'lesson') {
-            return (
-              <tr key={row.index}>
-                <td
-                  colSpan={grid.days.length + 1}
-                  className="border border-black/70 bg-black/[.04] px-1 py-0.5 text-[8pt] font-medium"
-                >
-                  {row.labelAr}
-                  {showTimes && <span className="mr-2 text-black/55">{row.timeRange}</span>}
-                </td>
-              </tr>
-            );
-          }
 
-          return (
-            <tr key={row.index}>
-              <th className="border border-black/70 bg-black/[.03] px-1 py-1 text-[8.5pt] font-semibold">
-                <span className="block">{row.labelAr}</span>
-                {showTimes && (
-                  <span className="ltr-run block text-[7pt] font-normal text-black/55">
+          {grid.rows.map((row) =>
+            row.kind === 'lesson' ? (
+              <th
+                key={row.index}
+                scope="col"
+                className={`${cell} bg-[color:var(--doc-head)] px-1 py-1.5 leading-tight`}
+              >
+                <span className="block text-[13px] font-semibold">{row.labelAr}</span>
+                {showTimes && row.timeRange && (
+                  <span className="latin mt-px block text-[10px] font-normal tabular-nums text-[color:var(--doc-muted)]">
                     {row.timeRange}
                   </span>
                 )}
               </th>
+            ) : (
+              <th
+                key={row.index}
+                scope="col"
+                className={`${cell} bg-[color:var(--doc-band)] px-0.5 py-1.5 leading-tight`}
+              >
+                <span className="block text-[10px] font-medium text-[color:var(--doc-muted)]">
+                  {row.labelAr}
+                </span>
+                {showTimes && row.timeRange && (
+                  <span className="latin mt-px block text-[8.5px] tabular-nums text-[color:var(--doc-muted)]">
+                    {row.timeRange}
+                  </span>
+                )}
+              </th>
+            ),
+          )}
+        </tr>
+      </thead>
 
-              {grid.days.map((day) => {
-                const period = periodOf(day, row.index);
-                if (period?.kind !== 'lesson') {
-                  return (
-                    <td key={day.id} className="border border-black/70 bg-black/[.05] px-1 py-2" />
-                  );
-                }
+      <tbody>
+        {grid.days.map((day) => (
+          <tr key={day.id}>
+            <th
+              scope="row"
+              className={`${cell} bg-[color:var(--doc-head)] px-1 py-2 leading-tight`}
+            >
+              <span className="block text-[16px] font-bold">{day.nameAr}</span>
+              {day.nameEn && (
+                <span className="latin block text-[10px] font-normal text-[color:var(--doc-muted)]">
+                  {day.nameEn}
+                </span>
+              )}
+              {grid.daysWithOwnTimes.has(day.id) && (
+                <span className="mt-0.5 block text-[8.5px] font-normal text-[color:var(--doc-muted)]">
+                  توقيت مختلف
+                </span>
+              )}
+            </th>
 
-                const lesson = bySlot.get(slotKey(day.id, row.index));
-                if (!lesson) {
-                  return (
-                    <td key={day.id} className="border border-black/70 px-1 py-2 align-middle">
-                      <span className="text-[8pt] text-black/35">—</span>
-                    </td>
-                  );
-                }
+            {grid.rows.map((row) => {
+              const period = periodOf(day, row.index);
 
-                const subject = index.subjectById.get(lesson.subjectId);
-                const section = index.sectionById.get(lesson.sectionId);
-                const teacher = lesson.teacherId ? index.teacherById.get(lesson.teacherId) : null;
-                const room = lesson.roomId ? index.roomById.get(lesson.roomId) : null;
-
+              if (period?.kind !== 'lesson') {
                 return (
-                  <td key={day.id} className="border border-black/70 px-1 py-1 align-middle">
-                    <span className="block text-[9pt] font-bold leading-tight">
-                      {lesson.variant && <span className="ml-0.5">{lesson.variant.icon}</span>}
-                      {context === 'teacher'
-                        ? section?.label
-                        : primary(subject?.nameAr ?? '—', subject?.nameEn, lang)}
-                    </span>
-                    <span className="block text-[8pt] leading-tight">
-                      {context === 'teacher'
-                        ? primary(subject?.nameAr ?? '—', subject?.nameEn, lang)
-                        : teacher
-                          ? primary(teacher.nameAr, teacher.nameEn, lang)
-                          : '—'}
-                    </span>
-                    {(context === 'teacher'
-                      ? secondary(subject?.nameAr ?? '', subject?.nameEn, lang)
-                      : secondary(teacher?.nameAr ?? '', teacher?.nameEn, lang)) && (
-                      <span className="block text-[7pt] leading-tight text-black/60" dir="ltr">
-                        {context === 'teacher'
-                          ? secondary(subject?.nameAr ?? '', subject?.nameEn, lang)
-                          : secondary(teacher?.nameAr ?? '', teacher?.nameEn, lang)}
-                      </span>
-                    )}
-                    {lesson.variant && (
-                      <span className="block text-[7pt] leading-tight text-black/60">
-                        {lesson.variant.labelAr}
-                      </span>
-                    )}
-                    {room && <span className="block text-[7pt] leading-tight text-black/55">{room.nameAr}</span>}
+                  <td
+                    key={row.index}
+                    className={`${cell} bg-[color:var(--doc-band)] px-1 py-3`}
+                    aria-label={period?.labelAr ?? 'لا توجد حصة'}
+                  />
+                );
+              }
+
+              const lesson = bySlot.get(slotKey(day.id, row.index));
+              if (!lesson) {
+                return (
+                  <td key={row.index} className={`${cell} px-1 py-3`}>
+                    <span className="text-[13px] text-[color:var(--doc-muted)]">ــ</span>
                   </td>
                 );
-              })}
-            </tr>
-          );
-        })}
+              }
+
+              const subject = index.subjectById.get(lesson.subjectId);
+              const section = index.sectionById.get(lesson.sectionId);
+              const teacher = lesson.teacherId ? index.teacherById.get(lesson.teacherId) : null;
+              const room = lesson.roomId ? index.roomById.get(lesson.roomId) : null;
+
+              /* في جدول المعلمة يتصدّر رقم الشعبة، وفي جدول الشعبة يتصدّر اسم المعلمة. */
+              const headline =
+                context === 'teacher' ? (section?.label ?? 'ــ') : (subject?.nameAr ?? 'ــ');
+              const bodyAr =
+                context === 'teacher' ? (subject?.nameAr ?? '') : (teacher?.nameAr ?? 'ــ');
+              const bodyEn =
+                context === 'teacher' ? (subject?.nameEn ?? '') : (teacher?.nameEn ?? '');
+
+              return (
+                <td key={row.index} className={`${cell} px-1 py-1.5 leading-tight`}>
+                  <span className="block text-[13px] font-bold">
+                    {lesson.variant && <span className="ms-0.5">{lesson.variant.icon}</span>}
+                    {context === 'teacher' ? <span className="latin">{headline}</span> : headline}
+                  </span>
+                  {bodyAr && <span className="block text-[12px]">{bodyAr}</span>}
+                  {bodyEn && (
+                    <span className="latin block text-[9.5px] text-[color:var(--doc-muted)]">
+                      {bodyEn}
+                    </span>
+                  )}
+                  {lesson.variant && (
+                    <span className="block text-[9.5px] text-[color:var(--doc-muted)]">
+                      {lesson.variant.labelAr}
+                    </span>
+                  )}
+                  {room && (
+                    <span className="block text-[9.5px] text-[color:var(--doc-muted)]">
+                      {room.nameAr}
+                    </span>
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
       </tbody>
     </table>
   );

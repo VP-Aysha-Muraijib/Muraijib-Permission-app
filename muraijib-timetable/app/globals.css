@@ -166,3 +166,68 @@
 .print-only {
   display: none;
 }
+
+/* ══════════════ الوثيقة الرسمية ══════════════
+   ألوان الوثيقة مستقلة عن ألوان الواجهة عمدًا: الورقة تُطبع بالأبيض والأسود
+   على طابعات مدرسية، فتُضبط بتدرّج رمادي مؤسسي محايد لا بألوان الهوية. */
+.doc {
+  --doc-ink: #111827;
+  --doc-muted: #6B7280;
+  --doc-line: #D1D5DB;
+  --doc-line-strong: #9CA3AF;
+  --doc-head: #F9FAFB;
+  --doc-band: #F3F4F6;
+  color: var(--doc-ink);
+  background: #FFFFFF;
+}
+
+/* الإنجليزية لغة مساندة: خط لاتيني مستقل، ومعزولة اتجاهيًا حتى لا تنقلب
+   داخل الفقرة العربية. */
+.latin {
+  font-family: var(--font-latin), system-ui, sans-serif;
+  unicode-bidi: isolate;
+  direction: ltr;
+}
+
+@media print {
+  .doc,
+  .doc * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .doc table {
+    break-inside: auto;
+  }
+  .doc thead {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+}
+
+/* ── امتلاء الورقة ──
+   الجدول الأسبوعي بضعة صفوف فقط، فيتكوّم أعلى الورقة ويترك ثلثها فارغًا.
+   يُمدَّد ليأخذ ما تبقى من ارتفاع الصفحة: الوثيقة الرسمية تُقرأ ممتلئة،
+   وارتفاع الخلية الأكبر يترك مجالًا لكتابة الملاحظات بخط اليد. */
+.print-page {
+  display: flex;
+  flex-direction: column;
+}
+/* الحاوية flex والجدول عنصر ينمو فيها: صندوق الجدول يتمدّد، وصفوفه توزّع
+   الفائض بينها تلقائيًا. حلّ height:100% وحده لا يكفي — ارتفاع العنصر
+   المحسوب بـ flex-grow لا يُعتمد أساسًا لحلّ النسب المئوية. */
+.sheet-fill {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+.sheet-fill > table {
+  flex: 1 1 auto;
+}
+
+@media print {
+  /* يُطبَّق على الأوراق ذات الشبكة وحدها — التقارير الطويلة تملأ ورقتها بنفسها. */
+  .print-page:has(.sheet-fill) {
+    min-height: 96vh;
+  }
+}

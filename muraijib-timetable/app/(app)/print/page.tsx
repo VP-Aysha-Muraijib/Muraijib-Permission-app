@@ -39,11 +39,20 @@ const KINDS: Array<{ id: Kind; label: string; icon: string; hint: string; paper:
   { id: 'conflicts', label: 'تقرير التعارضات', icon: 'TriangleAlert', hint: 'كل ملاحظات الفحص', paper: 'a4-portrait' },
 ];
 
-const PAPERS: Array<{ id: Paper; label: string; css: string; widthMm: number }> = [
-  { id: 'a4-portrait', label: 'A4 طولي', css: 'A4 portrait', widthMm: 210 },
-  { id: 'a4-landscape', label: 'A4 عرضي', css: 'A4 landscape', widthMm: 297 },
-  { id: 'a3-landscape', label: 'A3 عرضي', css: 'A3 landscape', widthMm: 420 },
+const PAPERS: Array<{
+  id: Paper;
+  label: string;
+  css: string;
+  widthMm: number;
+  heightMm: number;
+}> = [
+  { id: 'a4-portrait', label: 'A4 طولي', css: 'A4 portrait', widthMm: 210, heightMm: 297 },
+  { id: 'a4-landscape', label: 'A4 عرضي', css: 'A4 landscape', widthMm: 297, heightMm: 210 },
+  { id: 'a3-landscape', label: 'A3 عرضي', css: 'A3 landscape', widthMm: 420, heightMm: 297 },
 ];
+
+/** هامش الطباعة — مريح للتجليد وقراءة الحواف دون إهدار عرض الجدول. */
+const PAGE_MARGIN_MM = 12;
 
 export default function PrintCenterPage() {
   const params = useSearchParams();
@@ -130,7 +139,7 @@ export default function PrintCenterPage() {
   return (
     <div className="mx-auto max-w-[100rem]">
       {/* حجم الورق يُحقن كقاعدة @page حقيقية — لا محاكاة بصرية فقط. */}
-      <style>{`@media print { @page { size: ${paperSpec.css}; margin: 10mm; } }`}</style>
+      <style>{`@media print { @page { size: ${paperSpec.css}; margin: ${PAGE_MARGIN_MM}mm; } }`}</style>
 
       <div className="no-print">
         <PageHeader
@@ -239,8 +248,8 @@ export default function PrintCenterPage() {
                 </label>
 
                 <p className="rounded border border-line bg-surface-sunken px-2.5 py-2 text-2xs leading-relaxed text-ink-muted">
-                  شعار الوزارة يظهر في الترويسة تلقائيًا فور تزويد المشروع بالملف الرسمي — لم يُرسم شعار
-                  تقريبي في هذه النسخة.
+                  الترويسة تحمل شعار الوزارة المعتمد كما ورد في وثائق المدرسة الرسمية، وتُذيَّل كل ورقة
+                  بخانتَي اعتماد نائب مدير أكاديمي ومديرة المدرسة.
                 </p>
               </div>
             </Card>
@@ -261,8 +270,8 @@ export default function PrintCenterPage() {
                   {sheets.slice(0, 4).map((sheet, i) => (
                     <div
                       key={i}
-                      className="bg-white p-[10mm] text-black shadow-raised"
-                      style={{ minHeight: paper === 'a4-portrait' ? '297mm' : '210mm' }}
+                      className="doc flex flex-col bg-white p-[12mm] shadow-raised"
+                      style={{ minHeight: `${paperSpec.heightMm}mm` }}
                     >
                       {sheet}
                     </div>
@@ -280,7 +289,7 @@ export default function PrintCenterPage() {
       </div>
 
       {/* نسخة الطباعة الفعلية: مخفية على الشاشة، وهي ما يخرج على الورق. */}
-      <div className="print-only bg-white text-black">{sheets}</div>
+      <div className="print-only doc bg-white">{sheets}</div>
     </div>
   );
 }

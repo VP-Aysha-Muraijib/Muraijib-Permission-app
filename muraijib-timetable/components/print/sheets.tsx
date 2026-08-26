@@ -6,10 +6,10 @@ import { buildGrid } from '@/lib/engine/grid';
 import { slotKey } from '@/lib/engine/snapshot';
 import { computeTeacherWorkload, computeAllWorkloads } from '@/lib/engine/workload';
 import type { HealthReport } from '@/lib/engine/conflicts';
-import { PrintFooter, PrintHeader } from './print-header';
+import { PrintFooter, PrintHeader, PrintIdentity, PrintSignatures } from './print-header';
 import { PrintGrid } from './print-grid';
 import { LOAD_LABEL } from '@/components/workload-cell';
-import { primary, secondary, type DisplayLang } from '@/lib/i18n';
+import type { DisplayLang } from '@/lib/i18n';
 
 export interface SheetChrome {
   yearLabel: string;
@@ -19,7 +19,13 @@ export interface SheetChrome {
   lang: DisplayLang;
 }
 
-const page = 'print-page print-block';
+/** `doc` يحمل ألوان الوثيقة الرسمية، وهي مستقلة عن ألوان الواجهة. */
+const page = 'doc print-page print-block grow';
+
+/* حدود وخلفيات موحّدة لكل جداول التقارير — تُعرَّف مرة لتبقى الورقة متسقة. */
+const cell = 'border border-[color:var(--doc-line)]';
+const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 text-[12px] font-semibold`;
+const bodyCell = `${cell} px-2 py-1 text-[11.5px]`;
 
 /* ────────── جدول معلمة ────────── */
 
@@ -44,21 +50,30 @@ export function TeacherSheet({
 
   return (
     <section className={page}>
-      <PrintHeader
-        titleAr="جدول المعلمة · Teacher Timetable"
-        subtitleAr={
-          [teacher.nameAr, secondary(teacher.nameAr, teacher.nameEn, chrome.lang)]
-            .filter(Boolean)
-            .join(' · ')
-        }
-        yearLabel={chrome.yearLabel}
-        metaAr={[
-          { label: 'المادة', value: subjects || '—' },
-          { label: 'النصاب', value: `${load.assigned} / ${load.required}` },
-          { label: 'عدد الشعب', value: String(new Set(lessons.map((l) => l.sectionId)).size) },
+      <PrintHeader titleAr="جدول المعلمة" titleEn="Teacher Timetable" yearLabel={chrome.yearLabel} />
+      <PrintIdentity
+        nameAr={teacher.nameAr}
+        nameEn={teacher.nameEn}
+        meta={[
+          { label: 'المادة', labelEn: 'Subject', value: subjects || 'ــ' },
+          {
+            label: 'النصاب',
+            labelEn: 'Load',
+            value: `${load.assigned} / ${load.required}`,
+            latin: true,
+          },
+          {
+            label: 'عدد الشعب',
+            labelEn: 'Sections',
+            value: String(new Set(lessons.map((l) => l.sectionId)).size),
+            latin: true,
+          },
         ]}
       />
-      <PrintGrid index={index} lessons={lessons} context="teacher" lang={chrome.lang} />
+      <div className="sheet-fill">
+        <PrintGrid index={index} lessons={lessons} context="teacher" lang={chrome.lang} />
+      </div>
+      <PrintSignatures />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -90,17 +105,31 @@ export function ClassSheet({
 
   return (
     <section className={page}>
-      <PrintHeader
-        titleAr="جدول الصف · Class Timetable"
-        subtitleAr={`${primary(grade?.nameAr ?? '', grade?.nameEn, chrome.lang)} — الشعبة ${section.label}`}
-        yearLabel={chrome.yearLabel}
-        metaAr={[
-          { label: 'عدد الحصص', value: String(lessons.length) },
-          ...(section.studentCount ? [{ label: 'عدد الطالبات', value: String(section.studentCount) }] : []),
-          ...(classTeacher ? [{ label: 'رائدة الفصل', value: classTeacher }] : []),
+      <PrintHeader titleAr="جدول الصف" titleEn="Class Timetable" yearLabel={chrome.yearLabel} />
+      <PrintIdentity
+        nameAr={`${grade?.nameAr ?? ''} — الشعبة ${section.label}`.trim()}
+        nameEn={grade?.nameEn ? `${grade.nameEn} — Section ${section.label}` : undefined}
+        meta={[
+          { label: 'عدد الحصص', labelEn: 'Lessons', value: String(lessons.length), latin: true },
+          ...(section.studentCount
+            ? [
+                {
+                  label: 'عدد الطالبات',
+                  labelEn: 'Students',
+                  value: String(section.studentCount),
+                  latin: true,
+                },
+              ]
+            : []),
+          ...(classTeacher
+            ? [{ label: 'رائدة الفصل', labelEn: 'Class Teacher', value: classTeacher }]
+            : []),
         ]}
       />
-      <PrintGrid index={index} lessons={lessons} context="class" lang={chrome.lang} />
+      <div className="sheet-fill">
+        <PrintGrid index={index} lessons={lessons} context="class" lang={chrome.lang} />
+      </div>
+      <PrintSignatures />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -125,26 +154,35 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="الجدول المدرسي العام · Master Timetable"
-        subtitleAr="جميع الشعب · All classes"
+        titleAr="الجدول المدرسي العام"
+        titleEn="Master Timetable"
         yearLabel={chrome.yearLabel}
-        metaAr={[
-          { label: 'عدد الشعب', value: String(sections.length) },
-          { label: 'عدد الحصص', value: String(index.snapshot.lessons.length) },
+      />
+      <PrintIdentity
+        nameAr="جميع الشعب"
+        nameEn="All Classes"
+        meta={[
+          { label: 'عدد الشعب', labelEn: 'Sections', value: String(sections.length), latin: true },
+          {
+            label: 'عدد الحصص',
+            labelEn: 'Lessons',
+            value: String(index.snapshot.lessons.length),
+            latin: true,
+          },
         ]}
       />
 
-      <table className="w-full border-collapse text-center">
+      <table className="w-full table-fixed border-collapse text-center">
         <thead>
           <tr>
-            <th rowSpan={2} className="border border-black/70 bg-black/[.06] px-1 py-1 text-[8pt] font-bold">
+            <th rowSpan={2} className={`${cell} bg-[color:var(--doc-band)] w-[6%] px-1 py-1 text-[11px] font-bold`}>
               الشعبة
             </th>
             {grid.days.map((day) => (
               <th
                 key={day.id}
                 colSpan={day.periods.filter((p) => p.kind === 'lesson').length}
-                className="border border-black/70 bg-black/[.06] px-1 py-0.5 text-[8pt] font-bold"
+                className={`${cell} bg-[color:var(--doc-band)] px-1 py-1 text-[11px] font-bold`}
               >
                 {day.nameAr}
               </th>
@@ -154,7 +192,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
             {grid.columns.map((column) => (
               <th
                 key={`${column.day.id}-${column.index}`}
-                className="border border-black/70 bg-black/[.03] px-0.5 py-0.5 text-[7pt] font-semibold"
+                className={`${cell} latin bg-[color:var(--doc-head)] px-0.5 py-0.5 text-[9px] font-semibold tabular-nums`}
               >
                 {column.ordinal}
               </th>
@@ -164,7 +202,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
         <tbody>
           {sections.map((section) => (
             <tr key={section.id}>
-              <th className="border border-black/70 bg-black/[.03] px-1 py-1 text-[8pt] font-bold">
+              <th className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-bold`}>
                 {section.label}
               </th>
               {grid.columns.map((column) => {
@@ -174,19 +212,19 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
                 return (
                   <td
                     key={`${column.day.id}-${column.index}`}
-                    className="border border-black/70 px-0.5 py-0.5 align-middle"
+                    className={`${cell} px-0.5 py-0.5 align-middle leading-tight`}
                   >
                     {lesson ? (
                       <>
-                        <span className="block text-[6.5pt] font-bold leading-tight">
+                        <span className="block text-[9px] font-bold">
                           {subject?.code ?? subject?.nameAr}
                         </span>
-                        <span className="block text-[6pt] leading-tight text-black/65">
-                          {teacher?.nameAr ?? '—'}
+                        <span className="block text-[8px] text-[color:var(--doc-muted)]">
+                          {teacher?.nameAr ?? 'ــ'}
                         </span>
                       </>
                     ) : (
-                      <span className="text-[6pt] text-black/30">—</span>
+                      <span className="text-[9px] text-[color:var(--doc-muted)]">ــ</span>
                     )}
                   </td>
                 );
@@ -196,11 +234,11 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
         </tbody>
       </table>
 
-      <p className="mt-2 text-[7pt] text-black/60">
-        رموز المواد:{' '}
-        {index.snapshot.subjects.map((s) => `${s.code} = ${s.nameAr}`).join(' · ')}
+      <p className="mt-2 text-[9px] text-[color:var(--doc-muted)]">
+        رموز المواد: {index.snapshot.subjects.map((s) => `${s.code} = ${s.nameAr}`).join(' · ')}
       </p>
 
+      <PrintSignatures />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -218,22 +256,32 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="تقرير أنصبة المعلمات · Teaching Load Report"
+        titleAr="تقرير أنصبة المعلمات"
+        titleEn="Teaching Load Report"
         yearLabel={chrome.yearLabel}
-        metaAr={[
-          { label: 'عدد المعلمات', value: String(loads.length) },
-          { label: 'إجمالي الحصص', value: String(index.snapshot.lessons.length) },
+      />
+      <PrintIdentity
+        meta={[
+          { label: 'عدد المعلمات', labelEn: 'Teachers', value: String(loads.length), latin: true },
+          {
+            label: 'إجمالي الحصص',
+            labelEn: 'Total lessons',
+            value: String(index.snapshot.lessons.length),
+            latin: true,
+          },
         ]}
       />
 
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            {['م', 'المعلمة', 'المادة', 'المطلوب', 'المسند', 'المتبقي', 'الفراغات', 'الحالة'].map((h) => (
-              <th key={h} className="border border-black/70 bg-black/[.06] px-1.5 py-1 text-[8.5pt] font-bold">
-                {h}
-              </th>
-            ))}
+            {['م', 'المعلمة', 'المادة', 'المطلوب', 'المسند', 'المتبقي', 'الفراغات', 'الحالة'].map(
+              (h) => (
+                <th key={h} className={headCell}>
+                  {h}
+                </th>
+              ),
+            )}
           </tr>
         </thead>
         <tbody>
@@ -241,29 +289,26 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
             const teacher = index.teacherById.get(load.teacherId);
             const subject = teacher?.primarySubjectId
               ? index.subjectById.get(teacher.primarySubjectId)?.nameAr
-              : '—';
+              : 'ــ';
             return (
               <tr key={load.teacherId}>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">{i + 1}</td>
-                <td className="border border-black/70 px-1.5 py-1 text-[8.5pt] font-semibold">
-                  {teacher?.nameAr ?? '—'}
-                </td>
-                <td className="border border-black/70 px-1.5 py-1 text-[8pt]">{subject}</td>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">{load.required}</td>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">{load.assigned}</td>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt] font-semibold">
+                <td className={`${bodyCell} latin text-center tabular-nums`}>{i + 1}</td>
+                <td className={`${bodyCell} font-semibold`}>{teacher?.nameAr ?? 'ــ'}</td>
+                <td className={bodyCell}>{subject}</td>
+                <td className={`${bodyCell} latin text-center tabular-nums`}>{load.required}</td>
+                <td className={`${bodyCell} latin text-center tabular-nums`}>{load.assigned}</td>
+                <td className={`${bodyCell} latin text-center font-semibold tabular-nums`}>
                   {load.remaining}
                 </td>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">{load.gaps}</td>
-                <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">
-                  {LOAD_LABEL[load.status]}
-                </td>
+                <td className={`${bodyCell} latin text-center tabular-nums`}>{load.gaps}</td>
+                <td className={`${bodyCell} text-center`}>{LOAD_LABEL[load.status]}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
 
+      <PrintSignatures />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -284,6 +329,7 @@ export function ConflictsSheet({
   health: HealthReport;
   chrome: SheetChrome;
 }) {
+  void index;
   const SEVERITY: Record<string, string> = {
     critical: 'حرج',
     high: 'مرتفع',
@@ -294,16 +340,29 @@ export function ConflictsSheet({
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="تقرير فحص الجدول · Timetable Health Report"
+        titleAr="تقرير فحص الجدول"
+        titleEn="Timetable Health Report"
         yearLabel={chrome.yearLabel}
-        metaAr={[
-          { label: 'درجة الجودة', value: health.valid ? `${health.score}%` : 'غير صالح' },
-          { label: 'عدد الملاحظات', value: String(health.violations.length) },
+      />
+      <PrintIdentity
+        meta={[
+          {
+            label: 'درجة الجودة',
+            labelEn: 'Quality',
+            value: health.valid ? `${health.score}%` : 'غير صالح',
+            latin: health.valid,
+          },
+          {
+            label: 'عدد الملاحظات',
+            labelEn: 'Findings',
+            value: String(health.violations.length),
+            latin: true,
+          },
         ]}
       />
 
       {health.violations.length === 0 ? (
-        <p className="border border-black/70 px-3 py-6 text-center text-[10pt]">
+        <p className={`${cell} px-3 py-6 text-center text-[13px]`}>
           لا توجد ملاحظات — اجتاز الجدول جميع الفحوص.
         </p>
       ) : (
@@ -311,7 +370,7 @@ export function ConflictsSheet({
           <thead>
             <tr>
               {['م', 'النوع', 'الخطورة', 'الوصف'].map((h) => (
-                <th key={h} className="border border-black/70 bg-black/[.06] px-1.5 py-1 text-[8.5pt] font-bold">
+                <th key={h} className={headCell}>
                   {h}
                 </th>
               ))}
@@ -321,14 +380,10 @@ export function ConflictsSheet({
             {health.groups.flatMap((group) =>
               group.violations.map((violation, i) => (
                 <tr key={`${group.constraintId}-${i}`}>
-                  <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">{i + 1}</td>
-                  <td className="border border-black/70 px-1.5 py-1 text-[8pt]">{group.labelAr}</td>
-                  <td className="border border-black/70 px-1.5 py-1 text-center text-[8pt]">
-                    {SEVERITY[violation.severity]}
-                  </td>
-                  <td className="border border-black/70 px-1.5 py-1 text-[8pt] leading-relaxed">
-                    {violation.messageAr}
-                  </td>
+                  <td className={`${bodyCell} latin text-center tabular-nums`}>{i + 1}</td>
+                  <td className={bodyCell}>{group.labelAr}</td>
+                  <td className={`${bodyCell} text-center`}>{SEVERITY[violation.severity]}</td>
+                  <td className={`${bodyCell} leading-relaxed`}>{violation.messageAr}</td>
                 </tr>
               )),
             )}
@@ -336,6 +391,7 @@ export function ConflictsSheet({
         </table>
       )}
 
+      <PrintSignatures />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
