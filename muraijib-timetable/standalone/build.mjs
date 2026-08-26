@@ -71,7 +71,11 @@ const css = fs.readFileSync(path.join(out, 'app.css'), 'utf8');
 console.log(`   ${(css.length / 1024).toFixed(0)} كيلوبايت`);
 
 console.log('③ تجميع الصفحة…');
-const html = `<meta charset="utf-8">
+/* بلا `doctype` يرسم المتصفّح الصفحة في وضع التوافق (quirks mode)، وفيه لا
+   يرث الجدول لون النصّ ولا خطّه من محيطه — فتخرج شبكة الجدول بلون الواجهة
+   وخطّها بدل لون الوثيقة وخطّها. سطر واحد يمنع ذلك كلّه. */
+const html = `<!doctype html>
+<meta charset="utf-8">
 <title>منظومة مريجب الذكية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">

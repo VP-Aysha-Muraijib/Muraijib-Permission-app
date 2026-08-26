@@ -7,6 +7,7 @@ import { slotKey } from '@/lib/engine/snapshot';
 import { computeTeacherWorkload, computeAllWorkloads } from '@/lib/engine/workload';
 import type { HealthReport } from '@/lib/engine/conflicts';
 import {
+  DOC_TYPE,
   TeacherTimetablePrintPage,
   TimetableGrid,
   type InfoItem,
@@ -32,8 +33,8 @@ export interface SheetChrome {
 
 /* حدود وخلفيات جداول التقارير — تُعرَّف مرة لتبقى هي نفسها في كل تقرير. */
 const cell = 'border-[0.6px] border-[color:var(--doc-line)]';
-const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 text-[12px] font-semibold`;
-const bodyCell = `${cell} px-2 py-1 text-[11.5px]`;
+const headCell = `${cell} bg-[color:var(--doc-head)] px-2 py-1.5 ${DOC_TYPE.reportHead}`;
+const bodyCell = `${cell} px-2 py-1 ${DOC_TYPE.reportBody}`;
 
 /* ────────── جدول معلمة ────────── */
 
@@ -169,7 +170,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
           <tr>
             <th
               rowSpan={2}
-              className={`${cell} w-[6%] bg-[color:var(--doc-day)] px-1 py-1 text-[11px] font-semibold`}
+              className={`${cell} w-[6%] bg-[color:var(--doc-day)] px-1 py-1 ${DOC_TYPE.reportHead}`}
             >
               الشعبة
             </th>
@@ -177,7 +178,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
               <th
                 key={day.id}
                 colSpan={day.periods.filter((p) => p.kind === 'lesson').length}
-                className={`${cell} bg-[color:var(--doc-day)] px-1 py-1 text-[11px] font-semibold`}
+                className={`${cell} bg-[color:var(--doc-day)] px-1 py-1 ${DOC_TYPE.reportHead}`}
               >
                 {day.nameAr}
               </th>
@@ -187,7 +188,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
             {grid.columns.map((column) => (
               <th
                 key={`${column.day.id}-${column.index}`}
-                className={`${cell} latin bg-[color:var(--doc-head)] px-0.5 py-0.5 text-[9px] font-semibold tabular-nums`}
+                className={`${cell} latin bg-[color:var(--doc-head)] px-0.5 py-0.5 ${DOC_TYPE.masterOrdinal}`}
               >
                 {column.ordinal}
               </th>
@@ -198,7 +199,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
           {sections.map((section) => (
             <tr key={section.id}>
               <th
-                className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 text-[10px] font-semibold`}
+                className={`${cell} latin bg-[color:var(--doc-head)] px-1 py-1 ${DOC_TYPE.reportBodyStrong}`}
               >
                 {section.label}
               </th>
@@ -213,15 +214,15 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
                   >
                     {lesson ? (
                       <>
-                        <span className="block text-[9px] font-semibold">
+                        <span className={`block ${DOC_TYPE.masterCode}`}>
                           {subject?.code ?? subject?.nameAr}
                         </span>
-                        <span className="block text-[8px] text-[color:var(--doc-muted)]">
+                        <span className={`block ${DOC_TYPE.masterTeacher}`}>
                           {teacher?.nameAr ?? 'ــ'}
                         </span>
                       </>
                     ) : (
-                      <span className="text-[9px] text-[color:var(--doc-muted)]">ــ</span>
+                      <span className={DOC_TYPE.cellNote}>ــ</span>
                     )}
                   </td>
                 );
@@ -231,7 +232,7 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
         </tbody>
       </table>
 
-      <p className="mt-2 text-[9px] text-[color:var(--doc-muted)]">
+      <p className={`mt-2 ${DOC_TYPE.signRoleAr}`}>
         رموز المواد: {index.snapshot.subjects.map((s) => `${s.code} = ${s.nameAr}`).join(' · ')}
       </p>
     </TeacherTimetablePrintPage>
@@ -343,7 +344,7 @@ export function ConflictsSheet({
       ]}
     >
       {health.violations.length === 0 ? (
-        <p className={`${cell} px-3 py-6 text-center text-[13px]`}>
+        <p className={`${cell} px-3 py-6 text-center ${DOC_TYPE.reportBody}`}>
           لا توجد ملاحظات — اجتاز الجدول جميع الفحوص.
         </p>
       ) : (

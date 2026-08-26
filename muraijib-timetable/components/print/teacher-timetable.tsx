@@ -24,10 +24,67 @@ import { BRAND } from '@/lib/brand';
    والباقي للجدول والاعتماد. */
 const HEADER_H = 'h-[72px]';
 const INFO_H = 'h-[51px]';
-const LOGO_H = 'h-[32px]';
+const LOGO_H = 'h-[34px]';
 const GRID_GAP = 'pt-[17px]';
 
 const line = 'border-[0.6px] border-[color:var(--doc-line)]';
+
+/* ── سلّم الطباعة ──
+   مصدر واحد لكل مقاس ووزن وارتفاع سطر ودرجة لونية في الوثيقة. العائلات
+   والألوان في `globals.css`، والتراتب هنا. تغيير أي سطر أدناه يغيّر كل
+   الأوراق معًا، ووجوده هنا يمنع تسرّب مقاسات مرتجلة إلى ورقة دون أخرى.
+
+   الأوزان ثلاثة لا أكثر — 400/500/600 — فالوثيقة الرسمية تُقرأ بالتراتب لا
+   بالسماكة. وارتفاع السطر 1.25 للعناوين و1.35 للنصوص و1.2 للاتينية الصغيرة. */
+export const DOC_TYPE = {
+  ministryAr: 'text-[13.5px] font-semibold leading-[1.25]',
+  ministryEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  schoolAr: 'text-[11.5px] font-medium leading-[1.25]',
+  schoolEn: 'latin text-[9px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+
+  titleAr: 'text-[17.5px] font-semibold leading-[1.25]',
+  titleEn: 'latin text-[10px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  yearLabelAr: 'text-[9.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+  yearLabelEn: 'latin text-[8.5px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
+  yearValue: 'latin text-[15px] font-semibold leading-[1.25]',
+
+  nameAr: 'text-[16px] font-semibold leading-[1.25]',
+  nameEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  metaLabelAr: 'text-[9.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+  metaLabelEn: 'latin text-[9px] font-normal',
+  metaValue: 'text-[13px] font-semibold leading-[1.25]',
+
+  cornerAr: 'text-[11.5px] font-semibold leading-[1.25]',
+  cornerEn: 'latin text-[8.5px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
+  periodAr: 'text-[12px] font-semibold leading-[1.25]',
+  periodTime: 'latin text-[9px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  breakAr: 'text-[8.75px] font-medium leading-[1.25] text-[color:var(--doc-muted)]',
+  breakTime: 'latin text-[8px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
+  dayAr: 'text-[13px] font-semibold leading-[1.25]',
+  dayEn: 'latin text-[9px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  dayNote: 'text-[8px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
+
+  cellMain: 'text-[16px] font-semibold leading-[1.35]',
+  cellMainSm: 'text-[12.5px] font-semibold leading-[1.35]',
+  cellSub: 'text-[10px] font-normal leading-[1.35] text-[color:var(--doc-muted)]',
+  cellNote: 'text-[9px] font-normal leading-[1.35] text-[color:var(--doc-faint)]',
+  cellEmpty: 'text-[12px] font-normal text-[color:var(--doc-faint)]',
+
+  signRoleAr: 'text-[9.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+  signRoleEn: 'latin text-[8.5px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
+  signName: 'text-[12px] font-semibold leading-[1.25]',
+  signHint: 'text-[8.5px] font-normal text-[color:var(--doc-faint)]',
+  footer: 'text-[8.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+
+  /* جداول التقارير والجدول الرئيسي — نفس النظام، لا نظام ثانٍ. */
+  reportHead: 'text-[11.5px] font-semibold leading-[1.25]',
+  reportBody: 'text-[11px] font-normal leading-[1.35]',
+  reportBodyStrong: 'text-[11px] font-medium leading-[1.35]',
+  masterOrdinal: 'latin text-[9px] font-semibold leading-[1.2] text-[color:var(--doc-muted)]',
+  masterCode: 'text-[9px] font-semibold leading-[1.25]',
+  masterTeacher: 'text-[8px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+} as const;
+
 
 /* ────────── ١ · الترويسة المؤسسية ────────── */
 
@@ -61,36 +118,38 @@ export function InstitutionalHeader({
             className={`${LOGO_H} w-auto shrink-0 object-contain`}
           />
         )}
-        <div className="min-w-0 text-right leading-[1.3]">
-          <p className="truncate text-[12.5px] font-semibold">{BRAND.ministryNameAr}</p>
-          <p className="latin truncate text-[9px] text-[color:var(--doc-muted)]">
-            {BRAND.ministryNameEn}
-          </p>
-          <p className="truncate text-[11px] font-medium">{BRAND.schoolNameAr}</p>
-          <p className="latin truncate text-[9px] text-[color:var(--doc-muted)]">
-            {BRAND.schoolNameEn}
-          </p>
+        <div className="min-w-0 text-right">
+          {/* العلامة الرسمية تحمل اسم الوزارة بالعربية والإنجليزية معًا، فلا
+              يُعاد نصًّا بجوارها. يبقى اسم المدرسة وحده. */}
+          {!BRAND.ministryLogo && (
+            <>
+              <p className={`truncate ${DOC_TYPE.ministryAr}`}>{BRAND.ministryNameAr}</p>
+              <p className={`truncate ${DOC_TYPE.ministryEn}`}>{BRAND.ministryNameEn}</p>
+            </>
+          )}
+          <p className={`truncate ${DOC_TYPE.schoolAr}`}>{BRAND.schoolNameAr}</p>
+          <p className={`truncate ${DOC_TYPE.schoolEn}`}>{BRAND.schoolNameEn}</p>
         </div>
       </div>
 
       {/* المنتصف: هوية الوثيقة */}
-      <div className="min-w-0 flex-1 text-center leading-[1.3]">
-        <h1 className="truncate text-[17px] font-semibold">{titleAr}</h1>
+      <div className="min-w-0 flex-1 text-center">
+        <h1 className={`truncate ${DOC_TYPE.titleAr}`}>{titleAr}</h1>
         {/* الخمري هنا خطّ قصير لا أكثر — لمسة انتماء لا عنصر جذب. */}
         <span
           aria-hidden
           className="mx-auto mb-[3px] mt-[5px] block h-[1.5px] w-[26px] bg-[color:var(--doc-accent)]"
         />
         {titleEn && (
-          <p className="latin truncate text-[10px] text-[color:var(--doc-muted)]">{titleEn}</p>
+          <p className={`truncate ${DOC_TYPE.titleEn}`}>{titleEn}</p>
         )}
       </div>
 
       {/* يسارًا: العام الأكاديمي */}
-      <div className="shrink-0 text-left leading-[1.3]">
-        <p className="text-[9.5px] text-[color:var(--doc-muted)]">العام الأكاديمي</p>
-        <p className="latin text-[8.5px] text-[color:var(--doc-muted)]">Academic Year</p>
-        <p className="latin text-[15px] font-semibold">{yearLabel}</p>
+      <div className="shrink-0 text-left">
+        <p className={DOC_TYPE.yearLabelAr}>العام الأكاديمي</p>
+        <p className={DOC_TYPE.yearLabelEn}>Academic Year</p>
+        <p className={DOC_TYPE.yearValue}>{yearLabel}</p>
       </div>
     </header>
   );
@@ -119,11 +178,9 @@ export function TeacherInfoStrip({
     <section
       className={`${INFO_H} flex shrink-0 items-center justify-between gap-6 border-b-[0.6px] border-[color:var(--doc-line)]`}
     >
-      <div className="min-w-0 leading-[1.3]">
-        {nameAr && <p className="truncate text-[16.5px] font-semibold">{nameAr}</p>}
-        {nameEn && (
-          <p className="latin truncate text-[9.5px] text-[color:var(--doc-muted)]">{nameEn}</p>
-        )}
+      <div className="min-w-0">
+        {nameAr && <p className={`truncate ${DOC_TYPE.nameAr}`}>{nameAr}</p>}
+        {nameEn && <p className={`truncate ${DOC_TYPE.nameEn}`}>{nameEn}</p>}
       </div>
 
       {items && items.length > 0 && (
@@ -133,18 +190,18 @@ export function TeacherInfoStrip({
               key={item.label}
               className={
                 i > 0
-                  ? 'ms-4 border-s-[0.6px] border-[color:var(--doc-line)] ps-4 leading-[1.3]'
-                  : 'leading-[1.3]'
+                  ? 'ms-4 border-s-[0.6px] border-[color:var(--doc-line)] ps-4'
+                  : ''
               }
             >
               {/* الفجوة عبر flex لا عبر هامش: الوسم اللاتيني معزول اتجاهيًا،
                   فهامشه المنطقي ينقلب ويلتصق بالعربية. */}
-              <dt className="flex items-baseline gap-1 text-[9px] text-[color:var(--doc-muted)]">
+              <dt className={`flex items-baseline gap-1 ${DOC_TYPE.metaLabelAr}`}>
                 <span>{item.label}</span>
-                {item.labelEn && <span className="latin">{item.labelEn}</span>}
+                {item.labelEn && <span className={DOC_TYPE.metaLabelEn}>{item.labelEn}</span>}
               </dt>
               <dd
-                className={`truncate text-[13.5px] font-semibold ${item.latin ? 'latin' : ''}`}
+                className={`truncate ${DOC_TYPE.metaValue} ${item.latin ? 'latin' : ''}`}
                 title={item.value}
               >
                 {item.value}
@@ -232,12 +289,10 @@ export function TimetableGrid({
         <tr>
           <th
             scope="col"
-            className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5 leading-[1.3]`}
+            className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5`}
           >
-            <span className="block text-[11.5px] font-semibold">الحصص</span>
-            <span className="latin block text-[8.5px] font-normal text-[color:var(--doc-muted)]">
-              Periods
-            </span>
+            <span className={`block ${DOC_TYPE.cornerAr}`}>الحصص</span>
+            <span className={`block ${DOC_TYPE.cornerEn}`}>Periods</span>
           </th>
 
           {grid.rows.map((row) =>
@@ -245,25 +300,23 @@ export function TimetableGrid({
               <th
                 key={row.index}
                 scope="col"
-                className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5 leading-[1.3]`}
+                className={`${line} bg-[color:var(--doc-head)] px-1 py-1.5`}
               >
-                <span className="block text-[12px] font-semibold">{shortPeriodLabel(row)}</span>
+                <span className={`block ${DOC_TYPE.periodAr}`}>{shortPeriodLabel(row)}</span>
                 {row.timeRange && (
-                  <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
-                    {row.timeRange}
-                  </span>
+                  <span className={`block ${DOC_TYPE.periodTime}`}>{row.timeRange}</span>
                 )}
               </th>
             ) : (
               <th
                 key={row.index}
                 scope="col"
-                className={`${line} bg-[color:var(--doc-break)] px-0.5 py-1.5 leading-[1.3]`}
+                className={`${line} bg-[color:var(--doc-break)] px-0.5 py-1.5`}
               >
                 {shortBreakLabel(row.labelAr).map((part) => (
                   <span
                     key={part}
-                    className="block whitespace-nowrap text-[8.5px] font-medium text-[color:var(--doc-muted)]"
+                    className={`block whitespace-nowrap ${DOC_TYPE.breakAr}`}
                   >
                     {part}
                   </span>
@@ -271,7 +324,7 @@ export function TimetableGrid({
                 {splitTimeRange(row.timeRange).map((t) => (
                   <span
                     key={t}
-                    className="latin block whitespace-nowrap text-[7.5px] text-[color:var(--doc-muted)]"
+                    className={`block whitespace-nowrap ${DOC_TYPE.breakTime}`}
                   >
                     {t}
                   </span>
@@ -287,18 +340,12 @@ export function TimetableGrid({
           <tr key={day.id}>
             <th
               scope="row"
-              className={`${line} bg-[color:var(--doc-day)] px-1 py-1.5 leading-[1.3]`}
+              className={`${line} bg-[color:var(--doc-day)] px-1 py-1.5`}
             >
-              <span className="block text-[13.5px] font-semibold">{day.nameAr}</span>
-              {day.nameEn && (
-                <span className="latin block text-[9px] font-normal text-[color:var(--doc-muted)]">
-                  {day.nameEn}
-                </span>
-              )}
+              <span className={`block ${DOC_TYPE.dayAr}`}>{day.nameAr}</span>
+              {day.nameEn && <span className={`block ${DOC_TYPE.dayEn}`}>{day.nameEn}</span>}
               {grid.daysWithOwnTimes.has(day.id) && (
-                <span className="block text-[8px] font-normal text-[color:var(--doc-muted)]">
-                  توقيت مختلف
-                </span>
+                <span className={`block ${DOC_TYPE.dayNote}`}>توقيت مختلف</span>
               )}
             </th>
 
@@ -319,7 +366,7 @@ export function TimetableGrid({
               if (!lesson) {
                 return (
                   <td key={row.index} className={`${line} px-1`}>
-                    <span className="text-[12px] text-[color:var(--doc-muted)]">ــ</span>
+                    <span className={DOC_TYPE.cellEmpty}>ــ</span>
                   </td>
                 );
               }
@@ -341,24 +388,18 @@ export function TimetableGrid({
                   : (teacher?.nameAr ?? '');
 
               return (
-                <td key={row.index} className={`${line} px-1 leading-[1.3]`}>
+                <td key={row.index} className={`${line} px-1`}>
                   <span
-                    className={
-                      context === 'teacher'
-                        ? 'block text-[16px] font-semibold'
-                        : 'block text-[12.5px] font-semibold'
-                    }
+                    className={`block ${
+                      context === 'teacher' ? DOC_TYPE.cellMain : DOC_TYPE.cellMainSm
+                    }`}
                   >
                     {lesson.variant && <span className="ms-0.5">{lesson.variant.icon}</span>}
                     {isLatinRun(headline) ? <span className="latin">{headline}</span> : headline}
                   </span>
-                  {sub && (
-                    <span className="block text-[10px] text-[color:var(--doc-muted)]">{sub}</span>
-                  )}
+                  {sub && <span className={`block ${DOC_TYPE.cellSub}`}>{sub}</span>}
                   {lesson.variant && (
-                    <span className="block text-[9px] text-[color:var(--doc-muted)]">
-                      {lesson.variant.labelAr}
-                    </span>
+                    <span className={`block ${DOC_TYPE.cellNote}`}>{lesson.variant.labelAr}</span>
                   )}
                 </td>
               );
@@ -378,13 +419,13 @@ export function DocumentSignatures() {
     <section className="mt-4 shrink-0 break-inside-avoid">
       <div className="flex items-end justify-around gap-8">
         {BRAND.signatories.map((s) => (
-          <div key={s.roleAr} className="min-w-0 flex-1 text-center leading-[1.3]">
-            <p className="truncate text-[9.5px] text-[color:var(--doc-muted)]">{s.roleAr}</p>
-            {s.roleEn && (
-              <p className="latin truncate text-[8.5px] text-[color:var(--doc-muted)]">{s.roleEn}</p>
-            )}
-            <p className="mt-0.5 truncate text-[12px] font-semibold">{s.nameAr}</p>
-            <p className="mx-auto mt-3.5 w-3/4 border-t-[0.6px] border-[color:var(--doc-line)] pt-1 text-[8.5px] text-[color:var(--doc-muted)]">
+          <div key={s.roleAr} className="min-w-0 flex-1 text-center">
+            <p className={`truncate ${DOC_TYPE.signRoleAr}`}>{s.roleAr}</p>
+            {s.roleEn && <p className={`truncate ${DOC_TYPE.signRoleEn}`}>{s.roleEn}</p>}
+            <p className={`mt-0.5 truncate ${DOC_TYPE.signName}`}>{s.nameAr}</p>
+            <p
+              className={`mx-auto mt-3.5 w-3/4 border-t-[0.6px] border-[color:var(--doc-line)] pt-1 ${DOC_TYPE.signHint}`}
+            >
               التوقيع
             </p>
           </div>
@@ -405,7 +446,9 @@ export function DocumentFooter({
 }) {
   if (hidden) return null;
   return (
-    <footer className="mt-2 flex shrink-0 items-center justify-between border-t-[0.6px] border-[color:var(--doc-line)] pt-1 text-[8.5px] text-[color:var(--doc-muted)]">
+    <footer
+      className={`mt-2 flex shrink-0 items-center justify-between border-t-[0.6px] border-[color:var(--doc-line)] pt-1 ${DOC_TYPE.footer}`}
+    >
       <span>تاريخ الإصدار: {issuedAt}</span>
       <span>رقم النسخة: {versionLabel}</span>
       <span className="latin">{BRAND.systemNameAr}</span>
