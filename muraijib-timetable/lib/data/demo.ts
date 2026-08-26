@@ -524,10 +524,16 @@ function generateLessons(
     }
   }
 
-  // النصاب المطلوب يُضبط على ما أُسند فعلًا حتى لا تظهر لوحة الأنصبة مضلِّلة.
-  const balanced = teachers.map((t) => {
+  /**
+   * الأنصبة في المدارس نادرًا ما تكون مطابقة تمامًا لما أُسند: بعض المعلمات
+   * دون نصابهن المقرّر وبعضهن عليه بالضبط. تُحاكى هذه الفجوة بنمط ثابت
+   * (لا عشوائي) حتى تعكس لوحة الأنصبة واقعًا يُتخذ عليه قرار، لا صفوفًا كلها خضراء.
+   */
+  const SHORTFALL_PATTERN = [0, 0, 2, 0, 1, 0, 0, 3, 0, 1];
+  const balanced = teachers.map((t, i) => {
     const assigned = teacherLoad.get(t.id) ?? 0;
-    return { ...t, requiredLoad: assigned, maxLoad: Math.max(assigned + 3, t.requiredLoad) };
+    const requiredLoad = assigned + SHORTFALL_PATTERN[i % SHORTFALL_PATTERN.length];
+    return { ...t, requiredLoad, maxLoad: requiredLoad + 3 };
   });
 
   return { lessons, teachers: balanced };

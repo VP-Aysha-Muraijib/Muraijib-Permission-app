@@ -143,12 +143,18 @@ export default function ConflictsPage() {
             tone="ok"
             icon={<Icon name="ShieldCheck" className="h-5 w-5" />}
             title="لا توجد تعارضات 🎉"
-            description="جميع الحصص الحالية اجتازت الفحص: لا حجز مزدوج، ولا خرق لأوقات عدم التوفر، والأنصبة ضمن الحدود المسموحة."
+            description={
+              // ادّعاء «كل شيء سليم» مع وجود معلمات خارج النصاب ادّعاء غير دقيق:
+              // النصاب قيد مرن لا يمنع الاعتماد، لكنه يبقى عملًا مفتوحًا.
+              t.underload + t.overload > 0
+                ? `جميع الحصص اجتازت القيود الصارمة: لا حجز مزدوج، ولا خرق لأوقات عدم التوفر. يبقى ${t.underload + t.overload} معلمة خارج النصاب المطلوب — وهذا لا يمنع الاعتماد، لكنه يظهر في درجة الجودة.`
+                : 'جميع الحصص الحالية اجتازت الفحص: لا حجز مزدوج، ولا خرق لأوقات عدم التوفر، والأنصبة ضمن الحدود المسموحة.'
+            }
             action={
-              <Link href="/print">
+              <Link href={t.underload + t.overload > 0 ? '/workload' : '/print'}>
                 <Button size="sm" variant="secondary">
-                  <Icon name="Printer" className="h-3.5 w-3.5" />
-                  الانتقال إلى مركز الطباعة
+                  <Icon name={t.underload + t.overload > 0 ? 'Gauge' : 'Printer'} className="h-3.5 w-3.5" />
+                  {t.underload + t.overload > 0 ? 'مراجعة الأنصبة' : 'الانتقال إلى مركز الطباعة'}
                 </Button>
               </Link>
             }
