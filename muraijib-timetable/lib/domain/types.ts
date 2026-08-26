@@ -16,6 +16,7 @@ export interface Period {
   index: number;          // ترتيب الفترة داخل اليوم، يبدأ من 1
   kind: PeriodKind;
   labelAr: string;        // "الحصة الأولى" / "الفسحة"
+  labelEn?: string;
   startTime: string;      // "07:30"
   endTime: string;        // "08:15"
 }
@@ -24,6 +25,7 @@ export interface SchoolDay {
   id: ID;
   weekday: number;        // 0 = الأحد … 6 = السبت
   nameAr: string;
+  nameEn?: string;
   isTeaching: boolean;
   sort: number;
   /** لكل يوم فتراته الخاصة — لا يُفترض أن الأيام متطابقة. */
@@ -33,6 +35,7 @@ export interface SchoolDay {
 export interface SchoolWeek {
   yearLabel: string;      // "2026–2027"
   schoolNameAr: string;
+  schoolNameEn?: string;
   days: SchoolDay[];
 }
 
@@ -60,6 +63,7 @@ export interface Subject {
   id: ID;
   code: string;
   nameAr: string;
+  nameEn?: string;
   departmentId: ID | null;
   color: string;
   needsLab: boolean;
@@ -116,6 +120,7 @@ export interface Grade {
   id: ID;
   level: number;          // 6, 7, 8 …
   nameAr: string;         // "الصف السادس"
+  nameEn?: string;
   sort: number;
 }
 
@@ -142,10 +147,27 @@ export interface CurriculumEntry {
 
 /* ────────────────────────── الحصة ────────────────────────── */
 
+/**
+ * تمييز داخل المادة الواحدة.
+ *
+ * بعض الحصص تنتمي لمادة واحدة في الخطة والنصاب، لكنها تختلف في محتواها:
+ * حصة الجوجيتسو ضمن حصتَي التربية البدنية، وتخصص الفنون (بصرية/سمعية/دراما)
+ * ضمن حصص الفنون. جعلها موادّ مستقلة يضخّم الخطة ويكسر حساب النصاب،
+ * وإخفاؤها يفقد معلومة يحتاجها من يقرأ الجدول. لذلك هي سمة على الحصة.
+ */
+export interface LessonVariant {
+  code: string;
+  labelAr: string;
+  labelEn?: string;
+  /** رمز قصير يظهر على الخلية وفي الطباعة. */
+  icon: string;
+}
+
 export interface Lesson {
   id: ID;
   sectionId: ID;
   subjectId: ID;
+  variant?: LessonVariant | null;
   /** null = حصة مطلوبة لم تُسند لمعلمة بعد. */
   teacherId: ID | null;
   dayId: ID;

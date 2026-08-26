@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { makeSnapshot } from './fixtures';
 import { buildIndex } from '@/lib/engine/snapshot';
+import { buildGrid } from '@/lib/engine/grid';
 import { applyOps, buildChangeSet, diffLessons, invertOps } from '@/lib/engine/changeset';
 import { validateChangeSet } from '@/lib/engine/validator';
 import { computeTeacherWorkload, gapsInDay, longestRunInDay } from '@/lib/engine/workload';
 import { findAvailableSlots, findAvailableTeachers } from '@/lib/engine/solver';
 import { generateRepairProposals, simulateTeacherRemoval } from '@/lib/engine/repair';
 import { runHealthCheck } from '@/lib/engine/conflicts';
+import { scoreSnapshot } from '@/lib/engine/score';
 
 const cs = (ops: Parameters<typeof buildChangeSet>[0]['ops']) =>
   buildChangeSet({
@@ -222,5 +224,56 @@ describe('فحص صحة الجدول', () => {
     const report = runHealthCheck(snapshot);
     expect(report.totals.unassigned).toBe(1);
     expect(report.groups[0].severity === 'critical' || report.groups[0].severity === 'high').toBe(true);
+  });
+});
+
+describe('معايرة مقياس الفراغات', () => {
+  const build = (busyPerDay: number[][]) => {
+    const snapshot = makeSnapshot({ periods: 8, lessons: [] });
+    const lessons = busyPerDay.flatMap((periods, day) =>
+      periods.map((p, i) => ({
+        id: `x${day}-${i}`, sectionId: 's1', subjectId: 'math', teacherId: 't1',
+        dayId: `d${day}`, periodIndex: p, roomId: null, isLocked: false,
+      })),
+    );
+    return { ...snapshot, lessons };
+  };
+
+  const gapsScore = (s: ReturnType<typeof build>) =>
+    scoreSnapshot(s).lines.find((l) => l.constraintId === 'teacher-gaps')!;
+
+  it('جدول متلاصق بلا فراغات يأخذ الدرجة كاملة', () => {
+    expect(gapsScore(build([[1, 2, 3], [1, 2, 3]])).normalized).toBe(1);
+  });
+
+  it('فراغ واحد في اليوم لا يُفقد شيئًا — وهو واقع أي مدرسة', () => {
+    expect(gapsScore(build([[1, 2, 4], [1, 2, 4]])).normalized).toBe(1);
+  });
+
+  it('ثلاثة فراغات في اليوم تُفقد الدرجة كاملة', () => {
+    expect(gapsScore(build([[1, 5], [1, 5]])).normalized).toBe(0);
+  });
+
+  it('الشرح يذكر المتوسط اليومي لا رقمًا مجرّدًا', () => {
+    expect(gapsScore(build([[1, 3, 5]])).detailAr).toContain('في اليوم');
+  });
+});
+
+describe('اختلاف أوقات الأيام', () => {
+  it('يُعلَّم اليوم الذي تختلف أوقاته بدل أن يرث أوقات غيره', () => {
+    const snapshot = makeSnapshot({ days: 2, periods: 3 });
+    // اليوم الثاني بلا أوقات مزوّدة — كحال الجمعة في بيانات المدرسة
+    for (const period of snapshot.week.days[1].periods) {
+      period.startTime = '';
+      period.endTime = '';
+    }
+    const grid = buildGrid(snapshot.week);
+    expect(grid.daysWithOwnTimes.has('d1')).toBe(true);
+    expect(grid.daysWithOwnTimes.has('d0')).toBe(false);
+  });
+
+  it('أيام متطابقة الأوقات لا تُعلَّم', () => {
+    const grid = buildGrid(makeSnapshot({ days: 3 }).week);
+    expect(grid.daysWithOwnTimes.size).toBe(0);
   });
 });

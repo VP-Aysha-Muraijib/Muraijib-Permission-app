@@ -7,3 +7,8 @@ out/
 next-env.d.ts
 coverage/
 standalone/dist/
+
+# بيانات المدرسة لا تُرفع إلى مستودع عام
+*baseline*.json
+raw-extract.json
+clean.json

@@ -173,7 +173,7 @@ export default function AgentPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="مثال: انتقلت معلمة ٣ من المدرسة، أوجد أفضل حل دون تغيير جداول الصف الثامن"
+            placeholder="مثال: انتقلت معلمة 3 من المدرسة، أوجد أفضل حل دون تغيير جداول الصف الثامن"
             className="h-11"
           />
           <Button type="submit" variant="primary" size="lg" disabled={!input.trim()}>

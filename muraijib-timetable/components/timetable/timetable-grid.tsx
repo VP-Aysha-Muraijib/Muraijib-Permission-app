@@ -6,6 +6,7 @@ import type { SnapshotIndex } from '@/lib/engine/snapshot';
 import { buildGrid, periodOf } from '@/lib/engine/grid';
 import { slotKey } from '@/lib/engine/snapshot';
 import { cn } from '@/lib/utils';
+import { primary, secondary, useDisplayLang } from '@/lib/i18n';
 import { Icon } from '@/components/layout/icon';
 import { LessonCard, type CellContext } from './lesson-card';
 
@@ -41,6 +42,7 @@ export function TimetableGrid({
   readOnly?: boolean;
   emptyHintAr?: string;
 }) {
+  const { lang } = useDisplayLang();
   const grid = React.useMemo(() => buildGrid(index.snapshot.week), [index]);
   const [dragging, setDragging] = React.useState<Lesson | null>(null);
   const [hover, setHover] = React.useState<string | null>(null);
@@ -74,7 +76,20 @@ export function TimetableGrid({
                 key={day.id}
                 className="border-b border-line px-2 py-2 text-center text-xs font-bold text-ink"
               >
-                {day.nameAr}
+                <span className="block">{primary(day.nameAr, day.nameEn, lang)}</span>
+                {secondary(day.nameAr, day.nameEn, lang) && (
+                  <span className="block text-2xs font-normal text-ink-faint" dir="ltr">
+                    {secondary(day.nameAr, day.nameEn, lang)}
+                  </span>
+                )}
+                {grid.daysWithOwnTimes.has(day.id) && (
+                  <span
+                    className="mt-0.5 block rounded-sm bg-warn-soft px-1 py-px text-2xs font-medium text-warn"
+                    title="أوقات هذا اليوم تختلف عن العمود الأيمن ولم تُزوَّد بعد"
+                  >
+                    توقيت مختلف
+                  </span>
+                )}
               </th>
             ))}
           </tr>

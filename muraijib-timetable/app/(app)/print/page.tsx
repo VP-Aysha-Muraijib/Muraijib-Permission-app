@@ -16,6 +16,7 @@ import {
 } from '@/components/print/sheets';
 import { exportSheetsToExcel, exportSheetsToCsv } from '@/lib/print/export';
 import { cn, formatDateAr, matchesAr } from '@/lib/utils';
+import { LANG_LABEL, useDisplayLang, type DisplayLang } from '@/lib/i18n';
 
 type Kind =
   | 'teacher'
@@ -47,6 +48,7 @@ const PAPERS: Array<{ id: Paper; label: string; css: string; widthMm: number }> 
 export default function PrintCenterPage() {
   const params = useSearchParams();
   const { snapshot, index, health, versions } = useSchedule();
+  const { lang, setLang } = useDisplayLang();
 
   const [kind, setKind] = React.useState<Kind>((params.get('kind') as Kind) ?? 'teacher');
   const [entityId, setEntityId] = React.useState<string>(params.get('id') ?? '');
@@ -78,6 +80,7 @@ export default function PrintCenterPage() {
     versionLabel: current?.label ?? 'v1.0',
     issuedAt: formatDateAr(new Date().toISOString()),
     hideFooter,
+    lang,
   };
 
   const paperSpec = PAPERS.find((p) => p.id === paper)!;
@@ -204,6 +207,16 @@ export default function PrintCenterPage() {
                     </Field>
                   </>
                 )}
+
+                <Field label="لغة الجدول" hint="الأسماء تُطبع بالعربية والإنجليزية معًا افتراضيًا">
+                  <Select value={lang} onChange={(e) => setLang(e.target.value as DisplayLang)}>
+                    {(['both', 'ar', 'en'] as DisplayLang[]).map((option) => (
+                      <option key={option} value={option}>
+                        {LANG_LABEL[option]}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
 
                 <Field label="حجم الورق">
                   <Select value={paper} onChange={(e) => setPaper(e.target.value as Paper)}>

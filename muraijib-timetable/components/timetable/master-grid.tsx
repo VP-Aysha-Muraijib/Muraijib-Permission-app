@@ -7,6 +7,7 @@ import { slotKey } from '@/lib/engine/snapshot';
 import { buildGrid } from '@/lib/engine/grid';
 import { LessonCard } from './lesson-card';
 import { cn } from '@/lib/utils';
+import { primary, secondary, useDisplayLang } from '@/lib/i18n';
 
 export type MasterRowKind = 'section' | 'teacher';
 
@@ -31,13 +32,21 @@ export function MasterGrid({
   filterSubjectId?: ID | null;
   highlightTeacherId?: ID | null;
 }) {
+  const { lang } = useDisplayLang();
   const grid = React.useMemo(() => buildGrid(index.snapshot.week), [index]);
 
   const rows = React.useMemo(() => {
     if (rowKind === 'teacher') {
       return index.snapshot.teachers
         .filter((t) => t.status !== 'transferred')
-        .map((t) => ({ id: t.id, label: t.nameAr, sub: index.subjectById.get(t.primarySubjectId ?? '')?.nameAr ?? '' }));
+        .map((t) => {
+          const subject = index.subjectById.get(t.primarySubjectId ?? '');
+          return {
+            id: t.id,
+            label: primary(t.nameAr, t.nameEn, lang),
+            sub: subject ? primary(subject.nameAr, subject.nameEn, lang) : '',
+          };
+        });
     }
     return [...index.snapshot.sections]
       .filter((s) => s.isActive)
@@ -45,9 +54,12 @@ export function MasterGrid({
       .map((s) => ({
         id: s.id,
         label: s.label,
-        sub: index.gradeById.get(s.gradeId)?.nameAr ?? '',
+        sub: (() => {
+          const g = index.gradeById.get(s.gradeId);
+          return g ? primary(g.nameAr, g.nameEn, lang) : '';
+        })(),
       }));
-  }, [index, rowKind]);
+  }, [index, rowKind, lang]);
 
   const lookup = React.useMemo(() => {
     const map = new Map<string, Lesson>();
@@ -57,7 +69,7 @@ export function MasterGrid({
       map.set(`${owner}#${slotKey(lesson.dayId, lesson.periodIndex)}`, lesson);
     }
     return map;
-  }, [index, rowKind]);
+  }, [index, rowKind, lang]);
 
   return (
     <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 260px)' }}>
@@ -78,7 +90,12 @@ export function MasterGrid({
                   colSpan={span}
                   className="border-b border-l border-line bg-surface px-2 py-1.5 text-center text-xs font-bold text-ink"
                 >
-                  {day.nameAr}
+                  {primary(day.nameAr, day.nameEn, lang)}
+                  {secondary(day.nameAr, day.nameEn, lang) && (
+                    <span className="mr-1 text-2xs font-normal text-ink-faint" dir="ltr">
+                      {secondary(day.nameAr, day.nameEn, lang)}
+                    </span>
+                  )}
                 </th>
               );
             })}

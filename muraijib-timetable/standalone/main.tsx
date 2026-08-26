@@ -12,6 +12,7 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ScheduleProvider } from '@/lib/state/schedule-provider';
 import { AppShell } from '@/components/layout/app-shell';
+import { DisplayLangProvider } from '@/lib/i18n';
 import { usePathname } from './shims/navigation';
 
 import Dashboard from '@/app/(app)/page';
@@ -72,11 +73,13 @@ function App() {
   }, []);
 
   return (
-    <ScheduleProvider>
-      <AppShell>
-        <Router />
-      </AppShell>
-    </ScheduleProvider>
+    <DisplayLangProvider>
+      <ScheduleProvider>
+        <AppShell>
+          <Router />
+        </AppShell>
+      </ScheduleProvider>
+    </DisplayLangProvider>
   );
 }
 

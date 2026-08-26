@@ -4,6 +4,7 @@ import * as React from 'react';
 import type { Lesson } from '@/lib/domain/types';
 import type { SnapshotIndex } from '@/lib/engine/snapshot';
 import { cn, tintOf } from '@/lib/utils';
+import { primary, secondary, useDisplayLang } from '@/lib/i18n';
 import { Icon } from '@/components/layout/icon';
 
 export type CellContext = 'class' | 'teacher' | 'master' | 'subject';
@@ -37,6 +38,7 @@ export function LessonCard({
   onDragStart?: (e: React.DragEvent) => void;
   onClick?: () => void;
 }) {
+  const { lang } = useDisplayLang();
   const subject = index.subjectById.get(lesson.subjectId);
   const teacher = lesson.teacherId ? index.teacherById.get(lesson.teacherId) : null;
   const section = index.sectionById.get(lesson.sectionId);
@@ -44,13 +46,15 @@ export function LessonCard({
   const locked = index.lockedLessonIds.has(lesson.id);
   const color = subject?.color ?? 'var(--subject-fallback)';
 
-  const primary = context === 'teacher' ? section?.label ?? '—' : subject?.nameAr ?? '—';
-  const secondary =
-    context === 'teacher'
-      ? subject?.nameAr ?? ''
-      : context === 'master'
-        ? teacher?.nameAr ?? 'بلا معلمة'
-        : teacher?.nameAr ?? 'بلا معلمة';
+  const subjectName = primary(subject?.nameAr ?? '—', subject?.nameEn, lang);
+  const subjectAlt = secondary(subject?.nameAr ?? '', subject?.nameEn, lang);
+  const teacherName = teacher
+    ? primary(teacher.nameAr, teacher.nameEn, lang)
+    : 'بلا معلمة';
+
+  const headline = context === 'teacher' ? section?.label ?? '—' : subjectName;
+  const subline = context === 'teacher' ? subjectName : teacherName;
+  const altline = context === 'teacher' ? subjectAlt : secondary(teacher?.nameAr ?? '', teacher?.nameEn, lang);
 
   return (
     <div
@@ -89,7 +93,12 @@ export function LessonCard({
             compact ? 'text-2xs' : 'text-xs',
           )}
         >
-          {primary}
+          {lesson.variant && (
+            <span className="ml-1" title={lesson.variant.labelAr} aria-label={lesson.variant.labelAr}>
+              {lesson.variant.icon}
+            </span>
+          )}
+          {headline}
         </p>
         {locked && <Icon name="Lock" className="mt-0.5 h-2.5 w-2.5 shrink-0 text-ink-faint" />}
       </div>
@@ -101,8 +110,17 @@ export function LessonCard({
           teacher ? 'text-ink-muted' : 'font-medium text-danger',
         )}
       >
-        {secondary}
+        {subline}
       </p>
+
+      {altline && (
+        <p
+          className={cn('truncate leading-tight text-ink-faint', compact ? 'text-[9px]' : 'text-2xs')}
+          dir="ltr"
+        >
+          {altline}
+        </p>
+      )}
 
       {!compact && room && (
         <p className="truncate text-2xs leading-tight text-ink-faint">{room.nameAr}</p>

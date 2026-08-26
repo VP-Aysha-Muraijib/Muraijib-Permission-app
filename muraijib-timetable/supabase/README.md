@@ -31,7 +31,7 @@ psql -h /tmp -p 55432 -d muraijib -f local-auth-shim.sql
 psql -h /tmp -p 55432 -d muraijib -f schema.sql
 psql -h /tmp -p 55432 -d muraijib -f rls.sql
 
-psql -h /tmp -p 55432 -d muraijib -f verify-guards.sql   # يجب أن يرفض ٥ محاولات
+psql -h /tmp -p 55432 -d muraijib -f verify-guards.sql   # يجب أن يرفض 5 محاولات
 psql -h /tmp -p 55432 -d muraijib -f verify-apply.sql     # يجب أن ينجح الاعتماد المصرّح به وحده
 ```
 

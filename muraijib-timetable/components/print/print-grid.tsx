@@ -2,6 +2,7 @@ import type { Lesson } from '@/lib/domain/types';
 import type { SnapshotIndex } from '@/lib/engine/snapshot';
 import { slotKey } from '@/lib/engine/snapshot';
 import { buildGrid, periodOf } from '@/lib/engine/grid';
+import { primary, secondary, type DisplayLang } from '@/lib/i18n';
 
 /**
  * شبكة الجدول المطبوعة.
@@ -14,11 +15,13 @@ export function PrintGrid({
   lessons,
   context,
   showTimes = true,
+  lang = 'both',
 }: {
   index: SnapshotIndex;
   lessons: Lesson[];
   context: 'teacher' | 'class';
   showTimes?: boolean;
+  lang?: DisplayLang;
 }) {
   const grid = buildGrid(index.snapshot.week);
   const bySlot = new Map(lessons.map((l) => [slotKey(l.dayId, l.periodIndex), l]));
@@ -35,7 +38,15 @@ export function PrintGrid({
               key={day.id}
               className="border border-black/70 bg-black/[.06] px-1 py-1 text-[9pt] font-bold"
             >
-              {day.nameAr}
+              <span className="block">{primary(day.nameAr, day.nameEn, lang)}</span>
+              {secondary(day.nameAr, day.nameEn, lang) && (
+                <span className="block text-[7pt] font-normal text-black/60">
+                  {secondary(day.nameAr, day.nameEn, lang)}
+                </span>
+              )}
+              {grid.daysWithOwnTimes.has(day.id) && (
+                <span className="block text-[6.5pt] font-normal text-black/70">توقيت مختلف</span>
+              )}
             </th>
           ))}
         </tr>
@@ -92,11 +103,32 @@ export function PrintGrid({
                 return (
                   <td key={day.id} className="border border-black/70 px-1 py-1 align-middle">
                     <span className="block text-[9pt] font-bold leading-tight">
-                      {context === 'teacher' ? section?.label : subject?.nameAr}
+                      {lesson.variant && <span className="ml-0.5">{lesson.variant.icon}</span>}
+                      {context === 'teacher'
+                        ? section?.label
+                        : primary(subject?.nameAr ?? '—', subject?.nameEn, lang)}
                     </span>
                     <span className="block text-[8pt] leading-tight">
-                      {context === 'teacher' ? subject?.nameAr : (teacher?.nameAr ?? '—')}
+                      {context === 'teacher'
+                        ? primary(subject?.nameAr ?? '—', subject?.nameEn, lang)
+                        : teacher
+                          ? primary(teacher.nameAr, teacher.nameEn, lang)
+                          : '—'}
                     </span>
+                    {(context === 'teacher'
+                      ? secondary(subject?.nameAr ?? '', subject?.nameEn, lang)
+                      : secondary(teacher?.nameAr ?? '', teacher?.nameEn, lang)) && (
+                      <span className="block text-[7pt] leading-tight text-black/60" dir="ltr">
+                        {context === 'teacher'
+                          ? secondary(subject?.nameAr ?? '', subject?.nameEn, lang)
+                          : secondary(teacher?.nameAr ?? '', teacher?.nameEn, lang)}
+                      </span>
+                    )}
+                    {lesson.variant && (
+                      <span className="block text-[7pt] leading-tight text-black/60">
+                        {lesson.variant.labelAr}
+                      </span>
+                    )}
                     {room && <span className="block text-[7pt] leading-tight text-black/55">{room.nameAr}</span>}
                   </td>
                 );

@@ -100,29 +100,40 @@ function subjectClustering(idx: SnapshotIndex): { value: number; detail: string 
 /* ── فراغات المعلمات ── */
 function teacherGaps(idx: SnapshotIndex): { value: number; detail: string } {
   let gaps = 0;
-  let lessons = 0;
+  let teacherDays = 0;
   let worst: { name: string; gaps: number } | null = null;
 
   for (const teacher of idx.snapshot.teachers) {
-    const runs = teacherDayRuns(idx, teacher.id);
     let teacherGapCount = 0;
-    for (const run of runs) {
+    for (const run of teacherDayRuns(idx, teacher.id)) {
+      if (run.busy.length === 0) continue;
+      teacherDays += 1;
       teacherGapCount += gapsInDay(run.busy, run.available);
-      lessons += run.busy.length;
     }
     gaps += teacherGapCount;
     if (!worst || teacherGapCount > worst.gaps) worst = { name: teacher.nameAr, gaps: teacherGapCount };
   }
 
-  // مرجع مقبول: فراغ واحد لكل ست حصص.
-  const tolerance = Math.max(1, lessons / 6);
-  const value = 1 - Math.min(1, gaps / (tolerance * 2));
+  if (teacherDays === 0) return { value: 1, detail: 'لا توجد حصص لتقييم فراغاتها.' };
+
+  /**
+   * المعيار: متوسط الفراغات في اليوم الواحد للمعلمة الواحدة.
+   *
+   * القياس نسبةً إلى عدد الحصص كان يعطي عقوبة كاملة لأي مدرسة واقعية:
+   * معلمة تدرّس ٢٠ حصة في أسبوع من ٣٦ خانة لا بدّ أن يتخلّل جدولها فراغات.
+   * المرجع هنا ما يمكن بلوغه فعلًا: فراغ واحد في اليوم مقبول، وثلاثة فأكثر مرهقة.
+   */
+  const perDay = gaps / teacherDays;
+  const value = 1 - Math.min(1, Math.max(0, (perDay - 1) / 2));
+
   return {
     value: clamp01(value),
     detail:
       gaps === 0
         ? 'لا توجد فراغات في جداول المعلمات.'
-        : `إجمالي الفراغات ${gaps}${worst && worst.gaps > 0 ? ` — أعلاها ${worst.name} (${worst.gaps}).` : '.'}`,
+        : `متوسط ${perDay.toFixed(1)} فراغ في اليوم لكل معلمة (الإجمالي ${gaps})${
+            worst && worst.gaps > 0 ? ` — أعلاها ${worst.name} بـ${worst.gaps} أسبوعيًا.` : '.'
+          }`,
   };
 }
 

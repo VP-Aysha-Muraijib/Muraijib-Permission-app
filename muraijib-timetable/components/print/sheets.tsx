@@ -9,12 +9,14 @@ import type { HealthReport } from '@/lib/engine/conflicts';
 import { PrintFooter, PrintHeader } from './print-header';
 import { PrintGrid } from './print-grid';
 import { LOAD_LABEL } from '@/components/workload-cell';
+import { primary, secondary, type DisplayLang } from '@/lib/i18n';
 
 export interface SheetChrome {
   yearLabel: string;
   versionLabel: string;
   issuedAt: string;
   hideFooter: boolean;
+  lang: DisplayLang;
 }
 
 const page = 'print-page print-block';
@@ -43,8 +45,12 @@ export function TeacherSheet({
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="جدول المعلمة"
-        subtitleAr={teacher.nameAr}
+        titleAr="جدول المعلمة · Teacher Timetable"
+        subtitleAr={
+          [teacher.nameAr, secondary(teacher.nameAr, teacher.nameEn, chrome.lang)]
+            .filter(Boolean)
+            .join(' · ')
+        }
         yearLabel={chrome.yearLabel}
         metaAr={[
           { label: 'المادة', value: subjects || '—' },
@@ -52,7 +58,7 @@ export function TeacherSheet({
           { label: 'عدد الشعب', value: String(new Set(lessons.map((l) => l.sectionId)).size) },
         ]}
       />
-      <PrintGrid index={index} lessons={lessons} context="teacher" />
+      <PrintGrid index={index} lessons={lessons} context="teacher" lang={chrome.lang} />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -85,8 +91,8 @@ export function ClassSheet({
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="جدول الصف"
-        subtitleAr={`${grade?.nameAr ?? ''} — الشعبة ${section.label}`}
+        titleAr="جدول الصف · Class Timetable"
+        subtitleAr={`${primary(grade?.nameAr ?? '', grade?.nameEn, chrome.lang)} — الشعبة ${section.label}`}
         yearLabel={chrome.yearLabel}
         metaAr={[
           { label: 'عدد الحصص', value: String(lessons.length) },
@@ -94,7 +100,7 @@ export function ClassSheet({
           ...(classTeacher ? [{ label: 'رائدة الفصل', value: classTeacher }] : []),
         ]}
       />
-      <PrintGrid index={index} lessons={lessons} context="class" />
+      <PrintGrid index={index} lessons={lessons} context="class" lang={chrome.lang} />
       <PrintFooter
         versionLabel={chrome.versionLabel}
         issuedAt={chrome.issuedAt}
@@ -119,8 +125,8 @@ export function MasterSheet({ index, chrome }: { index: SnapshotIndex; chrome: S
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="الجدول المدرسي العام"
-        subtitleAr="جميع الشعب"
+        titleAr="الجدول المدرسي العام · Master Timetable"
+        subtitleAr="جميع الشعب · All classes"
         yearLabel={chrome.yearLabel}
         metaAr={[
           { label: 'عدد الشعب', value: String(sections.length) },
@@ -212,7 +218,7 @@ export function WorkloadSheet({ index, chrome }: { index: SnapshotIndex; chrome:
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="تقرير أنصبة المعلمات"
+        titleAr="تقرير أنصبة المعلمات · Teaching Load Report"
         yearLabel={chrome.yearLabel}
         metaAr={[
           { label: 'عدد المعلمات', value: String(loads.length) },
@@ -288,7 +294,7 @@ export function ConflictsSheet({
   return (
     <section className={page}>
       <PrintHeader
-        titleAr="تقرير فحص الجدول"
+        titleAr="تقرير فحص الجدول · Timetable Health Report"
         yearLabel={chrome.yearLabel}
         metaAr={[
           { label: 'درجة الجودة', value: health.valid ? `${health.score}%` : 'غير صالح' },

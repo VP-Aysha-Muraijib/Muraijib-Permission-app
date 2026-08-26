@@ -59,6 +59,9 @@ export function LessonInspector({
       <div className="space-y-2 border-b border-line px-4 py-3 text-xs">
         <Row label="المعلمة" value={teacher?.nameAr ?? 'بلا معلمة'} tone={teacher ? undefined : 'danger'} />
         <Row label="المادة" value={subject?.nameAr ?? '—'} />
+        {lesson.variant && (
+          <Row label="التخصص" value={`${lesson.variant.icon} ${lesson.variant.labelAr}`} tone="brand" />
+        )}
         <Row label="الشعبة" value={section?.label ?? '—'} />
         <Row label="الغرفة" value={room?.nameAr ?? 'غرفة الصف'} />
         <Row

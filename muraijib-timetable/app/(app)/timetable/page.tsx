@@ -15,6 +15,7 @@ import { MasterGrid } from '@/components/timetable/master-grid';
 import { LessonInspector } from '@/components/timetable/lesson-inspector';
 import { ChangePreviewDialog } from '@/components/timetable/change-preview';
 import { cn } from '@/lib/utils';
+import { LANG_LABEL, useDisplayLang, type DisplayLang } from '@/lib/i18n';
 
 type View = 'master' | 'master-teachers' | 'class' | 'teacher' | 'subject' | 'day' | 'conflicts';
 
@@ -32,6 +33,7 @@ export default function TimetablePage() {
   const router = useRouter();
   const params = useSearchParams();
   const { snapshot, index, health, workloads, preview, makeChangeSet, apply } = useSchedule();
+  const { lang, setLang } = useDisplayLang();
 
   const [view, setView] = React.useState<View>((params.get('view') as View) ?? 'master');
   const [entityId, setEntityId] = React.useState<ID | null>(params.get('id'));
@@ -192,7 +194,22 @@ export default function TimetablePage() {
           </Select>
         )}
 
-        <div className="mr-auto flex items-center gap-2 text-2xs text-ink-muted">
+        <div className="mr-auto flex items-center gap-3 text-2xs text-ink-muted">
+          <span className="flex items-center overflow-hidden rounded border border-line">
+            {(['both', 'ar', 'en'] as DisplayLang[]).map((option) => (
+              <button
+                key={option}
+                onClick={() => setLang(option)}
+                className={cn(
+                  'px-2 py-1 transition-colors',
+                  lang === option ? 'bg-brand text-ink-invert' : 'hover:bg-surface-sunken',
+                )}
+                title="لغة عرض الجدول"
+              >
+                {LANG_LABEL[option]}
+              </button>
+            ))}
+          </span>
           <LegendDot color="var(--danger)" label="تعارض" />
           <span className="flex items-center gap-1">
             <Icon name="Lock" className="h-3 w-3" /> مقفلة

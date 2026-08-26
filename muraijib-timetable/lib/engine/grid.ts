@@ -14,12 +14,14 @@ export interface GridRow {
   labelAr: string;
   /** التوقيت المعروض — من أول يوم يحتوي هذه الفترة. */
   timeRange: string;
-  /** تسلسل الحصة داخل اليوم (١، ٢، ٣…) — يتجاهل الطابور والفسحة والصلاة. */
+  /** تسلسل الحصة داخل اليوم (1، 2، 3…) — يتجاهل الطابور والفسحة والصلاة. */
   ordinal: number | null;
 }
 
 export interface GridGeometry {
   days: SchoolDay[];
+  /** أيام توقيتها يخالف الصف المشترك أو لم يُزوَّد — تُعلَّم في الرأس. */
+  daysWithOwnTimes: Set<string>;
   rows: GridRow[];
   /** أعمدة مسطّحة (يوم + فترة) — للعرض الرئيسي العريض. */
   columns: Array<{ day: SchoolDay; index: number; ordinal: number; labelAr: string; kind: PeriodKind }>;
@@ -40,7 +42,7 @@ export function buildGrid(week: SchoolWeek): GridGeometry {
           index: period.index,
           kind: period.kind,
           labelAr: period.labelAr,
-          timeRange: `${period.startTime} – ${period.endTime}`,
+          timeRange: period.startTime && period.endTime ? `${period.startTime} – ${period.endTime}` : '',
           ordinal: period.kind === 'lesson' ? lessonNo : null,
         });
       } else if (existing.kind !== 'lesson' && period.kind === 'lesson') {
@@ -64,7 +66,26 @@ export function buildGrid(week: SchoolWeek): GridGeometry {
       .map((p) => ({ day, index: p.index, ordinal: ++lessonNo, labelAr: p.labelAr, kind: p.kind }));
   });
 
-  return { days, rows, columns, totalTeachingSlots: columns.length };
+  /**
+   * صف الأوقات في الشبكة واحد لكل الأيام. اليوم الذي تختلف أوقاته — أو لم
+   * تُزوَّد بعد — لا يجوز أن يرث أوقات غيره بصمت، فيُعلَّم ليُعرف أن الوقت
+   * المعروض لا ينطبق عليه.
+   */
+  const daysWithOwnTimes = new Set<string>();
+  for (const day of days) {
+    for (const period of day.periods) {
+      if (period.kind !== 'lesson') continue;
+      const row = rowMap.get(period.index);
+      if (!row) continue;
+      const own = period.startTime && period.endTime ? `${period.startTime} – ${period.endTime}` : '';
+      if (own !== row.timeRange) {
+        daysWithOwnTimes.add(day.id);
+        break;
+      }
+    }
+  }
+
+  return { days, rows, columns, daysWithOwnTimes, totalTeachingSlots: columns.length };
 }
 
 /** هل هذا اليوم يحتوي فعلًا فترة بهذا الرقم، وهل هي حصة؟ */

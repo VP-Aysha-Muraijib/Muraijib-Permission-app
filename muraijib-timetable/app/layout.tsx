@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Tajawal } from 'next/font/google';
 import './globals.css';
 import { ScheduleProvider } from '@/lib/state/schedule-provider';
+import { DisplayLangProvider } from '@/lib/i18n';
 
 const tajawal = Tajawal({
   subsets: ['arabic'],
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" className={tajawal.variable}>
       <body style={{ ['--font-arabic' as string]: `var(--font-arabic-loaded), system-ui, sans-serif` }}>
-        <ScheduleProvider>{children}</ScheduleProvider>
+        <DisplayLangProvider>
+          <ScheduleProvider>{children}</ScheduleProvider>
+        </DisplayLangProvider>
       </body>
     </html>
   );

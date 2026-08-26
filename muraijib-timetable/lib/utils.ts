@@ -3,10 +3,10 @@ import { twMerge } from 'tailwind-merge';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-const AR_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-
-/** أرقام هندية للنصوص السردية. الجداول تبقى بأرقام لاتينية لسهولة المقارنة. */
-export const ar = (n: number | string) => String(n).replace(/\d/g, (d) => AR_DIGITS[Number(d)]);
+/**
+ * الأرقام تُعرض لاتينية (0-9) في كل الواجهة بقرار من المستخدم.
+ * أما المُدخلات فتُقبل بالصيغتين — انظر toLatinDigits في lib/agent/entities.ts
+ */
 
 export function formatDateAr(iso: string): string {
   try {

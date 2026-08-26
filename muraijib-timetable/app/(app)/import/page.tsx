@@ -6,6 +6,7 @@ import { useSchedule } from '@/lib/state/schedule-provider';
 import { downloadImportTemplate, parseFile, type ParsedSheet } from '@/lib/import/parse';
 import { FIELDS, missingRequired, suggestMapping, type ColumnMapping } from '@/lib/import/map';
 import { buildFromRows, type ImportReport } from '@/lib/import/build';
+import { validateSnapshotFile } from '@/lib/import/snapshot';
 import type { ScheduleSnapshot } from '@/lib/domain/types';
 import { runHealthCheck } from '@/lib/engine/conflicts';
 import { Badge, Button, Card, CardHeader, Field, Input, Select } from '@/components/ui';
@@ -46,6 +47,21 @@ export default function ImportPage() {
   const onFile = async (file: File) => {
     setError(null);
     setBusy(true);
+
+    // ملف لقطة جاهز: لا أعمدة تُطابَق، فيُنتقل مباشرةً إلى التدقيق.
+    if (file.name.toLowerCase().endsWith('.json')) {
+      try {
+        const parsedJson = JSON.parse(await file.text());
+        setFileName(file.name);
+        setBuilt(validateSnapshotFile(parsedJson));
+        setStep('review');
+      } catch {
+        setError('تعذّرت قراءة ملف JSON. تأكد من أنه ملف لقطة جدول صالح.');
+      }
+      setBusy(false);
+      return;
+    }
+
     try {
       const parsed = await parseFile(file);
       const usable = parsed.sheets.filter((s) => s.headers.length > 0 && s.rows.length > 0);
@@ -266,7 +282,7 @@ export default function ImportPage() {
           report={built.report}
           snapshot={built.snapshot}
           busy={busy}
-          onBack={() => setStep('map')}
+          onBack={() => setStep(sheets.length > 0 ? 'map' : 'upload')}
           onCommit={commit}
         />
       )}
@@ -323,11 +339,11 @@ function UploadStep({ busy, onFile }: { busy: boolean; onFile: (file: File) => v
             <Icon name="Upload" className="h-5 w-5" />
           </span>
           <p className="text-sm font-semibold text-ink">أفلت ملف الجدول هنا</p>
-          <p className="mt-1 text-xs text-ink-muted">أو اختر ملفًا من جهازك — XLSX أو CSV</p>
+          <p className="mt-1 text-xs text-ink-muted">أو اختر ملفًا من جهازك — XLSX أو CSV أو JSON</p>
           <input
             ref={inputRef}
             type="file"
-            accept=".xlsx,.xls,.csv"
+            accept=".xlsx,.xls,.csv,.json"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0];
@@ -353,6 +369,11 @@ function UploadStep({ busy, onFile }: { busy: boolean; onFile: (file: File) => v
           </p>
           <p className="rounded border border-line bg-surface-sunken px-2.5 py-2">
             تُستخرج المعلمات والمواد والصفوف والشعب وخطة المواد من الملف نفسه — لا حاجة لإدخالها يدويًا أولًا.
+          </p>
+          <p>
+            <span className="font-medium text-ink">ملف لقطة جاهز (JSON):</span> إن كانت البيانات محوَّلة
+            مسبقًا من نظام آخر، ارفعها بصيغة JSON. هذا المسار يحفظ ما لا يعبّر عنه جدول مسطّح:
+            الحصص المزدوجة، والتمييز داخل المادة، واختلاف الفترات بين الأيام.
           </p>
         </div>
       </Card>

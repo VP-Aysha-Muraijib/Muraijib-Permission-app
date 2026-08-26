@@ -2,7 +2,7 @@
  * بيانات تجريبية — للتقييم البصري فقط.
  *
  * لا تُعامَل هذه البيانات على أنها بيانات المدرسة. أسماء المعلمات رقمية صراحةً
- * ("معلمة ١") حتى لا تلتبس ببيانات حقيقية، وتعرض الواجهة شريطًا دائمًا يوضح ذلك
+ * ("معلمة 1") حتى لا تلتبس ببيانات حقيقية، وتعرض الواجهة شريطًا دائمًا يوضح ذلك
  * إلى أن تُستورد بيانات المدرسة الفعلية من مركز الاستيراد.
  *
  * الجدول التجريبي **يُبنى** بمولّد يحترم القيود الصارمة، لا بأرقام مكتوبة يدويًا،
@@ -24,9 +24,6 @@ import type {
 
 export const DEMO_FLAG = 'demo';
 
-const AR_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-export const toArabicDigits = (n: number | string) =>
-  String(n).replace(/\d/g, (d) => AR_DIGITS[Number(d)]);
 
 /* ────────── أسبوع الدراسة ────────── */
 
@@ -59,7 +56,7 @@ function buildDay(def: (typeof DAY_DEFS)[number], sort: number): SchoolDay {
     periods.push({
       index: index++,
       kind: 'lesson',
-      labelAr: `الحصة ${toArabicDigits(lessonNo)}`,
+      labelAr: `الحصة ${lessonNo}`,
       startTime: time(cursor),
       endTime: time(cursor + 45),
     });
@@ -163,7 +160,7 @@ const rooms: Room[] = [
 
 /* ────────── المعلمات ────────── */
 
-/** عدد الحصص الأسبوعية لكل مادة على مستوى المدرسة (٩ شعب). */
+/** عدد الحصص الأسبوعية لكل مادة على مستوى المدرسة (9 شعب). */
 const totalFor = (subjectId: string) =>
   SUBJECT_DEFS.find((s) => s.id === subjectId)!.weekly * sections.length;
 
@@ -191,7 +188,7 @@ function buildTeachers(): Teacher[] {
       const primary = group.subjectIds[0];
       out.push({
         id: `t${n}`,
-        nameAr: `معلمة ${toArabicDigits(n)}`,
+        nameAr: `معلمة ${n}`,
         departmentId: SUBJECT_DEFS.find((s) => s.id === primary)!.dep,
         primarySubjectId: primary,
         subjectIds: [...group.subjectIds],
