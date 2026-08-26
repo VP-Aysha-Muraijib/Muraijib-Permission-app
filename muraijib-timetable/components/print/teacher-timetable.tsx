@@ -22,10 +22,10 @@ import { BRAND } from '@/lib/brand';
    محسوبة على ورقة A4 عرضية بهامش 7mm رأسيًا: الارتفاع القابل للطباعة 196mm.
    1mm ≈ 3.78px. الترويسة 19mm وشريط البيانات 13.5mm — أي 17% للهوية مجتمعةً
    والباقي للجدول والاعتماد. */
-const HEADER_H = 'h-[72px]';
-const INFO_H = 'h-[51px]';
-const LOGO_H = 'h-[34px]';
-const GRID_GAP = 'pt-[17px]';
+const HEADER_H = 'h-[80px]';
+const INFO_H = 'h-[48px]';
+const LOGO_H = 'h-[30px]';
+const GRID_GAP = 'pt-[16px]';
 
 const line = 'border-[0.6px] border-[color:var(--doc-line)]';
 
@@ -37,22 +37,22 @@ const line = 'border-[0.6px] border-[color:var(--doc-line)]';
    الأوزان ثلاثة لا أكثر — 400/500/600 — فالوثيقة الرسمية تُقرأ بالتراتب لا
    بالسماكة. وارتفاع السطر 1.25 للعناوين و1.35 للنصوص و1.2 للاتينية الصغيرة. */
 export const DOC_TYPE = {
-  ministryAr: 'text-[13.5px] font-semibold leading-[1.25]',
-  ministryEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
-  schoolAr: 'text-[11.5px] font-medium leading-[1.25]',
-  schoolEn: 'latin text-[9px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  ministryAr: 'text-[12.5px] font-semibold leading-[1.25]',
+  ministryEn: 'latin text-[9px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  schoolAr: 'text-[12px] font-semibold leading-[1.25]',
+  schoolEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
 
-  titleAr: 'text-[17.5px] font-semibold leading-[1.25]',
-  titleEn: 'latin text-[10px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
-  yearLabelAr: 'text-[9.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+  titleAr: 'text-[17px] font-semibold leading-[1.25]',
+  titleEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
+  yearLabelAr: 'text-[9px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
   yearLabelEn: 'latin text-[8.5px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
-  yearValue: 'latin text-[15px] font-semibold leading-[1.25]',
+  yearValue: 'latin text-[14.5px] font-semibold leading-[1.25]',
 
-  nameAr: 'text-[16px] font-semibold leading-[1.25]',
+  nameAr: 'text-[15.5px] font-semibold leading-[1.25]',
   nameEn: 'latin text-[9.5px] font-normal leading-[1.2] text-[color:var(--doc-muted)]',
-  metaLabelAr: 'text-[9.5px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
-  metaLabelEn: 'latin text-[9px] font-normal',
-  metaValue: 'text-[13px] font-semibold leading-[1.25]',
+  metaLabelAr: 'text-[9px] font-normal leading-[1.25] text-[color:var(--doc-muted)]',
+  metaLabelEn: 'latin text-[8.5px] font-normal',
+  metaValue: 'text-[12.5px] font-semibold leading-[1.25]',
 
   cornerAr: 'text-[11.5px] font-semibold leading-[1.25]',
   cornerEn: 'latin text-[8.5px] font-normal leading-[1.2] text-[color:var(--doc-faint)]',
@@ -89,11 +89,17 @@ export const DOC_TYPE = {
 /* ────────── ١ · الترويسة المؤسسية ────────── */
 
 /**
- * ثلاث مناطق أفقية منخفضة الارتفاع: الهوية المؤسسية يمينًا، وهوية الوثيقة في
- * المنتصف، والعام الأكاديمي يسارًا.
+ * ترويسة الوثيقة الرسمية.
  *
- * شعار واحد لا مجموعة: اللوكاب الرسمي الموحّد للوزارة كما هو. المدرسة جهة
- * تابعة لا علامة مستقلة، فاسمها نصّ تحت اسم الوزارة لا شعار ثانٍ.
+ * الشعار في المحور لا على الطرف: الوثيقة الحكومية تُعرف من مركزها، والعلامة
+ * الموضوعة في الوسط تصنع محور تناظر يستقيم عليه العنوان تحتها ويتوازن حوله
+ * الطرفان — وهو ما يمنح الورقة هيبتها قبل أن تُقرأ كلمة منها.
+ *
+ * يمينًا المدرسة ويسارًا العام الأكاديمي، كتلتان صغيرتان متعادلتا الوزن لا
+ * تنافسان المحور. واسم الوزارة لا يُكتب نصًّا: العلامة تحمله بلغتيه.
+ *
+ * الترويسة كلّها ٢٠ مِلّيمترًا — أي عُشر ارتفاع الورقة — فالجدول هو المحتوى
+ * والترويسة تُعرِّف به ولا تزاحمه.
  */
 export function InstitutionalHeader({
   titleAr,
@@ -104,49 +110,44 @@ export function InstitutionalHeader({
   titleEn?: string;
   yearLabel: string;
 }) {
+  /* الطرفان بعرض واحد ثابت، فيبقى المحور في منتصف الورقة تمامًا مهما طال
+     اسم المدرسة أو قصر — التناظر هنا بنية لا مصادفة. */
+  const flank = 'w-[186px] shrink-0';
+
   return (
     <header
-      className={`${HEADER_H} flex shrink-0 items-center justify-between gap-6 border-b-[0.6px] border-[color:var(--doc-line)]`}
+      className={`${HEADER_H} flex shrink-0 items-center justify-between gap-4 border-b-[0.6px] border-[color:var(--doc-line)]`}
     >
-      {/* يمينًا: الوزارة فالمدرسة */}
-      <div className="flex min-w-0 shrink-0 items-center gap-2">
+      {/* يمينًا: المدرسة */}
+      <div className={`${flank} text-right`}>
+        <p className={`truncate ${DOC_TYPE.schoolAr}`}>{BRAND.schoolNameAr}</p>
+        <p className={`truncate ${DOC_TYPE.schoolEn}`}>{BRAND.schoolNameEn}</p>
+        {!BRAND.ministryLogo && (
+          <p className={`truncate ${DOC_TYPE.ministryAr}`}>{BRAND.ministryNameAr}</p>
+        )}
+      </div>
+
+      {/* المحور: العلامة الرسمية، فالعنوان تحتها */}
+      <div className="flex min-w-0 flex-1 flex-col items-center justify-center">
         {BRAND.ministryLogo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={BRAND.ministryLogo}
             alt={BRAND.ministryNameAr}
-            className={`${LOGO_H} w-auto shrink-0 object-contain`}
+            className={`${LOGO_H} mb-[6px] w-auto object-contain`}
           />
         )}
-        <div className="min-w-0 text-right">
-          {/* العلامة الرسمية تحمل اسم الوزارة بالعربية والإنجليزية معًا، فلا
-              يُعاد نصًّا بجوارها. يبقى اسم المدرسة وحده. */}
-          {!BRAND.ministryLogo && (
-            <>
-              <p className={`truncate ${DOC_TYPE.ministryAr}`}>{BRAND.ministryNameAr}</p>
-              <p className={`truncate ${DOC_TYPE.ministryEn}`}>{BRAND.ministryNameEn}</p>
-            </>
-          )}
-          <p className={`truncate ${DOC_TYPE.schoolAr}`}>{BRAND.schoolNameAr}</p>
-          <p className={`truncate ${DOC_TYPE.schoolEn}`}>{BRAND.schoolNameEn}</p>
-        </div>
-      </div>
-
-      {/* المنتصف: هوية الوثيقة */}
-      <div className="min-w-0 flex-1 text-center">
-        <h1 className={`truncate ${DOC_TYPE.titleAr}`}>{titleAr}</h1>
-        {/* الخمري هنا خطّ قصير لا أكثر — لمسة انتماء لا عنصر جذب. */}
+        <h1 className={`max-w-full truncate ${DOC_TYPE.titleAr}`}>{titleAr}</h1>
+        {/* الخمري خيط تحت العنوان لا أكثر — لمسة انتماء لا عنصر جذب. */}
         <span
           aria-hidden
-          className="mx-auto mb-[3px] mt-[5px] block h-[1.5px] w-[26px] bg-[color:var(--doc-accent)]"
+          className="my-[4px] block h-[1.2px] w-[30px] bg-[color:var(--doc-accent)]"
         />
-        {titleEn && (
-          <p className={`truncate ${DOC_TYPE.titleEn}`}>{titleEn}</p>
-        )}
+        {titleEn && <p className={`max-w-full truncate ${DOC_TYPE.titleEn}`}>{titleEn}</p>}
       </div>
 
       {/* يسارًا: العام الأكاديمي */}
-      <div className="shrink-0 text-left">
+      <div className={`${flank} text-left`}>
         <p className={DOC_TYPE.yearLabelAr}>العام الأكاديمي</p>
         <p className={DOC_TYPE.yearLabelEn}>Academic Year</p>
         <p className={DOC_TYPE.yearValue}>{yearLabel}</p>
@@ -498,7 +499,7 @@ export function TeacherTimetablePrintPage({
     <section className="doc print-page print-block grow">
       <span
         aria-hidden
-        className="block h-[1.5px] shrink-0 bg-[color:var(--doc-accent)]"
+        className="block h-[1.2px] shrink-0 bg-[color:var(--doc-accent)]"
       />
       <InstitutionalHeader titleAr={titleAr} titleEn={titleEn} yearLabel={chrome.yearLabel} />
       <TeacherInfoStrip nameAr={nameAr} nameEn={nameEn} items={info} />

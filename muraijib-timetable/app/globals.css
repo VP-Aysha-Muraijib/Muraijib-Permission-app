@@ -182,8 +182,8 @@
    صغيرة فقط. */
 .doc {
   --font-ar: 'DIN Next Arabic', 'Frutiger Arabic', var(--font-doc-arabic),
-    'Noto Sans Arabic', Arial, sans-serif;
-  --font-en: 'DIN Next', 'Frutiger', var(--font-latin), Inter, Arial, sans-serif;
+    'IBM Plex Sans Arabic', 'Noto Sans Arabic', Arial, sans-serif;
+  --font-en: 'DIN Next', 'Frutiger', var(--font-doc-latin), 'IBM Plex Sans', Arial, sans-serif;
 
   --w-regular: 400;
   --w-medium: 500;
@@ -194,11 +194,11 @@
   --doc-muted: #667085;
   --doc-faint: #8A9099;
 
-  --doc-line: #CDD2D8;
-  --doc-head: #F7F7F6;
-  --doc-day: #FAFAF9;
-  --doc-break: #F4F5F6;
-  --doc-accent: #7D2026;
+  --doc-line: #D0D5DD;
+  --doc-head: #F8F9FA;
+  --doc-day: #F8F9FA;
+  --doc-break: #F2F4F7;
+  --doc-accent: #7A1F2B;
 
   color: var(--doc-ink);
   background: #FFFFFF;
