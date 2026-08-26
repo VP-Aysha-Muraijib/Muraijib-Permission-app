@@ -132,7 +132,9 @@ window.APP = window.APP || {};
         { teacher:'Suhaila Alketbi', sections: R(6,1,7).concat(['6/ADV','7/4']) },
         { teacher:'Hessa Alahbabi',  sections: R(8,1,6).concat(['7/5','7/6','7/7']) }
       ] },
-    pe:         { coordinator:'', rows: [
+    pe:         { coordinator:'',
+      note:'حصة الجوجيتسو تُدرَّس ضمن إحدى حصتَي التربية البدنية لكل شعبة، فلا تُحتسب نصاباً إضافياً.',
+      rows: [
         { teacher:'دعاء مصطفى', sections: R(5,1,7).concat(R(7,1,7)) },
         { teacher:'سندس',       sections: R(6,1,7).concat(['6/ADV'], R(8,1,6)) }
       ] },
