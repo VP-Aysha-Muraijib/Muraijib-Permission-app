@@ -58,8 +58,8 @@ window.APP = window.APP || {};
         { teacher:'مريم خليفة الدرمكي', sections: R(5,1,5) },
         { teacher:'جميلة صبيح الكعبي',  sections: R(6,1,5) },
         { teacher:'بشرى الكعبي',        sections: ['5/6','5/7','6/6','6/7','6/ADV'], isNew:true },
-        { teacher:'صفية الهاشمي',       sections: R(7,1,7), isNew:true },
-        { teacher:'موزة سالم',          sections: R(8,1,6) }
+        { teacher:'صفية الهاشمي',       sections: R(8,1,6), isNew:true },
+        { teacher:'موزة سالم',          sections: R(7,1,7) }
       ]
     },
 
