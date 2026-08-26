@@ -11,10 +11,18 @@ import { localStore } from './local';
  */
 export function getStore(): DataStore {
   const mode = process.env.NEXT_PUBLIC_DATA_MODE ?? 'local';
+
   if (mode === 'supabase') {
-    // يمرّ كل شيء عبر مسارات /api حتى يبقى التحقق النهائي على الخادم.
-    return require('./remote').remoteStore as DataStore;
+    // مخطط قاعدة البيانات وسياسات الأمان جاهزان ومتحقَّق منهما (supabase/)،
+    // لكن مسارات /api التي يتحدث إليها remoteStore لم تُنفَّذ بعد.
+    // الفشل هنا صريح ومبكر: تشغيل وضع الإنتاج نصف مربوط أخطر من رفضه.
+    throw new Error(
+      'وضع Supabase غير مكتمل الربط بعد: مخطط قاعدة البيانات جاهز في مجلد supabase/ ' +
+        'لكن مسارات /api لم تُنفَّذ. اضبط NEXT_PUBLIC_DATA_MODE=local للتشغيل الآن، ' +
+        'وراجع README للخطوات المتبقية.',
+    );
   }
+
   return localStore;
 }
 

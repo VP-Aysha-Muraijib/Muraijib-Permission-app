@@ -5,6 +5,7 @@ import { useSchedule } from '@/lib/state/schedule-provider';
 import { Badge, Button, Card, CardHeader, EmptyState, Stat } from '@/components/ui';
 import { Icon } from '@/components/layout/icon';
 import { formatDateAr, greetingAr } from '@/lib/utils';
+import { buildNotifications, TONE_COLOR } from '@/lib/notifications';
 
 const QUICK_ACTIONS = [
   { href: '/print?kind=teacher', label: 'طباعة جدول معلمة', icon: 'Printer' },
@@ -27,7 +28,7 @@ export default function DashboardPage() {
   const over = workloads.filter((w) => w.status === 'over');
   const current = versions.find((v) => v.isCurrent);
 
-  const alerts = buildAlerts({ health, under, over, snapshot });
+  const alerts = buildNotifications(snapshot, health, workloads);
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -84,20 +85,20 @@ export default function DashboardPage() {
             />
           ) : (
             <ul className="divide-y divide-line">
-              {alerts.map((alert, i) => (
-                <li key={i}>
+              {alerts.slice(0, 7).map((alert) => (
+                <li key={alert.id}>
                   <Link
                     href={alert.href}
                     className="flex items-start gap-3 px-5 py-3 transition-colors hover:bg-surface-sunken"
                   >
                     <span
                       className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                      style={{ background: alert.color }}
+                      style={{ background: TONE_COLOR[alert.tone] }}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-medium text-ink">{alert.title}</span>
+                      <span className="block text-[13px] font-medium text-ink">{alert.titleAr}</span>
                       <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">
-                        {alert.detail}
+                        {alert.detailAr}
                       </span>
                     </span>
                     <Icon name="ChevronLeft" className="mt-1 h-4 w-4 shrink-0 text-ink-faint" />
@@ -158,79 +159,4 @@ export default function DashboardPage() {
       </Card>
     </div>
   );
-}
-
-/* ── بناء التنبيهات: نصوص تنفيذية لا رسائل نظام ── */
-
-interface Alert {
-  title: string;
-  detail: string;
-  href: string;
-  color: string;
-}
-
-function buildAlerts({
-  health,
-  under,
-  over,
-  snapshot,
-}: {
-  health: NonNullable<ReturnType<typeof useSchedule>['health']>;
-  under: ReturnType<typeof useSchedule>['workloads'];
-  over: ReturnType<typeof useSchedule>['workloads'];
-  snapshot: NonNullable<ReturnType<typeof useSchedule>['snapshot']>;
-}): Alert[] {
-  const alerts: Alert[] = [];
-  const nameOf = (id: string) => snapshot.teachers.find((t) => t.id === id)?.nameAr ?? '—';
-
-  for (const group of health.groups.slice(0, 4)) {
-    if (group.constraintId === 'curriculum-completeness' && group.count > 0) {
-      alerts.push({
-        title: `${group.count} ملاحظة على اكتمال نصاب المواد`,
-        detail: group.violations[0].messageAr,
-        href: '/conflicts',
-        color: 'var(--warn)',
-      });
-      continue;
-    }
-    alerts.push({
-      title: `${group.labelAr} — ${group.count}`,
-      detail: group.violations[0].messageAr,
-      href: '/conflicts',
-      color: group.severity === 'critical' ? 'var(--danger)' : group.severity === 'high' ? '#C2703A' : 'var(--warn)',
-    });
-  }
-
-  for (const load of over.slice(0, 2)) {
-    alerts.push({
-      title: `${nameOf(load.teacherId)} أعلى من النصاب`,
-      detail: `أُسند لها ${load.assigned} حصة والنصاب المطلوب ${load.required} — بزيادة ${load.assigned - load.required}.`,
-      href: `/teachers/${load.teacherId}`,
-      color: 'var(--danger)',
-    });
-  }
-
-  if (under.length > 0) {
-    const total = under.reduce((a, w) => a + w.remaining, 0);
-    alerts.push({
-      title: `${under.length} معلمة دون النصاب`,
-      detail: `مجموع الحصص المتبقية لديهن ${total} حصة يمكن الاستفادة منها عند أي تغيير في الجدول.`,
-      href: '/workload',
-      color: 'var(--warn)',
-    });
-  }
-
-  const transferred = snapshot.teachers.filter((t) => t.status === 'transferred');
-  for (const teacher of transferred) {
-    const lessons = snapshot.lessons.filter((l) => l.teacherId === teacher.id).length;
-    if (lessons === 0) continue;
-    alerts.push({
-      title: `${teacher.nameAr} منقولة وما زالت على الجدول`,
-      detail: `${lessons} حصة تحتاج إعادة توزيع. يمكن للمساعد الذكي اقتراح حلول بأقل تغيير.`,
-      href: '/agent',
-      color: 'var(--danger)',
-    });
-  }
-
-  return alerts.slice(0, 6);
 }

@@ -44,7 +44,9 @@ interface ScheduleContextValue {
   apply(changeSet: ChangeSet): Promise<ApplyResult>;
 
   canUndo: boolean;
+  canRedo: boolean;
   undo(): Promise<ApplyResult | null>;
+  redo(): Promise<ApplyResult | null>;
 
   /** حفظ البيانات المرجعية (معلمات/مواد/صفوف/إعدادات الأسبوع) — لا يمسّ الحصص. */
   saveReference(patch: Partial<ScheduleSnapshot>, summaryAr: string): Promise<void>;
@@ -68,8 +70,10 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [snapshot, setSnapshot] = React.useState<ScheduleSnapshot | null>(null);
   const [versions, setVersions] = React.useState<ScheduleVersion[]>([]);
   const [audit, setAudit] = React.useState<AuditEntry[]>([]);
-  /** مكدّس التراجع: عمليات عكسية مع النسخة التي تنطبق عليها. */
+  /** مكدّس التراجع: عمليات عكسية مع وصفها. */
   const [undoStack, setUndoStack] = React.useState<Array<{ ops: Op[]; label: string }>>([]);
+  /** مكدّس الإعادة — يُفرَغ عند أي تغيير جديد، وإلا أُعيد تطبيق عمل لم يعد له معنى. */
+  const [redoStack, setRedoStack] = React.useState<Array<{ ops: Op[]; label: string }>>([]);
 
   const refresh = React.useCallback(async () => {
     const store = getStore();
@@ -135,6 +139,7 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
       const result = await getStore().applyChangeSet(changeSet, profile?.name ?? 'مستخدم');
       if (result.ok) {
         setUndoStack((stack) => [{ ops: inverse, label: changeSet.summaryAr }, ...stack].slice(0, 20));
+        setRedoStack([]);
         await refresh();
       }
       return result;
@@ -142,24 +147,53 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
     [snapshot, profile, refresh],
   );
 
-  const undo = React.useCallback(async () => {
-    const top = undoStack[0];
-    if (!top || !snapshot) return null;
-    const changeSet = buildChangeSet({
-      baseVersionId: snapshot.versionId,
-      source: 'user',
-      summaryAr: `تراجع عن: ${top.label}`,
-      reason: 'تراجع',
-      ops: top.ops,
-      createdBy: profile?.name ?? 'مستخدم',
-    });
-    const result = await getStore().applyChangeSet(changeSet, profile?.name ?? 'مستخدم');
-    if (result.ok) {
-      setUndoStack((stack) => stack.slice(1));
-      await refresh();
-    }
-    return result;
-  }, [undoStack, snapshot, profile, refresh]);
+  /**
+   * التراجع والإعادة يمرّان بالمسار نفسه: مجموعة تغيير تُتحقَّق وتُعتمد وتُسجَّل.
+   * لا يوجد «تراجع صامت» يعدّل الجدول خارج سجل النسخ.
+   */
+  const runStackAction = React.useCallback(
+    async (
+      entry: { ops: Op[]; label: string } | undefined,
+      labelAr: string,
+      onSuccess: (inverse: { ops: Op[]; label: string }) => void,
+    ) => {
+      if (!entry || !snapshot) return null;
+      const inverse = invertOps(snapshot, entry.ops);
+      const changeSet = buildChangeSet({
+        baseVersionId: snapshot.versionId,
+        source: 'user',
+        summaryAr: `${labelAr}: ${entry.label}`,
+        reason: labelAr,
+        ops: entry.ops,
+        createdBy: profile?.name ?? 'مستخدم',
+      });
+      const result = await getStore().applyChangeSet(changeSet, profile?.name ?? 'مستخدم');
+      if (result.ok) {
+        onSuccess({ ops: inverse, label: entry.label });
+        await refresh();
+      }
+      return result;
+    },
+    [snapshot, profile, refresh],
+  );
+
+  const undo = React.useCallback(
+    () =>
+      runStackAction(undoStack[0], 'تراجع عن', (inverse) => {
+        setUndoStack((stack) => stack.slice(1));
+        setRedoStack((stack) => [inverse, ...stack].slice(0, 20));
+      }),
+    [undoStack, runStackAction],
+  );
+
+  const redo = React.useCallback(
+    () =>
+      runStackAction(redoStack[0], 'إعادة', (inverse) => {
+        setRedoStack((stack) => stack.slice(1));
+        setUndoStack((stack) => [inverse, ...stack].slice(0, 20));
+      }),
+    [redoStack, runStackAction],
+  );
 
   const saveReference = React.useCallback(
     async (patch: Partial<ScheduleSnapshot>, summaryAr: string) => {
@@ -212,7 +246,9 @@ export function ScheduleProvider({ children }: { children: React.ReactNode }) {
     makeChangeSet,
     apply,
     canUndo: undoStack.length > 0,
+    canRedo: redoStack.length > 0,
     undo,
+    redo,
     saveReference,
     refresh,
     restore,

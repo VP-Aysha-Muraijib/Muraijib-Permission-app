@@ -27,6 +27,7 @@ export const NAV: Array<{ section?: string; items: NavItem[] }> = [
     section: 'الإدارة',
     items: [
       { href: '/agent', label: 'مساعد الجدول الذكي', icon: 'Sparkles' },
+      { href: '/scenarios', label: 'محاكاة السيناريوهات', icon: 'FlaskConical' },
       { href: '/conflicts', label: 'التعارضات', icon: 'TriangleAlert', counter: 'conflicts' },
       { href: '/analytics', label: 'التحليلات', icon: 'ChartColumn' },
       { href: '/print', label: 'مركز الطباعة', icon: 'Printer' },

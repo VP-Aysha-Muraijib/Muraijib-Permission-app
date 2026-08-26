@@ -431,6 +431,17 @@ function DataSettings() {
         <Row label="عدد الحصص" value={String(snapshot?.lessons.length ?? 0)} />
       </dl>
 
+      <div className="rounded border border-info/30 bg-info-soft px-4 py-3 leading-relaxed text-info">
+        <p className="font-semibold">حالة وضع الإنتاج</p>
+        <p className="mt-1">
+          مخطط قاعدة البيانات وسياسات الأمان جاهزان ومتحقَّق منهما على PostgreSQL (مجلد{' '}
+          <code className="ltr-run rounded bg-surface px-1">supabase/</code>)، وتشمل فهارس تمنع الحجز
+          المزدوج ودالة اعتماد ذرّية وسجل تدقيق لا يُعدَّل. المتبقي هو ربط مسارات{' '}
+          <code className="ltr-run rounded bg-surface px-1">/api</code> بعميل Supabase؛ حتى ذلك الحين
+          يعمل النظام في الوضع المحلي.
+        </p>
+      </div>
+
       {DATA_MODE === 'local' && (
         <div className="rounded border border-warn/30 bg-warn-soft px-4 py-3 leading-relaxed text-warn">
           <p className="font-semibold">تنبيه على الوضع المحلي</p>

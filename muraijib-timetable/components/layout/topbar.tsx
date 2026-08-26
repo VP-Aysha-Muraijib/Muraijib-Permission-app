@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { useSchedule } from '@/lib/state/schedule-provider';
 import { Button } from '@/components/ui';
 import { GlobalSearch } from './global-search';
+import { NotificationCenter } from './notification-center';
 import { Icon } from './icon';
 
 export function Topbar({ onMenu }: { onMenu: () => void }) {
-  const { profile, versions, canUndo, undo } = useSchedule();
+  const { profile, versions, canUndo, canRedo, undo, redo } = useSchedule();
   const current = versions.find((v) => v.isCurrent);
 
   return (
@@ -33,16 +34,31 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
           </Link>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => void undo()}
-          disabled={!canUndo}
-          title="تراجع عن آخر تغيير معتمد"
-        >
-          <Icon name="Undo2" className="h-4 w-4" />
-          <span className="hidden sm:inline">تراجع</span>
-        </Button>
+        <div className="flex items-center rounded border border-line">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void undo()}
+            disabled={!canUndo}
+            title="تراجع عن آخر تغيير معتمد"
+            className="rounded-l-none"
+          >
+            <Icon name="Undo2" className="h-4 w-4" />
+            <span className="hidden sm:inline">تراجع</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void redo()}
+            disabled={!canRedo}
+            title="إعادة التغيير الذي تراجعت عنه"
+            className="rounded-r-none border-r border-line px-2"
+          >
+            <Icon name="Redo2" className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <NotificationCenter />
 
         <Link href="/agent">
           <Button variant="primary" size="sm">
