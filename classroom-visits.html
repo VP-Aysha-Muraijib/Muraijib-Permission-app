@@ -89,7 +89,9 @@ a{color:var(--olive-d);text-decoration:none}
 }
 .emblem{width:56px;height:56px;flex-shrink:0;display:block}
 .emblem img{width:100%;height:100%;object-fit:contain}
-.mast-titles{flex:1;min-width:220px}
+.charter{width:78px;flex-shrink:0;color:var(--ink);display:block}
+.charter svg,.charter img{display:block;width:100%;height:auto;max-height:62px;object-fit:contain}
+.mast-titles{flex:1;min-width:200px}
 .mast-ministry{font-size:11.5px;color:var(--ink-3);font-weight:500;letter-spacing:.2px}
 .mast-school{font-size:16px;font-weight:800;color:var(--olive-d);line-height:1.5}
 .mast-system{font-size:12.5px;color:var(--ink-2);font-weight:500}
@@ -469,13 +471,19 @@ html[dir=ltr] .switch input:checked + .track::after{transform:translateX(17px)}
 #printRoot{display:none}
 .pr-sheet{color:#000;background:#fff}
 .pr-head{display:flex;align-items:center;gap:14px;border-bottom:2px solid #4F6B45;padding-bottom:8px;margin-bottom:10px}
-.pr-head .pr-emb{width:52px;height:52px;flex-shrink:0}
+.pr-head .pr-emb{width:56px;height:56px;flex-shrink:0}
 .pr-head .pr-emb img{width:100%;height:100%;object-fit:contain}
 .pr-head .pr-t{flex:1;text-align:center}
 .pr-head .pr-t .m{font-size:10pt;color:#333}
 .pr-head .pr-t .s{font-size:13pt;font-weight:800;color:#3B5233}
 .pr-head .pr-t .y{font-size:9.5pt;color:#444}
-.pr-head .pr-r{font-size:9pt;color:#333;text-align:end;min-width:142px;line-height:1.7}
+.pr-head .pr-charter{width:72px;flex-shrink:0;color:#111}
+.pr-head .pr-charter svg,.pr-head .pr-charter img{display:block;width:100%;height:auto;max-height:44px;object-fit:contain}
+.pr-strip{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  border:1px solid #CCC;border-radius:4px;padding:3px 9px;font-size:8.5pt;color:#333;margin-bottom:6px}
+.pr-strip b{color:#111}
+.pr-strip > span{white-space:nowrap}
+.pr-form .pr-strip > span{overflow:hidden;text-overflow:ellipsis;max-width:46%}
 .pr-title{text-align:center;font-size:12.5pt;font-weight:800;margin:6px 0 3px;color:#262B23}
 .pr-sub{text-align:center;font-size:9.5pt;color:#444;margin-bottom:9px}
 .pr-meta{display:flex;justify-content:space-between;gap:10px;font-size:9pt;color:#333;border:1px solid #CCC;padding:5px 9px;border-radius:4px;margin-bottom:9px;flex-wrap:wrap}
@@ -489,7 +497,9 @@ table.pr-tbl tr{page-break-inside:avoid}
 .pr-form .pr-sec{margin-top:4px}
 .pr-form .pr-sec > h4{font-size:9pt;padding-bottom:1px;margin-bottom:3px}
 .pr-form .pr-head{padding-bottom:4px;margin-bottom:4px;gap:10px}
-.pr-form .pr-head .pr-emb{width:44px;height:44px}
+.pr-form .pr-head .pr-emb{width:48px;height:48px}
+.pr-form .pr-head .pr-charter{width:68px}
+.pr-form .pr-strip{padding:2px 8px;margin-bottom:4px}
 .pr-form .pr-title{font-size:11.5pt;margin:3px 0 1px}
 .pr-form .pr-sub{margin-bottom:4px}
 .pr-form .pr-sign{margin-top:7px}
@@ -597,6 +607,15 @@ table.tt td input{padding:4px 6px;font-size:11px;border-color:var(--line-2)}
 table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);text-align:center;white-space:nowrap;font-size:11px}
 
 /* previous-notes alert */
+.logo-slot{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--paper)}
+.logo-slot-h{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px;font-size:12px}
+.logo-slot-h b{font-weight:700;color:var(--ink)}
+.logo-slot-h .en{font-size:10.5px;color:var(--ink-3)}
+.logo-slot-p{
+  height:74px;display:flex;align-items:center;justify-content:center;background:#fff;
+  border:1px solid var(--line-2);border-radius:var(--r-sm);margin-bottom:10px;padding:7px;color:var(--ink);
+}
+.logo-slot-p svg,.logo-slot-p img{max-height:100%;max-width:150px;width:auto;height:auto;display:block}
 .prev-alert{
   display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r-sm);
   background:var(--warn-bg);border:1px solid #EADFC2;font-size:11.5px;color:#7C6320;flex-wrap:wrap;
@@ -635,10 +654,12 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
   repeating-linear-gradient(to bottom,transparent,transparent 8.4mm,#DDD 8.4mm,#DDD calc(8.4mm + 1px));
 }
 .wr-lines.h18{height:18mm}
+.wr-lines.h20{height:20mm}
 .wr-lines.h22{height:22mm}
 .wr-lines.h26{height:26mm}
 .wr-lines.h30{height:30mm}
 .wr-lines.h34{height:34mm}
+.wr-lines.h44{height:44mm}
 .wr-lines.h50{height:50mm}
 .wr-lines.h54{height:54mm}
 .wr-lines.h58{height:58mm}
@@ -663,7 +684,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
 .pr-fields .v.ltr{direction:ltr;unicode-bidi:isolate;text-align:end}
 .pr-badge{border:1px solid #3B5233;color:#3B5233;border-radius:3px;padding:0 5px;font-size:8pt;font-weight:700}
 .pr-idbox{display:inline-block;border:1px solid #3B5233;border-radius:4px;padding:3px 8px;text-align:center;font-size:8pt;color:#3B5233;line-height:1.5;white-space:nowrap}
-.pr-idbox b{display:block;font-size:9.5pt;font-weight:800;letter-spacing:.4px;direction:ltr;unicode-bidi:isolate}
+.pr-idbox b{font-size:9.5pt;font-weight:800;letter-spacing:.4px;direction:ltr;unicode-bidi:isolate}
 .pr-two{display:flex;gap:8px}
 .pr-two > div > h4{font-size:9pt;font-weight:800;color:#3B5233;border-bottom:1px solid #C9D3C2;padding-bottom:1px;margin-bottom:3px}
 .pr-two > *{flex:1;min-width:0}
@@ -689,6 +710,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
       <div class="mast-school">مدرسة مريجب للتعليم الأساسي — الحلقة الثانية</div>
       <div class="mast-system">نظام متابعة الزيارات الصفية · <span class="en">Classroom Visits Monitoring System</span></div>
     </div>
+    <div class="charter" id="mastCharter"></div>
     <div class="mast-meta">
       <div class="mast-chip acc">العام الدراسي <b class="en" id="mastYear">2026/2027</b></div>
       <div class="mast-chip" id="mastTerm">الفصل الأول</div>
@@ -959,6 +981,7 @@ const DEFAULT_SETTINGS = {
   observerEn: 'Academic Vice Principal',
   academicYear: '2026/2027',
   logo: '',
+  logoCharter: '',
   activeTermId: 'term1',
   terms: [
     {id:'term1', name:'Term 1 — الفصل الأول', start:'2026-09-03', end:'2026-12-17'},
@@ -1401,21 +1424,93 @@ function render(){
   $('#mastYear').textContent = S().academicYear;
   $('#mastTerm').textContent = Model.activeTerm().name;
   $('#mastObserver').textContent = S().observer;
-  $('#mastEmblem').innerHTML = emblemHTML();
+  $('#mastEmblem').innerHTML = logoMoeHTML();
+  $('#mastCharter').innerHTML = logoCharterHTML();
   $$('#view [data-nav]').forEach(b => b.onclick = () => go(b.dataset.nav, b.dataset.param || ''));
 }
 
-/* Ministry emblem — replaced by the school's own logo when uploaded in Settings */
-function emblemHTML(){
-  const logo = S().logo;
-  if(logo) return '<img src="' + h(logo) + '" alt="شعار">';
-  return '<svg viewBox="0 0 64 64" width="100%" height="100%" role="img" aria-label="شعار وزارة التربية والتعليم">' +
-    '<circle cx="32" cy="32" r="30" fill="#F6F9F3" stroke="#4F6B45" stroke-width="1.6"/>' +
-    '<circle cx="32" cy="32" r="25.5" fill="none" stroke="#A8BC9C" stroke-width=".8"/>' +
-    '<path d="M32 13 46 20v10.5c0 9.2-5.9 15.9-14 18.5-8.1-2.6-14-9.3-14-18.5V20z" fill="#fff" stroke="#4F6B45" stroke-width="1.5"/>' +
-    '<path d="M22.5 27.5h19M22.5 32.5h19M22.5 37.5h13" stroke="#6E8A62" stroke-width="1.4" stroke-linecap="round"/>' +
-    '<path d="M32 18.5l3.1 6.3 7 1-5 4.9 1.2 6.9-6.3-3.3-6.3 3.3 1.2-6.9-5-4.9 7-1z" fill="#EDF2E9" stroke="#4F6B45" stroke-width="1"/>' +
-    '</svg>';
+/* ══════════════════════════════════════════════════════════════════════
+   OFFICIAL MARKS
+   Two built-in vector marks so the system is correctly branded out of the
+   box; either can be replaced by the school's own artwork from Settings,
+   which then appears everywhere including every printed page.
+   ══════════════════════════════════════════════════════════════════════ */
+const lerpPt = (a, b, t) => [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t];
+const n1 = v => Math.round(v*10)/10;
+function starPath(cx, cy, r){
+  let p = '';
+  for(let i = 0; i < 10; i++){
+    const rr = i % 2 ? r*0.42 : r;
+    const a = -Math.PI/2 + i*Math.PI/5;
+    p += (i ? 'L' : 'M') + n1(cx + Math.cos(a)*rr) + ' ' + n1(cy + Math.sin(a)*rr) + ' ';
+  }
+  return '<path d="' + p + 'Z" fill="currentColor" stroke="none"/>';
+}
+/* a fan of feathers spanning an inner arc (at the body) and an outer arc (wing edge) */
+function featherFan(A, B, C, D, n, bulge){
+  let out = '';
+  for(let i = 0; i <= n; i++){
+    const t = i/n;
+    const P = lerpPt(A, B, t), Q = lerpPt(C, D, t);
+    const mx = (P[0]+Q[0])/2, my = (P[1]+Q[1])/2;
+    const dx = Q[0]-P[0], dy = Q[1]-P[1];
+    out += '<path d="M' + n1(P[0]) + ' ' + n1(P[1]) + ' Q' + n1(mx - dy*bulge) + ' ' + n1(my + dx*bulge) +
+           ' ' + n1(Q[0]) + ' ' + n1(Q[1]) + '"/>';
+  }
+  return out;
+}
+const mirrorX = svg => svg.replace(/M(-?[\d.]+) ([\d.]+) Q(-?[\d.]+) ([\d.]+) (-?[\d.]+) ([\d.]+)/g,
+  (m, a, b, c, d, e, f) => 'M' + n1(240-+a) + ' ' + b + ' Q' + n1(240-+c) + ' ' + d + ' ' + n1(240-+e) + ' ' + f);
+
+/* State emblem of the United Arab Emirates — Ministry of Education lockup */
+function moeEmblemSVG(){
+  const leftWing  = featherFan([104,52], [92,116], [24,94], [52,170], 7, 0.07) +
+                    featherFan([106,46], [98,88],  [54,76], [72,122], 4, 0.06);
+  const rightWing = mirrorX(leftWing);
+  let stars = '';
+  for(let i = 0; i < 7; i++){
+    const a = -Math.PI/2 + i * (2*Math.PI/7);
+    stars += starPath(120 + Math.cos(a)*25, 116 + Math.sin(a)*25, 4.2);
+  }
+  let tail = '';
+  for(let i = -4; i <= 4; i++){
+    const t = i/4;
+    tail += '<path d="M' + n1(120 + t*13) + ' 142 Q' + n1(120 + t*17) + ' 164 ' + n1(120 + t*21) + ' 182"/>';
+  }
+  return '<svg viewBox="0 0 240 216" fill="none" stroke="currentColor" stroke-width="2.6" ' +
+    'stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="شعار دولة الإمارات العربية المتحدة">' +
+    '<path d="M118 10c10-2 19 4 20 13 1 7-3 13-9 16"/>' +
+    '<path d="M118 10c-7 1-12 5-14 10l-9 4 9 3 5-1"/>' +
+    '<circle cx="129" cy="18" r="1.8" fill="currentColor" stroke="none"/>' +
+    '<path d="M129 39c9 2 16 6 21 12M111 39c-9 2-16 6-21 12"/>' +
+    '<path d="M104 52C74 50 40 64 22 92c-6 10-4 24 4 42 8 18 16 30 24 38" stroke-width="2.8"/>' +
+    '<path d="M136 52c30-2 64 12 82 40 6 10 4 24-4 42-8 18-16 30-24 38" stroke-width="2.8"/>' +
+    leftWing + rightWing +
+    '<circle cx="120" cy="116" r="30"/><circle cx="120" cy="116" r="19" stroke-width="2.2"/>' +
+    '<path d="M113 98v36" stroke-width="1.8"/><path d="M114 110h24M114 122h24" stroke-width="1.8"/>' +
+    stars +
+    '<path d="M96 142h48" stroke-width="2.4"/>' + tail +
+    '<path d="M58 184c26 8 98 8 124 0l-6 20c-26 7-86 7-112 0z"/>' +
+    '<path d="M70 191c22 5 78 5 100 0" stroke-width="1.6"/>' +
+  '</svg>';
+}
+/* الميثاق الوطني للتعليم — National Education Charter */
+function charterMarkSVG(){
+  const line = (y, txt) => '<text x="204" y="' + y + '" text-anchor="start" font-size="40" font-weight="500" ' +
+    'fill="currentColor" stroke="none">' + txt + '</text>';
+  return '<svg viewBox="0 0 210 152" role="img" font-family="Tajawal, sans-serif" ' +
+      'aria-label="الميثاق الوطني للتعليم">' +
+    line(40, 'الميثاق') + line(86, 'الوطني') + line(132, 'للتعليم') +
+    '<rect x="46" y="141" width="158" height="6" fill="#9E2A2B" stroke="none"/>' +
+  '</svg>';
+}
+function logoMoeHTML(){
+  const l = S().logo;
+  return l ? '<img src="' + h(l) + '" alt="وزارة التربية والتعليم">' : moeEmblemSVG();
+}
+function logoCharterHTML(){
+  const l = S().logoCharter;
+  return l ? '<img src="' + h(l) + '" alt="الميثاق الوطني للتعليم">' : charterMarkSVG();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2230,18 +2325,20 @@ function doPrint(orient, html){
   window.focus();
   setTimeout(() => window.print(), 60);
 }
-function printHeader(titleAr, titleEn, rightLines){
+function printHeader(titleAr, titleEn, metaItems){
+  const items = (metaItems || []).filter(Boolean);
   return '<div class="pr-head">' +
-    '<div class="pr-emb">' + emblemHTML() + '</div>' +
+    '<div class="pr-emb">' + logoMoeHTML() + '</div>' +
     '<div class="pr-t">' +
       '<div class="m">' + h(SCHOOL.ministryAr) + ' · <span class="en">' + h(SCHOOL.ministryEn) + '</span></div>' +
       '<div class="s">' + h(SCHOOL.nameAr) + '</div>' +
       '<div class="y">' + h(SCHOOL.nameEn) + ' · Academic Year ' + h(S().academicYear) + '</div>' +
     '</div>' +
-    '<div class="pr-r">' + (rightLines || []).join('<br>') + '</div>' +
+    '<div class="pr-charter">' + logoCharterHTML() + '</div>' +
   '</div>' +
   '<div class="pr-title">' + h(titleAr) + '</div>' +
-  '<div class="pr-sub en">' + h(titleEn) + '</div>';
+  '<div class="pr-sub en">' + h(titleEn) + '</div>' +
+  (items.length ? '<div class="pr-strip">' + items.map(x => '<span>' + x + '</span>').join('') + '</div>' : '');
 }
 function printFooter(note){
   return '<div class="pr-foot"><span>' + h(SCHOOL.nameAr) + ' — ' + h(SCHOOL.systemAr) + '</span>' +
@@ -2267,7 +2364,9 @@ function visitFormSheet(v){
   /* Deliberately sized to fall on exactly ONE A4 page — one teacher visit = one page. */
   return '<div class="pr-sheet pr-form">' +
     printHeader('نموذج الزيارة الصفية', 'Classroom Visit Form', [
-      '<span class="pr-idbox">Visit ID<b>' + h(v.code) + '</b></span>'
+      '<span class="pr-idbox"><span class="en">Visit ID:</span> <b>' + h(v.code) + '</b></span>',
+      '<span class="en">Academic Year:</span> <b>' + h(s.academicYear) + '</b>',
+      '<span class="en">Observer:</span> <b>' + h(v.observer || s.observer) + '</b>'
     ]) +
     '<div class="pr-sec"><h4>Visit Information — بيانات الزيارة</h4>' +
       '<div class="pr-fields c3">' +
@@ -2286,14 +2385,14 @@ function visitFormSheet(v){
       '<div class="pr-cbs c4">' + cbList(FOCUS.map(f => f[0]).concat(['Other: ____________']), v.focus)
         .replace('<div class="pr-cbs">','').replace(/<\/div>$/,'') + '</div></div>' +
     '<div class="pr-sec"><h4>Evidence Observed During the Lesson — الأدلة الملاحظة أثناء الحصة</h4>' +
-      '<div class="wr-lines h50"></div></div>' +
+      '<div class="wr-lines h44"></div></div>' +
     '<div class="pr-sec pr-two">' +
       '<div><h4>Strengths / Positive Evidence — نقاط القوة</h4><div class="wr-lines h22"></div></div>' +
       '<div><h4>Points for Further Discussion — نقاط للمتابعة</h4><div class="wr-lines h22"></div></div>' +
     '</div>' +
     '<div class="pr-sec"><h4>Administration Notes — ملاحظات الإدارة</h4>' +
       (v.admin && v.admin.current ? '<div class="pr-note"><b>Previous note:</b> ' + h(v.admin.current.slice(0,150)) + '</div>' : '') +
-      '<div class="wr-lines h22"></div></div>' +
+      '<div class="wr-lines h20"></div></div>' +
     '<div class="pr-sec"><h4>Suggested Next Step — الخطوة التالية المقترحة</h4>' +
       '<div class="pr-cbs c4">' + cbList(FORM_NEXT_STEPS.map(x => x[0]), v.nextSteps)
         .replace('<div class="pr-cbs">','').replace(/<\/div>$/,'') + '</div></div>' +
@@ -2311,7 +2410,12 @@ function visitRecordSheet(v){
   const fld = (k, val, full, ltr) => '<div' + (full ? ' class="full"' : '') + '><span class="k en">' + h(k) +
     '</span><span class="v' + (ltr ? ' ltr' : '') + '">' + h(val || '—') + '</span></div>';
   return '<div class="pr-sheet">' +
-    printHeader('سجل الزيارة الصفية', 'Classroom Visit Record', ['<span class="pr-idbox">Visit ID<b>' + h(v.code) + '</b></span>']) +
+    printHeader('سجل الزيارة الصفية', 'Classroom Visit Record', [
+      '<span class="pr-idbox"><span class="en">Visit ID:</span> <b>' + h(v.code) + '</b></span>',
+      '<span class="en">Teacher:</span> <b>' + h(t ? t.name : '—') + '</b>',
+      '<span class="en">Date:</span> <b>' + h(fmtDate(v.date)) + '</b>',
+      '<span class="en">Observer:</span> <b>' + h(v.observer || s.observer) + '</b>'
+    ]) +
     '<div class="pr-sec"><h4>Visit Information — بيانات الزيارة</h4><div class="pr-fields">' +
       fld('Teacher Name', t ? t.name : '') + fld('Subject', v.subject) +
       fld('Grade / Class', v.grade ? v.grade + ' / ' + v.cls : '', false, true) + fld('Date', fmtDate(v.date), false, true) +
@@ -2360,8 +2464,10 @@ function dailyPlanSheet(dateISO, list){
   }).join('');
   return '<div class="pr-sheet">' +
     printHeader('خطة الزيارات الصفية اليومية', 'Daily Classroom Visit Plan', [
-      '<b>' + h(fmtDate(dateISO)) + '</b>', DOW_AR[dowOf(dateISO)] + ' — ' + DOW_EN[dowOf(dateISO)],
-      'Observer: ' + h(S().observer)]) +
+      '<span class="en">Date:</span> <b>' + h(fmtDate(dateISO)) + '</b>',
+      '<span class="en">Day:</span> <b>' + DOW_AR[dowOf(dateISO)] + ' — ' + DOW_EN[dowOf(dateISO)] + '</b>',
+      '<span class="en">Visits:</span> <b>' + list.length + '</b>',
+      '<span class="en">Observer:</span> <b>' + h(S().observer) + '</b>']) +
     '<table class="pr-tbl"><thead><tr>' +
       '<th>#</th><th>Visit ID</th><th>Teacher</th><th>Subject</th><th>Grade/Class</th><th>Period</th>' +
       '<th>Lesson / Topic</th><th>Visit Type</th><th>Time</th><th>Min</th><th>Stage</th><th>Feedback</th><th>Follow-up</th><th style="width:16%">Notes</th>' +
@@ -2394,8 +2500,9 @@ function weeklyPlanSheet(){
   const c = Model.coverage();
   return '<div class="pr-sheet">' +
     printHeader('خطة الزيارات الصفية الأسبوعية', 'Weekly Classroom Visit Plan', [
-      '<b>' + fmtDate(S().windowStart) + ' – ' + fmtDate(S().windowEnd) + '</b>',
-      h(Model.activeTerm().name), 'Observer: ' + h(S().observer)]) +
+      '<span class="en">Period:</span> <b>' + fmtDate(S().windowStart) + ' – ' + fmtDate(S().windowEnd) + '</b>',
+      '<span class="en">Term:</span> <b>' + h(Model.activeTerm().name) + '</b>',
+      '<span class="en">Observer:</span> <b>' + h(S().observer) + '</b>']) +
     '<div class="pr-meta"><span>Total Teachers: <b>' + c.totalTeachers + '</b></span>' +
       '<span>Unique Teachers Visited: <b>' + c.uniqueVisited + '</b></span>' +
       '<span>Total Visits: <b>' + c.totalVisits + '</b></span>' +
@@ -2885,7 +2992,10 @@ function printTeacherRecord(id){
     '<td>' + h(v.followUp) + (v.followUpDate ? ' — ' + fmtDate(v.followUpDate) : '') + '</td></tr>').join('');
   doPrint('landscape', '<div class="pr-sheet">' +
     printHeader('السجل الإداري وسجل الزيارات الصفية للمعلمة', 'Teacher Administrative & Classroom Visit Record',
-      ['<b>' + h(t.name) + '</b>', h(t.subject || ''), 'Observer: ' + h(S().observer)]) +
+      ['<span class="en">Teacher:</span> <b>' + h(t.name) + '</b>',
+       '<span class="en">Subject:</span> <b>' + h(t.subject || '—') + '</b>',
+       '<span class="en">Visits:</span> <b>' + visits.length + '</b>',
+       '<span class="en">Observer:</span> <b>' + h(S().observer) + '</b>']) +
     '<table class="pr-tbl"><thead><tr><th>#</th><th>Date</th><th>Visit ID</th><th>Visit Type</th><th>Class</th>' +
       '<th>Focus</th><th>Strengths</th><th>Administration Note</th><th>Next Step</th><th>Follow-up</th></tr></thead>' +
       '<tbody>' + (rows || '<tr><td colspan="10" style="text-align:center;padding:14px">No records</td></tr>') + '</tbody></table>' +
@@ -3254,7 +3364,10 @@ function printEvaluation(evalId){
 
   doPrint('portrait', '<div class="pr-sheet">' +
     printHeader('نموذج تقييم الزيارة الصفية', 'Classroom Visit Evaluation Form',
-      ['<span class="pr-idbox">Visit ID<b>' + h(v.code || '—') + '</b></span>']) +
+      ['<span class="pr-idbox"><span class="en">Visit ID:</span> <b>' + h(v.code || '—') + '</b></span>',
+       '<span class="en">Teacher:</span> <b>' + h(t ? t.name : '—') + '</b>',
+       '<span class="en">Date:</span> <b>' + h(fmtDate(e.date)) + '</b>',
+       '<span class="en">Observer:</span> <b>' + h(e.observer) + '</b>']) +
     '<div class="pr-sec"><h4>Visit Information</h4><div class="pr-fields">' +
       fld('Teacher Name', t ? t.name : '') + fld('Subject', v.subject) +
       fld('Grade / Class', v.grade ? v.grade + ' / ' + v.cls : '', false, true) + fld('Date', fmtDate(e.date), false, true) +
@@ -3393,7 +3506,9 @@ function printFollowUpList(){
   }).join('');
   doPrint('landscape', '<div class="pr-sheet">' +
     printHeader('قائمة المتابعة والإجراءات', 'Follow-up & Actions List',
-      [h(Model.activeTerm().name), 'Observer: ' + h(S().observer)]) +
+      ['<span class="en">Term:</span> <b>' + h(Model.activeTerm().name) + '</b>',
+       '<span class="en">Actions:</span> <b>' + items.length + '</b>',
+       '<span class="en">Observer:</span> <b>' + h(S().observer) + '</b>']) +
     '<table class="pr-tbl"><thead><tr><th>#</th><th>Teacher</th><th>Visit ID</th><th>Date</th><th>Action</th>' +
       '<th>Responsible</th><th>Deadline</th><th>Status</th></tr></thead><tbody>' +
       (rows || '<tr><td colspan="8" style="text-align:center;padding:14px">No follow-up actions</td></tr>') + '</tbody></table>' +
@@ -3570,12 +3685,13 @@ VIEWS.settings = function(){
       '<div class="field"><label>المسمى بالإنجليزية<span class="en"> Observer Title (EN)</span></label><input type="text" id="stObserverEn" value="' + h(s.observerEn) + '"></div>' +
       '<div class="field"><label>المدة الافتراضية للزيارة (دقيقة)<span class="en"> Default Duration</span></label><input type="number" id="stDuration" min="5" max="60" value="' + h(s.defaultDuration) + '"></div>' +
     '</div>' +
-    '<div class="field" style="margin-top:12px"><label>شعار الوزارة / المدرسة<span class="en"> Logo (PNG / JPG / SVG)</span></label>' +
-      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' +
-        '<div class="emblem" style="border:1px solid var(--line);border-radius:8px;padding:4px;background:#fff">' + emblemHTML() + '</div>' +
-        '<input type="file" id="stLogo" accept="image/*" style="max-width:250px">' +
-        (s.logo ? '<button class="btn sm danger" id="stLogoDel">' + ICON.trash + ' إزالة الشعار</button>' : '') +
-      '</div><div class="hint">يظهر الشعار أعلى جميع النماذج المطبوعة. في حال عدم الرفع يُستخدم شعار رسمي مبسّط.</div></div>', true) +
+    '<div class="note" style="margin-top:12px;margin-bottom:10px">' + ICON.info +
+      ' يظهر الشعاران في أعلى المنصة وفي ترويسة <b>كل ورقة تُطبع</b>. النظام يحتوي على رسم مضمّن للشعارين،' +
+      ' ويُفضّل رفع الملف الرسمي لكل شعار للحصول على أعلى جودة في الطباعة.</div>' +
+    '<div class="form-grid two">' +
+      logoSlot('moe', 'شعار وزارة التربية والتعليم', 'Ministry of Education', logoMoeHTML(), !!s.logo) +
+      logoSlot('charter', 'شعار الميثاق الوطني للتعليم', 'National Education Charter', logoCharterHTML(), !!s.logoCharter) +
+    '</div>', true) +
 
   accSection('st_terms','2','الفصول الدراسية','Terms — Term 1 / 2 / 3',
     '<div class="tbl-wrap"><table class="tbl" style="min-width:620px"><thead><tr>' +
@@ -3626,6 +3742,17 @@ VIEWS.settings = function(){
     '</div>', false);
 };
 
+function logoSlot(key, ar, en, preview, custom){
+  return '<div class="logo-slot">' +
+    '<div class="logo-slot-h"><b>' + h(ar) + '</b><span class="en">' + h(en) + '</span>' +
+      (custom ? '<span class="badge b-ok plain">ملف مرفوع</span>' : '<span class="badge b-mute plain">رسم مضمّن</span>') + '</div>' +
+    '<div class="logo-slot-p">' + preview + '</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">' +
+      '<input type="file" id="stLogo_' + key + '" accept="image/*" style="max-width:210px;font-size:11px">' +
+      (custom ? '<button class="btn sm danger" id="stLogoDel_' + key + '">' + ICON.trash + ' إزالة</button>' : '') +
+    '</div></div>';
+}
+
 VIEWS.after_settings = function(){
   bindAcc();
   const s = S();
@@ -3641,15 +3768,19 @@ VIEWS.after_settings = function(){
     s.terms.push({id: uid('term'), name:'فصل جديد', start: todayISO(), end: addDays(todayISO(), 90)});
     Store.save(); render();
   };
-  const logo = $('#stLogo');
-  if(logo) logo.onchange = () => {
-    const file = logo.files[0]; if(!file) return;
-    if(file.size > 400000) return toast('حجم الصورة كبير — استخدمي صورة أقل من 400KB', 'err');
-    const fr = new FileReader();
-    fr.onload = () => { s.logo = fr.result; Store.save(); toast('تم رفع الشعار', 'ok'); render(); };
-    fr.readAsDataURL(file);
-  };
-  const ld = $('#stLogoDel'); if(ld) ld.onclick = () => { s.logo = ''; Store.save(); render(); };
+  [['moe','logo'],['charter','logoCharter']].forEach(([key, field]) => {
+    const inp = $('#stLogo_' + key);
+    if(inp) inp.onchange = () => {
+      const file = inp.files[0]; if(!file) return;
+      if(file.size > 500000) return toast('حجم الصورة كبير — استخدمي صورة أقل من 500KB', 'err');
+      const fr = new FileReader();
+      fr.onload = () => { s[field] = fr.result; Store.save(); toast('تم رفع الشعار', 'ok'); render(); };
+      fr.onerror = () => toast('تعذّرت قراءة الملف', 'err');
+      fr.readAsDataURL(file);
+    };
+    const del = $('#stLogoDel_' + key);
+    if(del) del.onclick = () => { s[field] = ''; Store.save(); toast('تمت العودة إلى الرسم المضمّن'); render(); };
+  });
 
   $('#stSave').onclick = () => {
     s.academicYear = $('#stYear').value.trim() || s.academicYear;
