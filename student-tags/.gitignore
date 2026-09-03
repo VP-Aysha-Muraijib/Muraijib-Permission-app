@@ -1,0 +1,17 @@
+# ---------------------------------------------------------------
+#  PRIVACY: real student data and generated cards are NEVER
+#  committed to git - they contain e-mail addresses and passwords.
+#  خصوصية: بيانات الطالبات وملفات PDF لا تُرفع إلى المستودع أبدًا
+# ---------------------------------------------------------------
+input/*
+!input/README.md
+
+output/*
+!output/README.md
+
+samples/*.pdf
+samples/*.xlsx
+
+__pycache__/
+*.pyc
+.DS_Store
