@@ -61,12 +61,22 @@ SHEET_TO_CLASS = {}
 PAGE_SIZE = "A4"                 # "A4" or "LETTER"
 PAGE_ORIENTATION = "portrait"    # "portrait" | "landscape" | "auto"
 
-ROWS_PER_PAGE = 5                # 5 x 4 = 20 cards per A4 page
-COLUMNS_PER_PAGE = 4
+# Wide "badge" cards: 2 columns x 5 rows = 10 cards per A4 page.
+# The card is 94 x 51 mm, which makes the e-mail and the password big
+# and easy to read.  Card size, margins and font sizes are recalculated
+# automatically, so these two numbers can be changed freely:
+#   2 x 4 =  8 per page  ->  94 x 65 mm, extra large
+#   2 x 5 = 10 per page  ->  94 x 51 mm  (current)
+#   2 x 6 = 12 per page  ->  94 x 42 mm
+#   2 x 7 = 14 per page  ->  94 x 35 mm
+#   3 x 7 = 21 per page  ->  62 x 35 mm, smaller text
+#   4 x 5 = 20 per page  ->  45 x 51 mm, tall cards
+ROWS_PER_PAGE = 5
+COLUMNS_PER_PAGE = 2
 
 PAGE_MARGIN_MM = 9.0             # safe printing margin on every side
-GAP_BETWEEN_CARDS_MM = 3.5       # space between cards (room for scissors)
-CARD_PADDING_MM = 3.0            # inner padding of a card
+GAP_BETWEEN_CARDS_MM = 4.0       # space between cards (room for scissors)
+CARD_PADDING_MM = 3.5            # inner padding of a card
 
 START_EACH_CLASS_ON_NEW_PAGE = True   # never mix two classes on one page
 
@@ -115,7 +125,7 @@ CHARACTER_AREA_RATIO = 0.45
 #   "band" -> a horizontal strip under the name
 CHARACTER_LAYOUT = "auto"
 CHARACTER_SIDE = "right"         # "right" | "left"   (used by the side layout)
-CHARACTER_MAX_WIDTH_RATIO = 0.42 # at most 42% of the card width
+CHARACTER_MAX_WIDTH_RATIO = 0.30 # at most 30% of the card width
 CHARACTER_ALIGN = "center"       # "left" | "center" | "right" (band layout only)
 # What to do when assets/character.png does not exist:
 #   "reserve"     -> keep the empty space (so you can add a sticker later)
@@ -135,14 +145,14 @@ FONT_MONO_BOLD = "NotoSansMono-Bold.ttf"
 USE_MONO_FOR_CREDENTIALS = True
 
 # Maximum font sizes - the program shrinks text automatically when needed.
-STUDENT_NAME_FONT_SIZE = 10.5
+STUDENT_NAME_FONT_SIZE = 15.0
 STUDENT_NAME_MIN_FONT_SIZE = 6.5
-STUDENT_NAME_MAX_LINES = 3
-CLASS_FONT_SIZE = 7.5
-LABEL_FONT_SIZE = 5.2
-EMAIL_FONT_SIZE = 7.2
+STUDENT_NAME_MAX_LINES = 2
+CLASS_FONT_SIZE = 9.5
+LABEL_FONT_SIZE = 7.5
+EMAIL_FONT_SIZE = 13.0
 EMAIL_MIN_FONT_SIZE = 4.8
-PASSWORD_FONT_SIZE = 11.5
+PASSWORD_FONT_SIZE = 18.0
 PASSWORD_MIN_FONT_SIZE = 6.5
 
 # ---------------------------------------------------------------

@@ -2,27 +2,29 @@
 ### بطاقات دخول الطالبات — جاهزة للطباعة والقص
 
 Turn an Excel file of student accounts into a clean, print-ready PDF of
-login cards: **20 cards on every A4 page**, grouped and sorted by class.
+wide badge-style login cards: **10 cards on every A4 page**, grouped and
+sorted by class.
 
 يحوّل ملف إكسل يحتوي على حسابات الطالبات إلى ملف PDF أنيق جاهز للطباعة،
-**٢٠ بطاقة في كل صفحة A4**، مرتّبة حسب الصف والشعبة.
+**١٠ بطاقات في كل صفحة A4**، مرتّبة حسب الصف والشعبة.
 
 ```
-┌──────────────────────────┐
-│  5-1              🤖     │   class chip  +  character
-│                   🤖     │
-│    Afra Eida      🤖     │   student name (auto-fit, up to 3 lines)
-│                          │
-│  ┌────────────────────┐  │
-│  │ EMAIL              │  │
-│  │ stuf2020@moe.sch.ae│  │   login details, monospaced
-│  │ ────────────────── │  │
-│  │ PASSWORD           │  │
-│  │ mruaePdrVd%6       │  │
-│  └────────────────────┘  │
-└──────────────────────────┘
-        45.4 × 51.4 mm
+┌───────────────────────────────────────────────────┐
+│  ┌─────┐                                    ┌───┐ │
+│  │ 5-1 │          Afra Eida                 │ 🤖│ │  name + character
+│  └─────┘                                    └───┘ │
+│  ┌─────────────────────────────────────────────┐  │
+│  │ EMAIL      stuf20200014344@moe.sch.ae       │  │  12 pt
+│  │ ─────────────────────────────────────────── │  │
+│  │ PASSWORD   mruaePdrVd%6                     │  │  18 pt
+│  └─────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────┘
+                    94 × 51 mm
 ```
+
+The login panel spans the **full width** of the card, so the e-mail and the
+password are as large as the page allows. Their size is calculated from your
+own data, not hard-coded — change the grid and everything rescales.
 
 ---
 
@@ -121,7 +123,7 @@ Everything lives in **`config.py`**. The most useful settings:
 
 | Setting | What it does |
 |---|---|
-| `ROWS_PER_PAGE`, `COLUMNS_PER_PAGE` | cards per page (`5 × 4 = 20`). Card size, margins and gaps are recalculated automatically. |
+| `ROWS_PER_PAGE`, `COLUMNS_PER_PAGE` | cards per page (`5 × 2 = 10`). Card size, margins, gaps **and font sizes** are recalculated automatically. `2 × 4` → bigger, `2 × 7` → 14 per page, `4 × 5` → 20 small tall cards. |
 | `PAGE_MARGIN_MM`, `GAP_BETWEEN_CARDS_MM`, `CARD_PADDING_MM` | printing margins and cutting space |
 | `START_EACH_CLASS_ON_NEW_PAGE` | `True` = a class never shares a page with another class |
 | `SHOW_CLASS_HEADER`, `SHOW_PAGE_NUMBER` | the small header line on top of each page |
@@ -129,7 +131,7 @@ Everything lives in **`config.py`**. The most useful settings:
 | `NAME_CASE` | `"title"` → `Afra Eida`, `"upper"` → `AFRA EIDA`, `"as_is"` → exactly as in Excel |
 | `SORT_STUDENTS_BY` | `"name"` (A–Z) or `"file"` (Excel order) |
 | `CHARACTER_LAYOUT`, `CHARACTER_SIDE`, `CHARACTER_MAX_WIDTH_RATIO` | where the character goes and how big it is |
-| `STUDENT_NAME_FONT_SIZE`, `EMAIL_FONT_SIZE`, `PASSWORD_FONT_SIZE` | **maximum** sizes — text shrinks by itself when it needs to |
+| `STUDENT_NAME_FONT_SIZE`, `EMAIL_FONT_SIZE`, `PASSWORD_FONT_SIZE` | **maximum** sizes — the program picks the largest size that actually fits your data and uses it on every card |
 | `COLOR_*` | all colours, as normal hex values (`"#1F5FA8"`) |
 
 ### Changing the font
@@ -170,11 +172,26 @@ not the wrong `5-1, 5-10, 5-2`. The same order is used for the pages, the
 per-class PDFs and the file names. Messy values are cleaned up automatically —
 `٥ - ١`, `5/1` and `5 _ 1` all become `5-1`.
 
-## Long text
+## Card size and text size
 
-Nothing ever leaves its card. Names wrap over up to three lines and shrink
-until they fit; e-mails shrink and, if still too long, break after the `@`;
-passwords shrink. Truncation is the last resort and is almost never reached.
+Nothing is hard-coded. When the program starts it measures your longest
+e-mail and password and picks the largest font size that fits the card, then
+uses that **same** size on every card so the sheet looks uniform.
+
+A single unusually long e-mail does not shrink the whole document — the size
+is taken from the 95th percentile, and that one card shrinks on its own.
+
+Nothing ever leaves its card either: names wrap over two lines and shrink
+until they fit, e-mails and passwords shrink, and on narrow cards an e-mail
+breaks after the `@`. Truncation is the last resort and is almost never
+reached.
+
+Two card shapes are built in and chosen automatically:
+
+* **wide** (the card is at least 1.25× wider than tall) — badge layout, the
+  login panel spans the full width and the labels sit beside the values
+* **tall** — the class pill on top, then the name, the character and the
+  login panel with the labels above the values
 
 ## Arabic
 

@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import math
 import argparse
 from dataclasses import dataclass, field
 from typing import List, Dict, Tuple, Optional, Sequence
@@ -611,11 +612,129 @@ def build_geometry() -> Geometry:
 #  SECTION 6 - DRAWING
 # ==========================================================================
 
+# Spacing inside the login panel (shared by the height calculation and the
+# drawing code, so the panel is always exactly as tall as its content).
+PANEL_PAD = 1.8 * mm
+LABEL_GAP = 1.0
+DIVIDER_SPACE = 2.6 * mm
+LABEL_VALUE_GAP = 2.0 * mm
+
+
+@dataclass
+class CardPlan:
+    """
+    Font sizes and panel height, decided ONCE for the whole document.
+
+    Every card then looks identical: same panel height, same e-mail size,
+    same password size - whatever grid or page size is configured.
+    """
+    wide: bool = False
+    name_size: float = 10.5
+    label_size: float = 5.2
+    email_size: float = 7.0
+    password_size: float = 11.0
+    email_lines: int = 1
+    label_w: float = 0.0
+    panel_h: float = 0.0
+
+
+def _quantile_width(texts: Sequence[str], font: str, q: float = 0.95) -> float:
+    """
+    Width (at 10pt) of the text at the q-quantile of the list.
+
+    Using the 95th percentile instead of the single widest value stops one
+    unusually long e-mail from shrinking the text on every other card - that
+    one card shrinks a little on its own instead.
+    """
+    widths = sorted(text_width(t, font, 10.0) for t in texts if t)
+    if not widths:
+        return 0.0
+    index = min(len(widths) - 1, max(0, int(round(q * (len(widths) - 1)))))
+    return widths[index]
+
+
+def _size_for(width_at_10pt: float, available: float,
+              size_max: float, size_min: float) -> float:
+    """Largest quarter-point font size at which that text fits `available`."""
+    if width_at_10pt <= 0:
+        return size_max
+    # keep a hair of breathing room so the longest value never touches the edge
+    raw = 10.0 * max(available - 2.0, 1.0) / width_at_10pt
+    size = math.floor(min(raw, size_max) * 4.0) / 4.0
+    return max(size, size_min)
+
+
+def plan_cards(groups, fonts: Dict[str, str], geo: Geometry) -> CardPlan:
+    """Work out the biggest font sizes that fit every student on this grid."""
+    plan = CardPlan(wide=geo.card_w >= geo.card_h * 1.25)
+    plan.name_size = CFG.STUDENT_NAME_FONT_SIZE
+    plan.label_size = CFG.LABEL_FONT_SIZE
+
+    mono, mono_bold = fonts[FONT_NAME_MONO], fonts[FONT_NAME_MONO_BOLD]
+    label_font = fonts[FONT_NAME_BOLD]
+
+    pad = CFG.CARD_PADDING_MM * mm
+    content_w = geo.card_w - 2 * pad
+
+    # On a wide card the login panel uses the full width - the character only
+    # shares the name row - so the e-mail gets as much room as possible.
+    # On a tall card the character takes a strip out of the width; that strip
+    # stays reserved even when the image file is missing, so adding it later
+    # never changes any of the text sizes.
+    if CFG.CHARACTER_AREA_ENABLED and not plan.wide:
+        inner_h = geo.card_h - 2 * pad
+        strip = min(content_w * float(CFG.CHARACTER_MAX_WIDTH_RATIO), inner_h * 0.45)
+        content_w -= strip + 1.2 * mm
+
+    value_w = content_w - 2 * PANEL_PAD
+    if plan.wide:
+        plan.label_w = max(
+            text_width(shape(CFG.LABEL_EMAIL), label_font, plan.label_size),
+            text_width(shape(CFG.LABEL_PASSWORD), label_font, plan.label_size),
+        )
+        value_w -= plan.label_w + LABEL_VALUE_GAP
+
+    emails = [st.email for _, items in groups for st in items if st.email]
+    passwords = [st.password for _, items in groups for st in items if st.password]
+
+    plan.email_size = _size_for(_quantile_width(emails, mono), value_w,
+                                CFG.EMAIL_FONT_SIZE, CFG.EMAIL_MIN_FONT_SIZE)
+    plan.password_size = _size_for(_quantile_width(passwords, mono_bold), value_w,
+                                   CFG.PASSWORD_FONT_SIZE, CFG.PASSWORD_MIN_FONT_SIZE)
+
+    if plan.wide:
+        plan.email_lines = 1
+        plan.panel_h = (2 * PANEL_PAD
+                        + max(plan.email_size, plan.label_size) * 1.45
+                        + DIVIDER_SPACE
+                        + max(plan.password_size, plan.label_size) * 1.45)
+    else:
+        # on a narrow card a long e-mail may need a second line (split at "@")
+        plan.email_lines = 1
+        if plan.email_size <= CFG.EMAIL_MIN_FONT_SIZE + 0.01:
+            heads = [e.split("@")[0] + "@" for e in emails if "@" in e]
+            tails = [e.split("@", 1)[1] for e in emails if "@" in e]
+            if heads:
+                plan.email_lines = 2
+                plan.email_size = min(
+                    _size_for(_quantile_width(heads, mono), value_w,
+                              CFG.EMAIL_FONT_SIZE, CFG.EMAIL_MIN_FONT_SIZE),
+                    _size_for(_quantile_width(tails, mono), value_w,
+                              CFG.EMAIL_FONT_SIZE, CFG.EMAIL_MIN_FONT_SIZE))
+        plan.panel_h = (2 * PANEL_PAD
+                        + plan.label_size + LABEL_GAP
+                        + plan.email_size * 1.12 * plan.email_lines
+                        + DIVIDER_SPACE
+                        + plan.label_size
+                        + plan.password_size * 1.16)
+    return plan
+
+
 class Renderer:
-    def __init__(self, fonts: Dict[str, str], geo: Geometry, email_lines: int = 1):
+    def __init__(self, fonts: Dict[str, str], geo: Geometry, plan: CardPlan):
         self.f = fonts
         self.geo = geo
-        self.email_lines = max(1, int(email_lines))
+        self.plan = plan
         self.c_border = HexColor(CFG.COLOR_CARD_BORDER)
         self.c_accent = HexColor(CFG.COLOR_ACCENT)
         self.c_accent_soft = HexColor(CFG.COLOR_ACCENT_SOFT)
@@ -715,57 +834,135 @@ class Renderer:
     # -- the card ----------------------------------------------------------
     def draw_card(self, c, x: float, y: float, student: Student):
         w, h = self.geo.card_w, self.geo.card_h
-        pad = CFG.CARD_PADDING_MM * mm
-        radius = CFG.CARD_CORNER_RADIUS_MM * mm
+        if self.plan.wide:
+            self._draw_card_wide(c, x, y, w, h, student)
+        else:
+            self._draw_card_tall(c, x, y, w, h, student)
 
-        # 1. outline
+    def _draw_outline(self, c, x, y, w, h):
         if CFG.SHOW_CUT_LINES:
             c.setStrokeColor(self.c_border)
             c.setLineWidth(CFG.CUT_LINE_WIDTH)
-            c.roundRect(x, y, w, h, radius, stroke=1, fill=0)
+            c.roundRect(x, y, w, h, CFG.CARD_CORNER_RADIUS_MM * mm, stroke=1, fill=0)
 
-        inner_x = x + pad
-        inner_w = w - 2 * pad
-        cursor = y + h - pad                       # we draw downwards
+    def _draw_chip(self, c, x, y, max_w, student: Student) -> float:
+        """Draw the little class pill.  Returns its width (0 if not drawn)."""
+        if not (CFG.SHOW_CLASS_ON_CARD and student.class_name):
+            return 0.0
+        text = (f"{CFG.LABEL_CLASS} {student.class_name}".strip()
+                if CFG.LABEL_CLASS else student.class_name)
+        text = shape(text)
+        font, size = self.f[FONT_NAME_BOLD], CFG.CLASS_FONT_SIZE
+        chip_w = min(text_width(text, font, size) + 4.4 * mm, max_w)
+        chip_h = size + 3.4
+        c.setFillColor(self.c_accent_soft)
+        c.roundRect(x, y, chip_w, chip_h, chip_h / 2, stroke=0, fill=1)
+        c.setFillColor(self.c_accent)
+        c.setFont(font, size)
+        c.drawString(x + 2.2 * mm, y + 2.6, text)
+        return chip_w
 
-        # 2. accent rule + class chip
-        if CFG.SHOW_CLASS_ON_CARD and student.class_name:
-            chip_text = (f"{CFG.LABEL_CLASS} {student.class_name}".strip()
-                         if CFG.LABEL_CLASS else student.class_name)
-            chip_text = shape(chip_text)
-            chip_font = self.f[FONT_NAME_BOLD]
-            chip_size = CFG.CLASS_FONT_SIZE
-            chip_w = text_width(chip_text, chip_font, chip_size) + 4.4 * mm
-            chip_h = chip_size + 3.2
-            chip_y = cursor - chip_h
-            c.setFillColor(self.c_accent_soft)
-            c.setStrokeColor(self.c_accent_soft)
-            c.roundRect(inner_x, chip_y, min(chip_w, inner_w), chip_h,
-                        chip_h / 2, stroke=0, fill=1)
-            c.setFillColor(self.c_accent)
-            c.setFont(chip_font, chip_size)
-            c.drawString(inner_x + 2.2 * mm, chip_y + 2.4, chip_text)
-
-            if CFG.LOGO_ON_CARD and self.logo:
-                self._draw_image_fitted(c, self.logo,
-                                        x + w - pad - chip_h * (self.logo["ratio"] or 1.0),
-                                        chip_y, chip_h * (self.logo["ratio"] or 1.0), chip_h)
-            cursor = chip_y - 2.0 * mm
-
-        # 3. credentials panel is anchored to the BOTTOM of the card
-        panel_h = self._credentials_height()
-        panel_y = y + pad
-        self._draw_credentials(c, inner_x, panel_y, inner_w, panel_h, student)
-
-        # 4. remaining space is shared by the name and the character
-        free_top = cursor
-        free_bottom = panel_y + panel_h + 2.0 * mm
-        free_h = max(free_top - free_bottom, 6.0)
-
+    def _character_box(self, inner_x, inner_y, inner_w, inner_h):
+        """Vertical strip reserved for the character, or None."""
         mode = str(CFG.CHARACTER_MISSING_MODE).lower()
         wanted = bool(CFG.CHARACTER_AREA_ENABLED) and (
             self.character is not None or mode in ("reserve", "placeholder"))
-        show_character = wanted and (self.character is not None or mode == "placeholder")
+        if not wanted:
+            return None, False
+        ratio = self.character["ratio"] if self.character else 0.45
+        strip_w = min(inner_w * float(CFG.CHARACTER_MAX_WIDTH_RATIO), inner_h * ratio)
+        if strip_w < 4:
+            return None, False
+        visible = self.character is not None or mode == "placeholder"
+        if str(CFG.CHARACTER_SIDE).lower() == "left":
+            return (inner_x, inner_y, strip_w, inner_h), visible
+        return (inner_x + inner_w - strip_w, inner_y, strip_w, inner_h), visible
+
+    def _draw_character(self, c, box, visible):
+        if not box or not visible:
+            return
+        bx, by, bw, bh = box
+        if self.character:
+            self._draw_image_fitted(c, self.character, bx, by, bw, bh)
+        else:
+            c.saveState()
+            c.setStrokeColor(self.c_placeholder)
+            c.setLineWidth(0.5)
+            c.setDash(1.6, 1.6)
+            c.roundRect(bx, by + 1.0, bw, bh - 2.0, 1.2 * mm, stroke=1, fill=0)
+            c.restoreState()
+
+    def _draw_name(self, c, x, y, w, h, student: Student):
+        font = self.f[FONT_NAME_BOLD]
+        lines, size = fit_lines(
+            format_name(student.name) or CFG.MISSING_VALUE_TEXT,
+            font, w, int(CFG.STUDENT_NAME_MAX_LINES),
+            self.plan.name_size, CFG.STUDENT_NAME_MIN_FONT_SIZE,
+        )
+        leading = size * 1.18
+        block_h = leading * len(lines)
+        area_h = max(h, block_h)
+        start_y = y + (area_h - block_h) / 2.0 + block_h - size
+        start_y = min(start_y, y + h - size)
+        c.setFillColor(self.c_text)
+        c.setFont(font, size)
+        for i, line in enumerate(lines):
+            c.drawCentredString(x + w / 2, start_y - i * leading, line)
+
+    # ---- WIDE card: a badge-shaped rectangle (character | name + login) ----
+    def _draw_card_wide(self, c, x, y, w, h, student: Student):
+        pad = CFG.CARD_PADDING_MM * mm
+        self._draw_outline(c, x, y, w, h)
+
+        inner_x, inner_y = x + pad, y + pad
+        inner_w, inner_h = w - 2 * pad, h - 2 * pad
+
+        # the login panel takes the full width, at the bottom of the card
+        panel_h = self.plan.panel_h
+        panel_y = inner_y
+        self._draw_credentials(c, inner_x, panel_y, inner_w, panel_h, student)
+
+        # everything above it is the name row, shared with the character
+        row_bottom = panel_y + panel_h + 1.8 * mm
+        row_h = max(inner_y + inner_h - row_bottom, 8.0)
+
+        char_box, char_visible = self._character_box(
+            inner_x, row_bottom, inner_w, row_h)
+        row_x, row_w = inner_x, inner_w
+        if char_box:
+            gap_x = 2.0 * mm
+            row_w = inner_w - char_box[2] - gap_x
+            if str(CFG.CHARACTER_SIDE).lower() == "left":
+                row_x = inner_x + char_box[2] + gap_x
+
+        chip_h = CFG.CLASS_FONT_SIZE + 3.4
+        chip_w = self._draw_chip(c, row_x, row_bottom + (row_h - chip_h) / 2.0,
+                                 row_w * 0.35, student)
+        name_gap = 2.0 * mm if chip_w else 0.0
+        self._draw_name(c, row_x + chip_w + name_gap, row_bottom,
+                        row_w - chip_w - name_gap, row_h, student)
+
+        self._draw_character(c, char_box, char_visible)
+
+    # ---- TALL card: class pill on top, name, character, login panel -------
+    def _draw_card_tall(self, c, x, y, w, h, student: Student):
+        pad = CFG.CARD_PADDING_MM * mm
+        self._draw_outline(c, x, y, w, h)
+
+        inner_x, inner_w = x + pad, w - 2 * pad
+        cursor = y + h - pad
+
+        chip_h = CFG.CLASS_FONT_SIZE + 3.4
+        if self._draw_chip(c, inner_x, cursor - chip_h, inner_w, student):
+            cursor -= chip_h + 2.0 * mm
+
+        panel_h = self.plan.panel_h
+        panel_y = y + pad
+        self._draw_credentials(c, inner_x, panel_y, inner_w, panel_h, student)
+
+        free_top = cursor
+        free_bottom = panel_y + panel_h + 2.0 * mm
+        free_h = max(free_top - free_bottom, 6.0)
 
         layout = str(getattr(CFG, "CHARACTER_LAYOUT", "auto")).lower()
         if layout == "auto":
@@ -773,136 +970,126 @@ class Renderer:
             layout = "side" if ratio < 0.8 else "band"
 
         name_x, name_w = inner_x, inner_w
-        name_top, name_bottom = free_top, free_bottom
-        char_box = None
+        name_bottom, name_h = free_bottom, free_h
+        char_box, char_visible = None, False
 
-        if wanted and layout == "side":
-            # The picture gets a vertical strip running from the top of the
-            # card down to the credentials panel; the name keeps the rest.
+        if layout == "side":
+            # the strip runs from the top of the card down to the panel
             strip_top = y + h - pad
-            strip_h = max(strip_top - free_bottom, 6.0)
-            ratio = self.character["ratio"] if self.character else 0.45
-            strip_w = min(inner_w * float(CFG.CHARACTER_MAX_WIDTH_RATIO),
-                          strip_h * ratio)
-            gap_x = 1.2 * mm
-            if str(CFG.CHARACTER_SIDE).lower() == "left":
-                char_box = (inner_x, free_bottom, strip_w, strip_h)
-                name_x = inner_x + strip_w + gap_x
-            else:
-                char_box = (inner_x + inner_w - strip_w, free_bottom, strip_w, strip_h)
-            name_w = inner_w - strip_w - gap_x
-        elif wanted and layout == "band":
-            char_h = min(free_h * float(CFG.CHARACTER_AREA_RATIO), free_h * 0.60)
-            if char_h > 3:
-                box_x, box_w = inner_x, inner_w
-                if self.character:
-                    target_w = min(inner_w, char_h * (self.character["ratio"] or 1.0))
-                    align = str(CFG.CHARACTER_ALIGN).lower()
-                    if align == "left":
-                        box_x, box_w = inner_x, target_w
-                    elif align == "right":
-                        box_x, box_w = inner_x + inner_w - target_w, target_w
-                char_box = (box_x, free_bottom, box_w, char_h)
-                name_bottom = free_bottom + char_h
+            box, char_visible = self._character_box(
+                inner_x, free_bottom, inner_w, max(strip_top - free_bottom, 6.0))
+            if box:
+                char_box = box
+                gap_x = 1.2 * mm
+                name_w = inner_w - box[2] - gap_x
+                if str(CFG.CHARACTER_SIDE).lower() == "left":
+                    name_x = inner_x + box[2] + gap_x
+        else:
+            mode = str(CFG.CHARACTER_MISSING_MODE).lower()
+            wanted = bool(CFG.CHARACTER_AREA_ENABLED) and (
+                self.character is not None or mode in ("reserve", "placeholder"))
+            if wanted:
+                band_h = min(free_h * float(CFG.CHARACTER_AREA_RATIO), free_h * 0.60)
+                if band_h > 3:
+                    box_x, box_w = inner_x, inner_w
+                    if self.character:
+                        target_w = min(inner_w, band_h * (self.character["ratio"] or 1.0))
+                        align = str(CFG.CHARACTER_ALIGN).lower()
+                        if align == "left":
+                            box_x, box_w = inner_x, target_w
+                        elif align == "right":
+                            box_x, box_w = inner_x + inner_w - target_w, target_w
+                    char_box = (box_x, free_bottom, box_w, band_h)
+                    char_visible = self.character is not None or mode == "placeholder"
+                    name_bottom = free_bottom + band_h
+                    name_h = free_h - band_h
 
-        # 4a. student name (largest element, auto wrapped and auto shrunk)
-        name_font = self.f[FONT_NAME_BOLD]
-        lines, size = fit_lines(
-            format_name(student.name) or CFG.MISSING_VALUE_TEXT,
-            name_font, name_w, int(CFG.STUDENT_NAME_MAX_LINES),
-            CFG.STUDENT_NAME_FONT_SIZE, CFG.STUDENT_NAME_MIN_FONT_SIZE,
-        )
-        leading = size * 1.18
-        block_h = leading * len(lines)
-        area_h = max(name_top - name_bottom, block_h)
-        start_y = name_bottom + (area_h - block_h) / 2.0 + block_h - size
-        start_y = min(start_y, name_top - size)
-        c.setFillColor(self.c_text)
-        c.setFont(name_font, size)
-        for i, line in enumerate(lines):
-            c.drawCentredString(name_x + name_w / 2, start_y - i * leading, line)
-
-        # 4b. character / picture
-        if char_box and show_character:
-            bx, by, bw, bh = char_box
-            if self.character:
-                self._draw_image_fitted(c, self.character, bx, by, bw, bh)
-            else:
-                c.saveState()
-                c.setStrokeColor(self.c_placeholder)
-                c.setLineWidth(0.5)
-                c.setDash(1.6, 1.6)
-                c.roundRect(bx, by + 1.0, bw, bh - 2.0, 1.2 * mm, stroke=1, fill=0)
-                c.restoreState()
+        self._draw_name(c, name_x, name_bottom, name_w, name_h, student)
+        self._draw_character(c, char_box, char_visible)
 
     # -- credentials block -------------------------------------------------
-    # These constants are shared by the height calculation and the drawing
-    # code, so the panel is always exactly as tall as its content.
-    PANEL_PAD = 1.8 * mm
-    LABEL_GAP = 1.0
-    DIVIDER_SPACE_ABOVE = 1.6 * mm
-    DIVIDER_SPACE_BELOW = 1.4 * mm
-
-    def _credentials_height(self) -> float:
-        label = CFG.LABEL_FONT_SIZE
-        return (2 * self.PANEL_PAD
-                + label + self.LABEL_GAP
-                + CFG.EMAIL_FONT_SIZE * 1.12 * self.email_lines
-                + self.DIVIDER_SPACE_ABOVE + self.DIVIDER_SPACE_BELOW
-                + label
-                + CFG.PASSWORD_FONT_SIZE * 1.16
-                + 0.8 * mm)
-
     def _draw_credentials(self, c, x, y, w, h, student: Student):
-        radius = CFG.PANEL_CORNER_RADIUS_MM * mm
+        plan = self.plan
         c.setFillColor(self.c_panel)
         c.setStrokeColor(self.c_panel_border)
         c.setLineWidth(0.4)
-        c.roundRect(x, y, w, h, radius, stroke=1, fill=1)
+        c.roundRect(x, y, w, h, CFG.PANEL_CORNER_RADIUS_MM * mm, stroke=1, fill=1)
 
-        inner_pad = self.PANEL_PAD
-        tx = x + inner_pad
-        tw = w - 2 * inner_pad
-        cursor = y + h - inner_pad
-
-        # --- e-mail ---
-        c.setFillColor(self.c_muted)
-        c.setFont(self.f[FONT_NAME_BOLD], CFG.LABEL_FONT_SIZE)
-        cursor -= CFG.LABEL_FONT_SIZE
-        c.drawString(tx, cursor, shape(CFG.LABEL_EMAIL))
-        cursor -= self.LABEL_GAP
+        pad = PANEL_PAD
+        tx, tw = x + pad, w - 2 * pad
+        cursor = y + h - pad
 
         email = student.email or CFG.MISSING_VALUE_TEXT
-        mono = self.f[FONT_NAME_MONO]
-        e_lines, e_size = fit_email(email, mono, tw, CFG.EMAIL_FONT_SIZE,
-                                    CFG.EMAIL_MIN_FONT_SIZE, self.email_lines)
+        password = student.password or CFG.MISSING_VALUE_TEXT
+        mono, mono_bold = self.f[FONT_NAME_MONO], self.f[FONT_NAME_MONO_BOLD]
+        label_font = self.f[FONT_NAME_BOLD]
+
+        if plan.wide:
+            # label on the left, value on the right - one line each
+            value_x = tx + plan.label_w + LABEL_VALUE_GAP
+            value_w = tw - plan.label_w - LABEL_VALUE_GAP
+
+            row_h = max(plan.email_size, plan.label_size) * 1.45
+            cursor -= row_h
+            c.setFillColor(self.c_muted)
+            c.setFont(label_font, plan.label_size)
+            c.drawString(tx, cursor + (row_h - plan.label_size) / 2.0 + 0.6,
+                         shape(CFG.LABEL_EMAIL))
+            text, size = fit_single_line(email, mono, value_w, plan.email_size,
+                                         CFG.EMAIL_MIN_FONT_SIZE)
+            c.setFillColor(self.c_text)
+            c.setFont(mono, size)
+            c.drawString(value_x, cursor + (row_h - size) / 2.0 + 0.6, text)
+
+            cursor -= DIVIDER_SPACE
+            c.setStrokeColor(self.c_panel_border)
+            c.setLineWidth(0.4)
+            c.line(tx, cursor + DIVIDER_SPACE / 2.0, tx + tw, cursor + DIVIDER_SPACE / 2.0)
+
+            row_h = max(plan.password_size, plan.label_size) * 1.45
+            cursor -= row_h
+            c.setFillColor(self.c_muted)
+            c.setFont(label_font, plan.label_size)
+            c.drawString(tx, cursor + (row_h - plan.label_size) / 2.0 + 0.6,
+                         shape(CFG.LABEL_PASSWORD))
+            text, size = fit_single_line(password, mono_bold, value_w,
+                                         plan.password_size, CFG.PASSWORD_MIN_FONT_SIZE)
+            c.setFillColor(self.c_accent)
+            c.setFont(mono_bold, size)
+            c.drawString(value_x, cursor + (row_h - size) / 2.0 + 0.6, text)
+            return
+
+        # narrow card - label above value
+        c.setFillColor(self.c_muted)
+        c.setFont(label_font, plan.label_size)
+        cursor -= plan.label_size
+        c.drawString(tx, cursor, shape(CFG.LABEL_EMAIL))
+        cursor -= LABEL_GAP
+
+        e_lines, e_size = fit_email(email, mono, tw, plan.email_size,
+                                    CFG.EMAIL_MIN_FONT_SIZE, plan.email_lines)
         c.setFillColor(self.c_text)
         c.setFont(mono, e_size)
-        for line in e_lines:
-            cursor -= e_size * 1.12
+        for line in e_lines[:plan.email_lines]:
+            cursor -= plan.email_size * 1.12
             c.drawString(tx, cursor, line)
 
-        # --- divider ---
-        cursor -= self.DIVIDER_SPACE_ABOVE
+        cursor -= DIVIDER_SPACE
         c.setStrokeColor(self.c_panel_border)
         c.setLineWidth(0.4)
-        c.line(tx, cursor, tx + tw, cursor)
+        c.line(tx, cursor + DIVIDER_SPACE / 2.0, tx + tw, cursor + DIVIDER_SPACE / 2.0)
 
-        # --- password ---
-        cursor -= self.DIVIDER_SPACE_BELOW
         c.setFillColor(self.c_muted)
-        c.setFont(self.f[FONT_NAME_BOLD], CFG.LABEL_FONT_SIZE)
-        cursor -= CFG.LABEL_FONT_SIZE
+        c.setFont(label_font, plan.label_size)
+        cursor -= plan.label_size
         c.drawString(tx, cursor, shape(CFG.LABEL_PASSWORD))
 
-        password = student.password or CFG.MISSING_VALUE_TEXT
-        mono_bold = self.f[FONT_NAME_MONO_BOLD]
-        p_text, p_size = fit_single_line(password, mono_bold, tw,
-                                         CFG.PASSWORD_FONT_SIZE, CFG.PASSWORD_MIN_FONT_SIZE)
-        cursor -= p_size * 1.16
+        text, size = fit_single_line(password, mono_bold, tw,
+                                     plan.password_size, CFG.PASSWORD_MIN_FONT_SIZE)
+        cursor -= plan.password_size * 1.16
         c.setFillColor(self.c_accent)
-        c.setFont(mono_bold, p_size)
-        c.drawString(tx, cursor, p_text)
+        c.setFont(mono_bold, size)
+        c.drawString(tx, cursor, text)
 
 
 # ==========================================================================
@@ -916,29 +1103,14 @@ def _pages_for(groups, geo: Geometry) -> int:
     return max(1, -(-total // geo.per_page))
 
 
-def needed_email_lines(groups, fonts: Dict[str, str], geo: Geometry) -> int:
-    """
-    Decide once for the whole document whether e-mails need one or two lines,
-    so that every card in every class has exactly the same panel height.
-    """
-    inner_w = geo.card_w - 2 * CFG.CARD_PADDING_MM * mm - 2 * (1.8 * mm)
-    font = fonts[FONT_NAME_MONO]
-    limit = CFG.EMAIL_MIN_FONT_SIZE
-    for _, students in groups:
-        for s in students:
-            if s.email and text_width(s.email, font, limit) > inner_w:
-                return 2
-    return 1
-
-
 def build_pdf(groups, out_path: str, fonts: Dict[str, str], geo: Geometry,
-              email_lines: int = 1) -> int:
+              plan: CardPlan) -> int:
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     c = rl_canvas.Canvas(out_path, pagesize=(geo.page_w, geo.page_h))
     c.setTitle(CFG.PDF_TITLE)
     c.setAuthor(CFG.PDF_AUTHOR)
     c.setSubject("Student login cards")
-    renderer = Renderer(fonts, geo, email_lines=email_lines)
+    renderer = Renderer(fonts, geo, plan)
 
     total_pages = _pages_for(groups, geo)
     page_no = 0
@@ -1047,10 +1219,13 @@ def main(argv=None) -> int:
     fonts = register_fonts()
     groups = group_by_class(students)
 
-    email_lines = needed_email_lines(groups, fonts, geo)
+    plan = plan_cards(groups, fonts, geo)
+    print(f"  Card shape         : {'wide (badge)' if plan.wide else 'tall'}"
+          f"   name {plan.name_size:.1f}pt / email {plan.email_size:.1f}pt"
+          f" / password {plan.password_size:.1f}pt")
 
     main_pdf = os.path.join(out_dir, CFG.MAIN_PDF_NAME)
-    pages = build_pdf(groups, main_pdf, fonts, geo, email_lines)
+    pages = build_pdf(groups, main_pdf, fonts, geo, plan)
     print(f"  [OK] {os.path.relpath(main_pdf, BASE_DIR)}  ({pages} pages)")
 
     if CFG.MAKE_PER_CLASS_PDFS and not args.no_per_class:
@@ -1059,7 +1234,7 @@ def main(argv=None) -> int:
         for class_name, items in groups:
             safe = re.sub(r"[^\w\-]+", "_", class_name) or "class"
             path = os.path.join(class_dir, f"{safe}_Student_Tags.pdf")
-            n = build_pdf([(class_name, items)], path, fonts, geo, email_lines)
+            n = build_pdf([(class_name, items)], path, fonts, geo, plan)
             print(f"  [OK] {os.path.relpath(path, BASE_DIR)}"
                   f"  ({len(items)} students, {n} pages)")
 
