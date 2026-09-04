@@ -5,3 +5,6 @@ reportlab>=4.0
 Pillow>=9.0
 arabic-reshaper>=3.0
 python-bidi>=0.4.2
+
+# only needed for export_card_images.py (one PNG per student)
+pymupdf>=1.23

@@ -115,6 +115,43 @@ output/classes/5-10_Student_Tags.pdf
 
 Print at **100 % scale** — never “fit to page” — so the cards keep their size.
 
+## 8. One image per student (optional)
+
+Besides the printable sheets you can export **one PNG per student**, named
+after her, zipped per class — handy for sending a card to each student
+individually.
+
+```bash
+python export_card_images.py
+```
+
+```
+output/images/5-1_Student_Cards.zip
+    Afra Eida.png
+    Aldmani Alblooshi.png
+    ...
+output/images/5-2_Student_Cards.zip
+...
+```
+
+Each image is the card on its own, at 300 dpi with a small white border.
+Options:
+
+```bash
+python export_card_images.py --dpi 200        # smaller files
+python export_card_images.py --keep-folders   # also leave the loose PNGs
+```
+
+`IMAGE_DPI`, `IMAGE_MARGIN_MM` and `IMAGE_FORMAT` (`png` or `jpg`) are at the
+top of `export_card_images.py`. Two students with the same name get
+`Name.png` and `Name (2).png`.
+
+This script needs one extra library, `pymupdf`, which is already listed in
+`requirements.txt`.
+
+**These images contain passwords — share them as carefully as the printed
+cards.**
+
 ---
 
 ## Changing the design
