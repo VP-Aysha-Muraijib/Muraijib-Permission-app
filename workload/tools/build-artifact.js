@@ -40,7 +40,7 @@ function subjectSection(s, i){
   const rows = s.rows.map(r=>{
     const gr = en ? r.grades.map(g=>'Grade '+g).join(' + ') : r.grades.map(g=>'الصف '+GA[g]).join(' + ');
     return `<tr>
-      <th scope="row" class="c-t">${esc(r.teacher)}${
+      <th scope="row" class="c-t${r.vacancy?' vac':''}">${esc(r.teacher)}${
         r.isNew?`<span class="tag tag-new">${t.newTag}</span>`:''}${
         r.role?`<span class="sub">${esc(r.role)}</span>`:''}${
         (s.coordinator && r.teacher===s.coordinator)?`<span class="sub coord">${esc(s.coordinatorTitle)}</span>`:''}</th>
@@ -93,7 +93,7 @@ const html = `<title>أنصبة مريجب ح٢</title>
   --ink:#241C15; --ink-2:#5A4B3D; --ink-3:#8B7A68;
   --ground:#FBF9F5; --surface:#FFFFFF; --sand:#F1EADE; --line:#DFD4C3; --hair:#EBE3D6;
   --bronze:#8A6A3C; --bronze-deep:#5C4526; --gold:#C9A227;
-  --ok:#2E6B4F; --ok-bg:#E7F1EA; --warn:#8A5E17;
+  --ok:#2E6B4F; --ok-bg:#E7F1EA; --warn:#8A5E17; --alert:#93331B;
   --shadow:0 1px 2px rgba(36,28,21,.05),0 8px 24px -12px rgba(36,28,21,.18);
   --serif:'Amiri',Georgia,'Times New Roman',serif;
   --naskh:'Noto Naskh Arabic','Amiri',Georgia,serif;
@@ -103,14 +103,14 @@ const html = `<title>أنصبة مريجب ح٢</title>
   --ink:#F0E7DA; --ink-2:#BCAB96; --ink-3:#8D7C68;
   --ground:#16120E; --surface:#1F1913; --sand:#2A2219; --line:#3D3225; --hair:#2E2619;
   --bronze:#C9A46A; --bronze-deep:#E0C99E; --gold:#D8B44A;
-  --ok:#7FC7A0; --ok-bg:#1D3229; --warn:#D8A94E;
+  --ok:#7FC7A0; --ok-bg:#1D3229; --warn:#D8A94E; --alert:#E0865F;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
 }}
 :root[data-theme="dark"]{
   --ink:#F0E7DA; --ink-2:#BCAB96; --ink-3:#8D7C68;
   --ground:#16120E; --surface:#1F1913; --sand:#2A2219; --line:#3D3225; --hair:#2E2619;
   --bronze:#C9A46A; --bronze-deep:#E0C99E; --gold:#D8B44A;
-  --ok:#7FC7A0; --ok-bg:#1D3229; --warn:#D8A94E;
+  --ok:#7FC7A0; --ok-bg:#1D3229; --warn:#D8A94E; --alert:#E0865F;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
 }
 *{box-sizing:border-box}
@@ -154,6 +154,9 @@ h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4.6vw,44px);lin
 .kpi dd{margin:6px 0 0;font-family:var(--sans);font-size:30px;font-weight:600;line-height:1;color:var(--bronze-deep)}
 .kpi dd small{font-size:14px;font-weight:400;color:var(--ink-3);margin-inline-start:4px}
 .kpi.full dd{color:var(--ok)}
+.kpi.gap dd{color:var(--alert)}
+.c-t.vac{color:var(--alert);font-size:22px;letter-spacing:2px}
+.c-t.vac .sub{letter-spacing:0}
 
 /* ─ layout ─ */
 .wrap{max-width:1180px;margin:0 auto;padding:34px 28px 60px;
@@ -272,7 +275,10 @@ footer{max-width:1180px;margin:0 auto;padding:0 28px 50px;text-align:center;
   <div class="kpi"><dt>الشُّعب</dt><dd>${D.totals.classes}</dd></div>
   <div class="kpi"><dt>المعلمات</dt><dd>${D.totals.teachers}</dd></div>
   <div class="kpi"><dt>الحصص أسبوعيّاً</dt><dd>${D.totals.required}</dd></div>
-  <div class="kpi full"><dt>تغطية الشُّعب</dt><dd>100<small>%</small></dd></div>
+  <div class="kpi${D.totals.assigned===D.totals.required?' full':' gap'}"><dt>تغطية الحصص</dt><dd>${
+    Math.round(D.totals.assigned/D.totals.required*100)}<small>%</small></dd></div>${
+    D.totals.assigned!==D.totals.required?`
+  <div class="kpi gap"><dt>حصص شاغرة</dt><dd>${D.totals.required-D.totals.assigned}</dd></div>`:''}
 </dl></div>
 
 <div class="wrap">
