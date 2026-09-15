@@ -34,7 +34,7 @@ def build_register(wb, cname, idx):
     dvc = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح",
                          prompt="كل يوم دوام حتى هذا التاريخ يُعتبر محصورًا: من لم يُسجَّل له غياب يُعتبر حاضرًا. فارغ = حتى اليوم", promptTitle="الحصر مكتمل حتى")
     ws.add_data_validation(dvc); dvc.add(ws["K2"])
-    put(ws, "A3", "الحصر: كل الأطفال حاضرون افتراضيًا. في عمود اليوم اختاري من القائمة المنسدلة «غياب بعذر» أو «غياب بدون عذر» لمن غاب فقط (و«متأخر» عند الحاجة). الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, "A3", "خانة الحضور بجانب اسم الطفل هي عمود اليوم: الجميع حاضر افتراضيًا، اختاري من القائمة «غياب بعذر» أو «غياب بدون عذر» أو «متأخر» لمن غاب فقط. لأي يوم سابق: اختاري التاريخ ثم اضغطي الرابط. الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
     put(ws, "H3", "الانتقال إلى تاريخ:", f=font(10, True, NAVY), al=ALIGN_R)
     input_cell(ws, "I3", None, nf="dd/mm/yyyy")
     put(ws, "J3", f'=IF($I$3="","⬅ اختاري تاريخًا",IFERROR(HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+MATCH($I$3,{DATES_R},0)),"⬅ فتح عمود "&TEXT($I$3,"dd/mm/yyyy")),"⚠ ليس يوم دوام"))', f=font(10, True, "1D4ED8"), al=ALIGN_R)
@@ -42,6 +42,8 @@ def build_register(wb, cname, idx):
     ws.add_data_validation(dvd); dvd.add(ws["I3"])
     put(ws, "K3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(TODAY(),{DATES_R},1),1)),"⬅ عمود اليوم")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
     put(ws, "L3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH($L$2,{DATES_R},1),1)),"⬅ آخر يوم محصور")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    put(ws, (1, DATE_COL0), "الحضور – اختاري حالة الطفل من القائمة في عمود اليوم (حاضر افتراضيًا)", f=font(12, True, TEAL), al=ALIGN_R)
+    put(ws, "M3", f'=HYPERLINK("#{q(S)}!D{REG_FIRST}","⬅ الإحصائيات وبيانات التواصل")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
     lab_col = L(DATE_COL0 - 1)
     for r, t in [(4, "الشهر"), (5, "التاريخ"), (6, "يوم دراسي"), (7, "محصور ✓")]:
         put(ws, f"{lab_col}{r}", t, f=font(9, True, NAVY), al=ALIGN_R)
@@ -144,6 +146,8 @@ def build_register(wb, cname, idx):
     ws.conditional_formatting.add(f"I{REG_FIRST}:I{REG_LAST}", FormulaRule(formula=[f'ISNUMBER(SEARCH("مطلوب",$I{REG_FIRST}))'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     ws.conditional_formatting.add(f"B{REG_FIRST}:B{REG_LAST}", FormulaRule(formula=[f'AND($B{REG_FIRST}<>"",COUNTIF(Stu_ID,$B{REG_FIRST})>1)'], fill=fill(RED_F), font=Font(name=FONT, bold=True, color=RED_T)))
     ws.freeze_panes = f"D{REG_FIRST}"
+    ws.sheet_view.pane.topLeftCell = f"{DC0}{REG_FIRST}"      # open on the attendance grid: name, then today's column
+    ws.sheet_view.selection[-1].activeCell = f"{DC0}{REG_FIRST}"; ws.sheet_view.selection[-1].sqref = f"{DC0}{REG_FIRST}"
     if idx >= ACTIVE_CLASSES:
         ws.sheet_state = "hidden"
     protect(ws)
