@@ -21,8 +21,8 @@ def period_counts(S, rr, start, end):
     """Return (attended_formula_part, total_formula_part, absent_part) for register row rr within [start,end]."""
     RNG = f"{cq(S)}${DC0}{rr}:${DC1}{rr}"
     D = f"{cq(S)}${DC0}$5:${DC1}$5"; SCH = f"{cq(S)}${DC0}$6:${DC1}$6"; CONF = f"{cq(S)}${DC0}$7:${DC1}$7"
-    crit = f'{SCH},1,{D},">="&MAX({cq(S)}$U{rr},{start}),{D},"<="&{end}'
-    P = f'COUNTIFS({RNG},"حاضر",{crit})+COUNTIFS({CONF},"✓",{crit})-COUNTIFS({RNG},"<>",{CONF},"✓",{crit})'
+    crit = f'{CONF},"✓",{SCH},1,{D},">="&MAX({cq(S)}$U{rr},{start}),{D},"<="&{end}'
+    P = f'COUNTIFS({RNG},"حاضر",{crit})+COUNTIFS({crit})-COUNTIFS({RNG},"<>",{crit})'
     A = f'COUNTIFS({RNG},"غياب بدون عذر",{crit})'; E = f'COUNTIFS({RNG},"غياب بعذر",{crit})'; Lt = f'COUNTIFS({RNG},"متأخر",{crit})'
     att = f'{P}+IF(LateAsPresent="نعم",{Lt},0)'
     tot = f'{P}+{A}+{E}+{Lt}'
@@ -109,11 +109,11 @@ def build_db(wb):
                 ws.cell(r, 2, f"={P}$B$2")
                 ws.cell(r, 3, f'=IF({P}$B{rr}="","",{P}$B{rr})')
                 ws.cell(r, 4, f'=IF(C{r}="","",{P}$C{rr})')
-                ws.cell(r, 5, f'=IF(OR(C{r}="",{P}{col}$6<>1,{P}$U{rr}>A{r}),"",IF({P}{col}{rr}<>"",{P}{col}{rr},IF({P}{col}$7="✓","حاضر","")))')
+                ws.cell(r, 5, f'=IF(OR(C{r}="",{P}{col}$7<>"✓",{P}$U{rr}>A{r}),"",IF({P}{col}{rr}<>"",{P}{col}{rr},"حاضر"))')
                 ws.cell(r, 6, f'=IF(E{r}="","",IF(E{r}="حاضر","P",IF(E{r}="غياب بدون عذر","A",IF(E{r}="غياب بعذر","E",IF(E{r}="متأخر","L","")))))')
                 ws.cell(r, 7, f'=IF(F{r}="A",1,0)')
                 ws.cell(r, 9, f'=IF(OR(F{r}="A",F{r}="E"),1,0)')
-                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غياب بدون عذر",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$U{rr}),"")')
+                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غياب بدون عذر",{P}${DC0}$7:{col}$7,"✓",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$U{rr}),"")')
                 ws.cell(r, 10, f'=I{r}' if r == DB_FIRST else f'=J{r-1}+I{r}')
                 r += 1
     assert r - 1 == DB_LAST

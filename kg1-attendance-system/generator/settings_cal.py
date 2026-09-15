@@ -94,7 +94,7 @@ def build_settings(wb):
         put(ws, f"C{r}", pres, f=font(10), al=ALIGN_C, b=box()); put(ws, f"D{r}", sym, f=font(10), al=ALIGN_C, b=box()); r += 1
     names["StatusLabels"] = f"{cq(ws.title)}$A${s0}:$A${s0+3}"; names["StatusCodes"] = f"{cq(ws.title)}$B${s0}:$B${s0+3}"
     names["StatusSymbols"] = f"{cq(ws.title)}$D${s0}:$D${s0+3}"
-    put(ws, f"A{r}", "الخلية الفارغة في أي يوم ضمن «الحصر مكتمل حتى» تُعتبر حضورًا؛ تُختار الحالات الأخرى من القائمة.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, f"A{r}", "كل خانات الحضور تبدأ بـ «حاضر»؛ تُحتسب فقط الأيام حتى تاريخ «الحصر مكتمل حتى» في ورقة الصف.", f=font(9, False, MUTED, True), al=ALIGN_R)
     r += 2
     section(ws, f"A{r}", "الصفوف", "Classes", 4); r += 1
     header_row(ws, r, 1, ["الصف", "مفعّل؟", "اسم الورقة", "ملاحظة"], height=24); r += 1

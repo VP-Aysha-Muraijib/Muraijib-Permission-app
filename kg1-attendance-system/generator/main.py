@@ -66,7 +66,7 @@ def build(path, with_demo=True, real=None):
                 ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"K{r}"] = s["guardian"]; ws[f"J{r}"] = s["phone"]; ws[f"Z{r}"] = s["phone"]
                 if s.get("phone2"): ws[f"AA{r}"] = s["phone2"]
                 for d, v in enumerate(s["grid"]):
-                    if v: ws.cell(r, DATE_COL0 + d, v)
+                    ws.cell(r, DATE_COL0 + d, v or "حاضر")
             ws["K2"] = DATES[testdata.REC_DAYS - 1 - (1 if ci == 4 else 0)]
             ws[f"L{REG_FIRST+3}"] = "متابعة مستمرة مع الأسرة"
         logs = testdata.make_contacts(students)
@@ -84,6 +84,8 @@ def build(path, with_demo=True, real=None):
                 ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"K{r}"] = s["guardian"]; ws[f"J{r}"] = s["phone"]
                 for j, ph in enumerate(([s["phone"]] + s["extra"])[:4]):
                     ws[f"{['Z','AA','AB','AC'][j]}{r}"] = ph
+                for d in range(NDAYS):
+                    ws.cell(r, DATE_COL0 + d, "حاضر")
     # normalise data validations to Excel's canonical form (no leading "=", messages enabled)
     names = {n: dn.attr_text for n, dn in wb.defined_names.items()}
     for ws in wb.worksheets:
@@ -99,6 +101,12 @@ def build(path, with_demo=True, real=None):
                 dv.showErrorMessage = True
             dv.showInputMessage = True
             dv.showDropDown = False
+    if not with_demo and not real:      # blank template: every attendance cell starts as "حاضر"
+        for cn in CLASSES:
+            ws = wb[cn]
+            for r in range(REG_FIRST, REG_LAST + 1):
+                for d in range(NDAYS):
+                    ws.cell(r, DATE_COL0 + d, "حاضر")
     wb.calculation.fullCalcOnLoad = True
     wb.save(path)
     print("saved", path, "in", round(time.time() - t0, 1), "s")

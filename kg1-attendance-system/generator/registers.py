@@ -34,7 +34,7 @@ def build_register(wb, cname, idx):
     dvc = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح",
                          prompt="كل يوم دوام حتى هذا التاريخ يُعتبر محصورًا: من لم يُسجَّل له غياب يُعتبر حاضرًا. فارغ = حتى اليوم", promptTitle="الحصر مكتمل حتى")
     ws.add_data_validation(dvc); dvc.add(ws["K2"])
-    put(ws, "A3", "خانة الحضور بجانب اسم الطفل هي عمود اليوم: الجميع حاضر افتراضيًا، اختاري من القائمة «غياب بعذر» أو «غياب بدون عذر» أو «متأخر» لمن غاب فقط. لأي يوم سابق: اختاري التاريخ ثم اضغطي الرابط. الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, "A3", "خانة الحضور بجانب اسم الطفل هي عمود اليوم: كل الخانات «حاضر»، غيّري من القائمة إلى «غياب بعذر» أو «غياب بدون عذر» أو «متأخر» لمن غاب فقط. لأي يوم سابق: اختاري التاريخ ثم اضغطي الرابط. الأعمدة الرمادية عطلات، والأيام بعد «الحصر مكتمل حتى» لا تُحتسب.", f=font(9, False, MUTED, True), al=ALIGN_R)
     put(ws, "H3", "الانتقال إلى تاريخ:", f=font(10, True, NAVY), al=ALIGN_R)
     input_cell(ws, "I3", None, nf="dd/mm/yyyy")
     put(ws, "J3", f'=IF($I$3="","⬅ اختاري تاريخًا",IFERROR(HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+MATCH($I$3,{DATES_R},0)),"⬅ فتح عمود "&TEXT($I$3,"dd/mm/yyyy")),"⚠ ليس يوم دوام"))', f=font(10, True, "1D4ED8"), al=ALIGN_R)
@@ -62,14 +62,14 @@ def build_register(wb, cname, idx):
     ws.row_dimensions[4].height = 14; ws.row_dimensions[5].height = 18; ws.row_dimensions[6].height = 14; ws.row_dimensions[7].height = 16
     for r in range(REG_FIRST, REG_LAST + 1):
         G0 = lambda expr: f'=IF($B{r}="","",{expr})'
-        crit = f'{SCH},1,{DATES_R},">="&$U{r}'
+        crit = f'{CONF},"✓",{SCH},1,{DATES_R},">="&$U{r}'
         f = {}
         f["A"] = f'=IF($B{r}="","",ROW()-{REG_FIRST-1})'
         f["U"] = f'=IF($B{r}="","",YearStart)'
         f["D"] = G0(f'COUNTIFS({RNG(r)},"غياب بدون عذر",{crit})')
         f["E"] = G0(f'COUNTIFS({RNG(r)},"غياب بعذر",{crit})')
         f["F"] = G0(f'COUNTIFS({RNG(r)},"متأخر",{crit})')
-        f["N"] = G0(f'COUNTIFS({RNG(r)},"حاضر",{crit})+COUNTIFS({CONF},"✓",{crit})-COUNTIFS({RNG(r)},"<>",{CONF},"✓",{crit})')
+        f["N"] = G0(f'COUNTIFS({RNG(r)},"حاضر",{crit})+COUNTIFS({crit})-COUNTIFS({RNG(r)},"<>",{crit})')
         f["M"] = G0(f'$N{r}+$D{r}+$E{r}+$F{r}')
         f["G"] = f'=IF($M{r}="","",IF($M{r}=0,"",($N{r}+IF(LateAsPresent="نعم",$F{r},0))/$M{r}))'
         f["O"] = f'=IF($M{r}="","",IF($M{r}=0,"",($D{r}+$E{r})/$M{r}))'
@@ -83,7 +83,7 @@ def build_register(wb, cname, idx):
         for col, fm in f.items():
             put(ws, f"{col}{r}", fm, f=font(10), al=ALIGN_C, b=box())
         for col, thr in zip(["V", "W", "X", "Y"], ["Thr_FollowUp", "Thr_Repeated", "Thr_High", "Thr_Critical"]):
-            ws[f"{col}{r}"] = ArrayFormula(f"{col}{r}", f'=IF($D{r}="","",IFERROR(SMALL(IF(({RNG(r)}="غياب بدون عذر")*({SCH}=1)*({DATES_R}>=$U{r}),{DATES_R}),{thr}),""))')
+            ws[f"{col}{r}"] = ArrayFormula(f"{col}{r}", f'=IF($D{r}="","",IFERROR(SMALL(IF(({RNG(r)}="غياب بدون عذر")*({CONF}="✓")*({SCH}=1)*({DATES_R}>=$U{r}),{DATES_R}),{thr}),""))')
             style(ws[f"{col}{r}"], f=font(10), al=ALIGN_C, b=box(), nf="dd/mm/yyyy")
         for col in ["P", "R", "U"]:
             ws[f"{col}{r}"].number_format = "dd/mm/yyyy"
@@ -111,10 +111,10 @@ def build_register(wb, cname, idx):
             c = DATE_COL0 + i; col = L(c)
             base = f'$U${REG_FIRST}:$U${REG_LAST},"<="&{col}$5'
             stu = f'{col}${REG_FIRST}:{col}${REG_LAST}'
-            if key == "abs": fm = f'=IF({col}$6=1,COUNTIFS({stu},"غياب بدون عذر",{base}),0)'
-            elif key == "exc": fm = f'=IF({col}$6=1,COUNTIFS({stu},"غياب بعذر",{base}),0)'
-            elif key == "late": fm = f'=IF({col}$6=1,COUNTIFS({stu},"متأخر",{base}),0)'
-            elif key == "pres": fm = f'=IF({col}$6=1,COUNTIFS({stu},"حاضر",{base})+IF({col}$7="✓",COUNTIFS($B${REG_FIRST}:$B${REG_LAST},"<>",{base})-COUNTIFS({stu},"<>",{base}),0),0)'
+            if key == "abs": fm = f'=IF({col}$7="✓",COUNTIFS({stu},"غياب بدون عذر",{base}),0)'
+            elif key == "exc": fm = f'=IF({col}$7="✓",COUNTIFS({stu},"غياب بعذر",{base}),0)'
+            elif key == "late": fm = f'=IF({col}$7="✓",COUNTIFS({stu},"متأخر",{base}),0)'
+            elif key == "pres": fm = f'=IF({col}$7="✓",COUNTIFS({stu},"حاضر",{base})+COUNTIFS($B${REG_FIRST}:$B${REG_LAST},"<>",{base})-COUNTIFS({stu},"<>",{base}),0)'
             elif key == "reg": fm = f'={col}{SUM_ROW["abs"]}+{col}{SUM_ROW["exc"]}+{col}{SUM_ROW["late"]}+{col}{SUM_ROW["pres"]}'
             else: fm = f'=IF({col}{SUM_ROW["reg"]}=0,"",({col}{SUM_ROW["pres"]}+IF(LateAsPresent="نعم",{col}{SUM_ROW["late"]},0))/{col}{SUM_ROW["reg"]})'
             put(ws, (r, c), fm, f=font(9, True if key in ("reg", "rate") else False, NAVY if key in ("reg", "rate") else TXT), al=ALIGN_C, bg=LIGHT, nf="0%" if key == "rate" else "0")
@@ -130,7 +130,7 @@ def build_register(wb, cname, idx):
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"غياب بعذر"'], fill=fill(EXC_F), font=Font(name=FONT, color=EXC_T)))
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"متأخر"'], fill=fill(LATE_F), font=Font(name=FONT, color=LATE_T)))
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"حاضر"'], font=Font(name=FONT, color=GREEN_T)))
-    ws.conditional_formatting.add(grid, FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1,{DC0}{REG_FIRST}="",$B{REG_FIRST}<>"")'], fill=fill("FAFAFA"), font=Font(name=FONT, color="C0C4CC")))
+    ws.conditional_formatting.add(grid, FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1)'], font=Font(name=FONT, color="C0C4CC")))
     ws.conditional_formatting.add(f"{DC0}4:{DC1}8", FormulaRule(formula=[f"{DC0}$5=TODAY()"], fill=fill(BLUE_F)))
     ws.conditional_formatting.add(f"{DC0}4:{DC1}8", FormulaRule(formula=[f"{DC0}$5={CUTOFF_CELL}"], fill=fill(TEAL_L)))
     ws.conditional_formatting.add(f"{DC0}7:{DC1}7", FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1,COUNTA({DC0}${REG_FIRST}:{DC0}${REG_LAST})>0)'], fill=fill(YEL_F), font=Font(name=FONT, color=YEL_T)))

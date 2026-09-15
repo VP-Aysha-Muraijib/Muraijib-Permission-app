@@ -29,9 +29,8 @@ for ci, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
         eff = [None] * NDAYS
         for d in range(NDAYS):
             if not active or DATES[d] < join: continue
-            v = s["grid"][d]
-            if v: eff[d] = v
-            elif testdata.confirmed(ci, d): eff[d] = "حاضر"
+            if not testdata.confirmed(ci, d): continue
+            eff[d] = s["grid"][d] or "حاضر"
         P = eff.count("حاضر"); A = eff.count("غياب بدون عذر"); E = eff.count("غياب بعذر"); Lt = eff.count("متأخر")
         tot = P + A + E + Lt
         rate = (P + Lt) / tot if tot else None
@@ -98,8 +97,8 @@ def eff_status(m, d):
     s = next(x for x in students[m["cls"]] if x["id"] == [k for k, v in model.items() if v is m][0])
     join = YEAR_START
     if DATES[d] < join: return None
-    v = s["grid"][d]
-    return v if v else ("حاضر" if testdata.confirmed(m["ci"], d) else None)
+    if not testdata.confirmed(m["ci"], d): return None
+    return s["grid"][d] or "حاضر"
 att = tot = 0
 for m in actives:
     for d in nov:
