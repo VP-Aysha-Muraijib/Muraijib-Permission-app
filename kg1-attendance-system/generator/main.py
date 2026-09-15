@@ -63,13 +63,12 @@ def build(path, with_demo=True, real=None):
             ws = wb[cn]
             for i, s in enumerate(students[cn]):
                 r = REG_FIRST + i
-                ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"I{r}"] = s["status"]; ws[f"K{r}"] = s["guardian"]; ws[f"L{r}"] = s["phone"]
-                if s["join"]: ws[f"J{r}"] = s["join"]
+                ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"K{r}"] = s["guardian"]; ws[f"J{r}"] = s["phone"]; ws[f"Z{r}"] = s["phone"]
+                if s.get("phone2"): ws[f"AA{r}"] = s["phone2"]
                 for d, v in enumerate(s["grid"]):
                     if v: ws.cell(r, DATE_COL0 + d, v)
-            for d in range(NDAYS):
-                if testdata.confirmed(ci, d): ws.cell(7, DATE_COL0 + d, "✓")
-            ws[f"M{REG_FIRST+3}"] = "متابعة مستمرة مع الأسرة"
+            ws["K2"] = DATES[testdata.REC_DAYS - 1 - (1 if ci == 4 else 0)]
+            ws[f"L{REG_FIRST+3}"] = "متابعة مستمرة مع الأسرة"
         logs = testdata.make_contacts(students)
         wl = wb[SHEETS["clog"]]
         for k, (d, sid, m, note) in enumerate(logs):
@@ -82,8 +81,9 @@ def build(path, with_demo=True, real=None):
             for i, s in enumerate(real.get(cn, [])):
                 assert i < SLOTS, cn
                 r = REG_FIRST + i
-                ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"I{r}"] = "نشط"; ws[f"K{r}"] = s["guardian"]; ws[f"L{r}"] = s["phone"]
-                if s["extra"]: ws[f"M{r}"] = "هواتف أخرى: " + " / ".join(s["extra"])
+                ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"K{r}"] = s["guardian"]; ws[f"J{r}"] = s["phone"]
+                for j, ph in enumerate(([s["phone"]] + s["extra"])[:4]):
+                    ws[f"{['Z','AA','AB','AC'][j]}{r}"] = ph
     wb.calculation.fullCalcOnLoad = True
     wb.save(path)
     print("saved", path, "in", round(time.time() - t0, 1), "s")

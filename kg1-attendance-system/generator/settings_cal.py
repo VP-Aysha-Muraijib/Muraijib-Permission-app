@@ -22,6 +22,7 @@ def build_settings(wb):
     r = 5
     section(ws, f"A{r}", "بيانات عامة", "General", 4); r += 1
     general = [("اسم المدرسة", "روضة الخليف", "SchoolName", None),
+               ("النطاق التعليمي", "AD 2.3", "SchoolZone", None),
                ("القسم", "الروضة الأولى KG1", "SectionName", None),
                ("العام الدراسي", "2026–2027", "AcademicYear", None),
                ("الفصل الدراسي الحالي", "الفصل الأول", "CurrentTerm", "terms"),
@@ -148,8 +149,9 @@ def build_settings(wb):
     put(ws, "G11", "نعم", f=font(10), al=ALIGN_C); put(ws, "G12", "لا", f=font(10), al=ALIGN_C)
     names["YesNo"] = f"{cq(ws.title)}$G$11:$G$12"
     put(ws, "G14", "✓", f=font(10), al=ALIGN_C); names["ConfirmList"] = f"{cq(ws.title)}$G$14:$G$14"
-    put(ws, "G16", "يوم", f=font(10), al=ALIGN_C); names["RptPeriodList"] = f"{cq(ws.title)}$G$16:$G$19"
-    put(ws, "G17", "الشهر", f=font(10), al=ALIGN_C); put(ws, "G18", "الفصل الدراسي", f=font(10), al=ALIGN_C); put(ws, "G19", "العام الدراسي", f=font(10), al=ALIGN_C)
+    for i, t in enumerate(["يوم", "الأسبوع", "الشهر", "الفصل الدراسي", "العام الدراسي"]):
+        put(ws, f"G{16+i}", t, f=font(10), al=ALIGN_C)
+    names["RptPeriodList"] = f"{cq(ws.title)}$G$16:$G$20"
     for k, v in names.items():
         if not k.startswith("_"):
             define(wb, k, v)

@@ -32,7 +32,7 @@ def build_daily(wb):
         sums[key] = f"CHOOSE(Daily_ClsIdx,{terms})"
     conf = "CHOOSE(Daily_ClsIdx," + ",".join(f"INDEX({cq(cn)}${DC0}$7:${DC1}$7,Daily_DayIdx)" for cn in CLASSES) + ")"
     cards = [("اليوم", '=IF(Daily_DayIdx=0,"—",INDEX(Cal_Day,Daily_DayIdx))'), ("يوم دراسي؟", '=IF(Daily_DayIdx=0,"—",IF(INDEX(Cal_School,Daily_DayIdx)=1,"نعم","عطلة"))'),
-             ("تأكيد التسجيل", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),"—",IF({conf}="✓","✓ مؤكَّد","لم يُؤكَّد"))'),
+             ("ضمن الحصر؟", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),"—",IF({conf}="✓","✓ محصور","غير محصور"))'),
              ("المسجَّلون", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["reg"]})'), ("حاضر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["pres"]})'),
              ("غائب", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["abs"]})'), ("بعذر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["exc"]})'),
              ("متأخر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["late"]})'), ("نسبة الحضور", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),"—",IF({sums["rate"]}="","—",{sums["rate"]}))')]
@@ -41,8 +41,8 @@ def build_daily(wb):
         put(ws, (7, c), lab, f=font(9, True, MUTED), bg=LIGHT, al=ALIGN_C, b=box(WHITE))
         put(ws, (8, c), fm, f=font(14, True, NAVY), bg=LIGHT, al=ALIGN_C, b=box(WHITE), nf="0.0%" if j == 8 else None)
     ws.row_dimensions[8].height = 30
-    ws.conditional_formatting.add("D8", FormulaRule(formula=['$D$8="لم يُؤكَّد"'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
-    ws.conditional_formatting.add("D8", FormulaRule(formula=['$D$8="✓ مؤكَّد"'], fill=fill(GREEN_F), font=Font(name=FONT, bold=True, color=GREEN_T)))
+    ws.conditional_formatting.add("D8", FormulaRule(formula=['$D$8="غير محصور"'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
+    ws.conditional_formatting.add("D8", FormulaRule(formula=['$D$8="✓ محصور"'], fill=fill(GREEN_F), font=Font(name=FONT, bold=True, color=GREEN_T)))
     section(ws, "A10", "قائمة أطفال الصف وحالتهم في هذا اليوم", None, 8)
     list_header(ws, 11, 1, ["م", "الرقم الطلابي", "اسم الطفل", "الحالة اليوم", "الرمز", "إجمالي الغياب", "حالة المتابعة", "التواصل مع ولي الأمر"])
     for i in range(1, SLOTS + 1):
@@ -53,27 +53,27 @@ def build_daily(wb):
         put(ws, f"C{r}", f'=IF(B{r}="","",INDEX(Stu_Name,{mrow}))', f=font(10, True), al=ALIGN_R, b=bottom())
         code = f'INDEX(DB_Code,1+(Daily_ClsIdx-1)*{DB_BLOCK}+(Daily_DayIdx-1)*{SLOTS}+{i-1})'
         put(ws, f"E{r}", f'=IF(OR(B{r}="",Daily_DayIdx=0),"",{code})', f=font(10), al=ALIGN_C, b=bottom())
-        put(ws, f"D{r}", f'=IF(B{r}="","",IF(INDEX(Stu_StStatus,{mrow})<>"نشط","غير نشط",IF(Daily_DayIdx=0,"—",IF(E{r}="","لم يُسجَّل",INDEX(StatusLabels,MATCH(E{r},StatusCodes,0))))))', f=font(10, True), al=ALIGN_C, b=bottom())
+        put(ws, f"D{r}", f'=IF(B{r}="","",IF(INDEX(Stu_StStatus,{mrow})<>"نشط","غير نشط",IF(Daily_DayIdx=0,"—",IF(E{r}="","غير محصور",INDEX(StatusLabels,MATCH(E{r},StatusCodes,0))))))', f=font(10, True), al=ALIGN_C, b=bottom())
         put(ws, f"F{r}", f'=IF(B{r}="","",INDEX(Stu_Abs,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"G{r}", f'=IF(B{r}="","",INDEX(Stu_Status,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"H{r}", f'=IF(B{r}="","",INDEX(Stu_ContactReq,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
     rg = f"D12:D{11+SLOTS}"
-    for val, bg, fg in [("حاضر", GREEN_F, GREEN_T), ("غائب", ABS_F, ABS_T), ("بعذر", EXC_F, EXC_T), ("متأخر", LATE_F, LATE_T), ("لم يُسجَّل", YEL_F, YEL_T)]:
+    for val, bg, fg in [("حاضر", GREEN_F, GREEN_T), ("غائب", ABS_F, ABS_T), ("بعذر", EXC_F, EXC_T), ("متأخر", LATE_F, LATE_T), ("غير محصور", YEL_F, YEL_T)]:
         ws.conditional_formatting.add(rg, FormulaRule(formula=[f'$D12="{val}"'], fill=fill(bg), font=Font(name=FONT, bold=True, color=fg)))
     ws.conditional_formatting.add(f"G12:G{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("حرجة",$G12))'], fill=fill(RED_F), font=Font(name=FONT, bold=True, color=RED_T)))
     ws.conditional_formatting.add(f"G12:G{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("⚠",$G12))'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
     ws.conditional_formatting.add(f"H12:H{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("مطلوب",$H12))'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     r0 = 11 + SLOTS + 3
     section(ws, f"A{r0}", "جميع الصفوف في هذا اليوم", "All classes – selected day", 8)
-    list_header(ws, r0 + 1, 1, ["", "الصف", "تأكيد التسجيل", "المسجَّلون", "حاضر", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
+    list_header(ws, r0 + 1, 1, ["", "الصف", "ضمن الحصر؟", "المسجَّلون", "حاضر", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
     for k, cn in enumerate(CLASSES):
         r = r0 + 2 + k
         put(ws, f"B{r}", f'=IF(INDEX(ClassActive,{k+1})="نعم",{cq(cn)}$B$2,"")', f=font(10, True), al=ALIGN_C, b=bottom())
         G = lambda e: f'=IF(OR($B{r}="",Daily_DayIdx=0),"",{e})'
-        put(ws, f"C{r}", G(f'IF(INDEX({cq(cn)}${DC0}$7:${DC1}$7,Daily_DayIdx)="✓","✓","لم يُؤكَّد")'), f=font(10), al=ALIGN_C, b=bottom())
+        put(ws, f"C{r}", G(f'IF(INDEX({cq(cn)}${DC0}$7:${DC1}$7,Daily_DayIdx)="✓","✓","غير محصور")'), f=font(10), al=ALIGN_C, b=bottom())
         for j, key in enumerate(["reg", "pres", "abs", "exc", "late", "rate"]):
             put(ws, (r, 4 + j), G(f"INDEX({cq(cn)}${DC0}${SUM_ROW[key]}:${DC1}${SUM_ROW[key]},Daily_DayIdx)"), f=font(10), al=ALIGN_C, b=bottom(), nf="0.0%" if key == "rate" else None)
-    ws.conditional_formatting.add(f"C{r0+2}:C{r0+2+NCLS}", FormulaRule(formula=[f'$C{r0+2}="لم يُؤكَّد"'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
+    ws.conditional_formatting.add(f"C{r0+2}:C{r0+2+NCLS}", FormulaRule(formula=[f'$C{r0+2}="غير محصور"'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
     ws.freeze_panes = "A12"
     protect(ws)
     return ws

@@ -38,8 +38,8 @@ NCLS = len(CLASSES)
 # register layout
 REG_FIRST = 9                      # first student row
 REG_LAST = REG_FIRST + SLOTS - 1   # 38
-DATE_COL0 = 28                     # column AB
-DATE_COL1 = DATE_COL0 + NDAYS - 1  # 245 -> IK
+DATE_COL0 = 30                     # column AD (after the hidden helper block)
+DATE_COL1 = DATE_COL0 + NDAYS - 1  # 247 -> IM
 DC0 = L(DATE_COL0); DC1 = L(DATE_COL1)
 SUM_ROW = {"abs": 40, "exc": 41, "late": 42, "pres": 43, "reg": 44, "rate": 45}
 
@@ -166,6 +166,7 @@ def protect(ws, password=None):
 
 
 APPROVER = "نعيمة الكتبي"
+PRINCIPAL = "منى الغيثي"
 import os
 ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 
@@ -184,6 +185,25 @@ def add_logo(ws, name, c0, r0, c1, r1):
     ws.add_image(img)
 
 def approval_block(ws, label_ref, name_ref, date_ref, size=10):
-    put(ws, label_ref, "معتمد،", f=font(size, True, NAVY), al=ALIGN_R)
+    put(ws, label_ref, "يعتمد،", f=font(size, True, NAVY), al=ALIGN_R)
     put(ws, name_ref, APPROVER, f=font(size + 1, True, NAVY), al=ALIGN_R)
     put(ws, date_ref, '="التاريخ: "&TEXT(TODAY(),"dd/mm/yyyy")', f=font(size - 1, False, MUTED), al=ALIGN_R)
+
+def principal_block(ws, label_ref, name_ref, sig_ref, size=10):
+    AL = Alignment(horizontal="left", vertical="center")
+    put(ws, label_ref, "مديرة المدرسة:", f=font(size, True, NAVY), al=AL)
+    put(ws, name_ref, PRINCIPAL, f=font(size + 1, True, NAVY), al=AL)
+    put(ws, sig_ref, "التوقيع: ______________________", f=font(size - 1, False, MUTED), al=AL)
+
+def letterhead(ws, logo_cols, rows=(1, 3)):
+    """Ministry logo centered, school name at the far right (column A) with the zone beneath it."""
+    add_logo(ws, "moe_logo.png", logo_cols[0], rows[0], logo_cols[1], rows[1])
+    put(ws, "A1", "=SchoolName", f=font(16, True, NAVY), al=Alignment(horizontal="right", vertical="center"))
+    put(ws, "A2", '="نطاق "&SchoolZone', f=font(11, True, TEAL), al=Alignment(horizontal="right", vertical="center"))
+
+# register columns (visible block A..L, hidden helper block M..AC)
+RC = {"num": "A", "id": "B", "name": "C", "abs": "D", "exc": "E", "late": "F", "rate": "G", "status": "H", "contact": "I",
+      "phone": "J", "guardian": "K", "notes": "L", "days": "M", "pres": "N", "absrate": "O", "lastabs": "P", "contacted": "Q",
+      "lastcontact": "R", "method": "S", "level": "T", "start": "U", "d3": "V", "d5": "W", "d10": "X", "d15": "Y",
+      "ph1": "Z", "ph2": "AA", "ph3": "AB", "ph4": "AC"}
+CUTOFF_CELL = "$L$2"      # effective "counted up to" date inside each register sheet

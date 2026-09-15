@@ -24,8 +24,8 @@ def to_date(v):
 model = {}   # id -> dict
 for ci, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
     for i, s in enumerate(students[cn]):
-        active = s["status"] == "نشط"
-        join = s["join"] or YEAR_START
+        active = True
+        join = YEAR_START
         eff = [None] * NDAYS
         for d in range(NDAYS):
             if not active or DATES[d] < join: continue
@@ -49,18 +49,17 @@ for cn in CLASSES[:ACTIVE_CLASSES]:
     ws = wb[cn]
     for i, s in enumerate(students[cn]):
         r = REG_FIRST + i; m = model[s["id"]]
-        if not m["active"]:
-            check(f"{cn} r{r} inactive blanks", (ws[f"D{r}"].value, ws[f"E{r}"].value, ws[f"G{r}"].value), (None, None, "غير نشط")); continue
-        check(f"{cn} r{r} present", ws[f"D{r}"].value, m["P"]); check(f"{cn} r{r} absent", ws[f"E{r}"].value, m["A"])
-        check(f"{cn} r{r} excused", ws[f"O{r}"].value, m["E"]); check(f"{cn} r{r} late", ws[f"P{r}"].value, m["L"])
-        check(f"{cn} r{r} days", ws[f"N{r}"].value, m["tot"]); check(f"{cn} r{r} rate", ws[f"F{r}"].value, m["rate"])
-        check(f"{cn} r{r} level", ws[f"V{r}"].value, m["level"])
-        for col, n in zip(["X", "Y", "Z", "AA"], (3, 5, 10, 15)):
+        check(f"{cn} r{r} present", ws[f"N{r}"].value, m["P"]); check(f"{cn} r{r} absent", ws[f"D{r}"].value, m["A"])
+        check(f"{cn} r{r} excused", ws[f"E{r}"].value, m["E"]); check(f"{cn} r{r} late", ws[f"F{r}"].value, m["L"])
+        check(f"{cn} r{r} days", ws[f"M{r}"].value, m["tot"]); check(f"{cn} r{r} rate", ws[f"G{r}"].value, m["rate"])
+        check(f"{cn} r{r} level", ws[f"T{r}"].value, m["level"])
+        for col, n in zip(["V", "W", "X", "Y"], (3, 5, 10, 15)):
             check(f"{cn} r{r} reached{n}", to_date(ws[f"{col}{r}"].value), m["reached"][n])
-        check(f"{cn} r{r} lastcontact", to_date(ws[f"T{r}"].value), m["lastc"])
-        check(f"{cn} r{r} contacted", ws[f"S{r}"].value, m["contacted"])
+        check(f"{cn} r{r} lastcontact", to_date(ws[f"R{r}"].value), m["lastc"])
+        check(f"{cn} r{r} contacted", ws[f"Q{r}"].value, m["contacted"])
         exp_status = {0: "منتظم", 3: "⚠ يحتاج متابعة", 5: "⚠ غياب متكرر", 10: "⚠ غياب مرتفع", 15: "🔴 حالة حرجة"}[m["level"]]
-        check(f"{cn} r{r} status", ws[f"G{r}"].value, exp_status)
+        check(f"{cn} r{r} status", ws[f"H{r}"].value, exp_status)
+        check(f"{cn} r{r} phone", ws[f"J{r}"].value, s["phone"])
 # summary rows for today
 ws = wb[CLASSES[0]]; col = L(DATE_COL0 + testdata.TODAY_IDX)
 act = [model[s["id"]] for s in students[CLASSES[0]] if model[s["id"]]["active"]]
@@ -97,7 +96,7 @@ check("alerts levels", [wd[f"C{18+k}"].value for k in range(len(new_today))], [f
 nov = [d for d in range(NDAYS) if DATES[d].month == 11 and DATES[d].year == 2026]
 def eff_status(m, d):
     s = next(x for x in students[m["cls"]] if x["id"] == [k for k, v in model.items() if v is m][0])
-    join = s["join"] or YEAR_START
+    join = YEAR_START
     if DATES[d] < join: return None
     v = s["grid"][d]
     return v if v else ("حاضر" if testdata.confirmed(m["ci"], d) else None)
@@ -164,10 +163,13 @@ check("profile contacts", [wp[f"N{19+k}"].value for k in range(2)], [l[2] for l 
 # daily sheet (KG1-A, last recorded day)
 wdy = wb[SHEETS["daily"]]
 check("daily class reg", wdy["E8"].value, sum(1 for m in actives if m["cls"] == CLASSES[0] and m["status_today"]))
-check("daily E unconfirmed", wdy[f"C{11+SLOTS+3+2+4}"].value, "لم يُؤكَّد")
+check("daily class5 not counted", wdy[f"C{11+SLOTS+3+2+4}"].value, "غير محصور")
 # report (month, all)
 wr = wb[SHEETS["rpt"]]
-check("report kids", wr["A8"].value, len(actives)); check("report rate", wr["G8"].value, att / tot)
+check("report kids", wr["A8"].value, len(actives)); check("report rate (daily)", wr["G8"].value, att_t / reg_t)
+absent_today = sorted([m for m in actives if m["status_today"] in ("غائب", "بعذر")], key=lambda m: (m["ci"], m["slot"]))
+check("report absentees", [wr[f"A{74+k}"].value for k in range(len(absent_today) + 1)], [m["name"] for m in absent_today] + [None])
+check("report day row", (to_date(wr["A46"].value), wr["C46"].value, wr["A47"].value), (DATES[testdata.TODAY_IDX], reg_t, None))
 # trends monthly Nov row (Aug=row r1+2 ... ) : find by label
 wt = wb[SHEETS["trend"]]
 for r in range(1, 120):

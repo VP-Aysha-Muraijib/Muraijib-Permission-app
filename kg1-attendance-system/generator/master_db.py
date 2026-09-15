@@ -9,19 +9,19 @@ STU_HDR = ["م", "الرقم الطلابي", "اسم الطفل", "الصف", "
            "بلوغ حد المتابعة", "بلوغ الغياب المتكرر", "بلوغ الغياب المرتفع", "بلوغ الحالة الحرجة", "تاريخ آخر تواصل", "طريقة آخر تواصل", "تم التواصل؟",
            "التواصل مع ولي الأمر", "الإجراء المطلوب", "فئة الحضور", "ملاحظات", "رقم مكرر؟",
            "مشمول في فلتر اللوحة", "حالة اليوم المحدد", "حضور الفترة", "أيام الفترة", "مستوى بلغه اليوم", "تسلسل تنبيه اليوم",
-           "مفتاح المتابعة", "مفتاح الأعلى حضورًا", "مفتاح الدعم", "مفتاح الحرجة", "مشمول في التقرير", "مفتاح التقرير", "حضور فترة التقرير", "أيام فترة التقرير", "غياب فترة التقرير", "رقم الصف", "رقم الصف الداخلي"]
+           "مفتاح المتابعة", "مفتاح الأعلى حضورًا", "مفتاح الدعم", "مفتاح الحرجة", "مشمول في التقرير", "مفتاح التقرير", "حضور فترة التقرير", "أيام فترة التقرير", "غياب فترة التقرير", "رقم الصف", "رقم الصف الداخلي", "حالة يوم التقرير", "تسلسل غائبي يوم التقرير"]
 STU_NAMES = {"B": "Stu_ID", "C": "Stu_Name", "D": "Stu_Class", "E": "Stu_Section", "F": "Stu_StStatus", "G": "Stu_Join", "H": "Stu_Guardian", "I": "Stu_Phone",
              "J": "Stu_Days", "K": "Stu_Pres", "L": "Stu_Abs", "M": "Stu_Exc", "N": "Stu_Late", "O": "Stu_Rate", "P": "Stu_AbsRate", "Q": "Stu_Level", "R": "Stu_Status",
              "S": "Stu_LastAbs", "T": "Stu_D3", "U": "Stu_D5", "V": "Stu_D10", "W": "Stu_D15", "X": "Stu_LastContact", "Y": "Stu_Method", "Z": "Stu_Contacted",
              "AA": "Stu_ContactReq", "AB": "Stu_Action", "AC": "Stu_Cat", "AD": "Stu_Notes", "AE": "Stu_Dup", "AF": "Stu_InFilter", "AG": "Stu_Today",
              "AH": "Stu_PAtt", "AI": "Stu_PTot", "AJ": "Stu_LvlToday", "AK": "Stu_AlertSeq", "AL": "Stu_KeyFU", "AM": "Stu_KeyTop", "AN": "Stu_KeySup",
-             "AO": "Stu_KeyCrit", "AP": "Stu_RptIn", "AQ": "Stu_KeyRpt", "AR": "Stu_RAtt", "AS": "Stu_RTot", "AT": "Stu_RAbs", "AU": "Stu_C", "AV": "Stu_I"}
+             "AO": "Stu_KeyCrit", "AP": "Stu_RptIn", "AQ": "Stu_KeyRpt", "AR": "Stu_RAtt", "AS": "Stu_RTot", "AT": "Stu_RAbs", "AU": "Stu_C", "AV": "Stu_I", "AW": "Stu_RToday", "AX": "Stu_RAbsSeq"}
 
 def period_counts(S, rr, start, end):
     """Return (attended_formula_part, total_formula_part, absent_part) for register row rr within [start,end]."""
     RNG = f"{cq(S)}${DC0}{rr}:${DC1}{rr}"
     D = f"{cq(S)}${DC0}$5:${DC1}$5"; SCH = f"{cq(S)}${DC0}$6:${DC1}$6"; CONF = f"{cq(S)}${DC0}$7:${DC1}$7"
-    crit = f'{SCH},1,{D},">="&MAX({cq(S)}$W{rr},{start}),{D},"<="&{end}'
+    crit = f'{SCH},1,{D},">="&MAX({cq(S)}$U{rr},{start}),{D},"<="&{end}'
     P = f'COUNTIFS({RNG},"حاضر",{crit})+COUNTIFS({CONF},"✓",{crit})-COUNTIFS({RNG},"<>",{CONF},"✓",{crit})'
     A = f'COUNTIFS({RNG},"غائب",{crit})'; E = f'COUNTIFS({RNG},"بعذر",{crit})'; Lt = f'COUNTIFS({RNG},"متأخر",{crit})'
     att = f'{P}+IF(LateAsPresent="نعم",{Lt},0)'
@@ -33,9 +33,9 @@ def build_master(wb):
     ws = wb.create_sheet(SHEETS["stu"])
     setup_sheet(ws, tab="9CA3AF")
     title_block(ws, "قاعدة بيانات الأطفال الموحدة", "تُجمَّع تلقائيًا من أوراق الصفوف (tblStudents) — الإدخال يتم في ورقة كل صف، وهذه الورقة للعرض والفلترة والتحليل فقط", "Master student table (auto)")
-    widths = [4, 11, 22, 9, 7, 9, 11, 16, 13, 6, 6, 6, 6, 6, 8, 8, 7, 14, 11, 11, 11, 11, 11, 11, 12, 8, 16, 30, 12, 20, 8] + [9] * 17
+    widths = [4, 11, 22, 9, 7, 9, 11, 16, 13, 6, 6, 6, 6, 6, 8, 8, 7, 14, 11, 11, 11, 11, 11, 11, 12, 8, 16, 30, 12, 20, 8] + [9] * 19
     header_row(ws, 4, 1, STU_HDR, widths=widths, height=42)
-    for c in range(32, 49):
+    for c in range(32, 51):
         ws.cell(4, c).fill = fill(MUTED); ws.cell(4, c).font = font(8, True, WHITE)
     for ci, S in enumerate(CLASSES):
         for i in range(1, SLOTS + 1):
@@ -43,12 +43,12 @@ def build_master(wb):
             rr = REG_FIRST + i - 1
             M = lambda col: f'=IF({cq(S)}${col}{rr}="","",{cq(S)}${col}{rr})'
             f = {"A": f'=IF(B{r}="","",ROW()-{STU_FIRST-1})', "B": M("B"), "C": M("C"), "D": f'=IF(B{r}="","",{cq(S)}$B$2)',
-                 "E": f'=IF(B{r}="","",MID(D{r},FIND("-",D{r}&"-")+1,10))', "F": M("I"), "G": M("J"), "H": M("K"), "I": M("L"),
-                 "J": M("N"), "K": M("D"), "L": M("E"), "M": M("O"), "N": M("P"), "O": M("F"), "P": M("Q"), "Q": M("V"), "R": M("G"), "S": M("R"),
-                 "T": M("X"), "U": M("Y"), "V": M("Z"), "W": M("AA"), "X": M("T"), "Y": M("U"), "Z": M("S"), "AA": M("H"),
+                 "E": f'=IF(B{r}="","",MID(D{r},FIND("-",D{r}&"-")+1,10))', "F": f'=IF(B{r}="","","نشط")', "G": f'=IF(B{r}="","","")', "H": M("K"), "I": M("J"),
+                 "J": M("M"), "K": M("N"), "L": M("D"), "M": M("E"), "N": M("F"), "O": M("G"), "P": M("O"), "Q": M("T"), "R": M("H"), "S": M("P"),
+                 "T": M("V"), "U": M("W"), "V": M("X"), "W": M("Y"), "X": M("R"), "Y": M("S"), "Z": M("Q"), "AA": M("I"),
                  "AB": f'=IF(Q{r}="","",INDEX(LevelActions,MATCH(Q{r},LevelValues,0)))',
                  "AC": f'=IF(J{r}="","",IF(J{r}=0,"—",IF(AND(L{r}=0,M{r}=0),Cat_L1,IF(O{r}>=Cat_95,Cat_L2,IF(O{r}>=Cat_90,Cat_L3,Cat_L4)))))',
-                 "AD": M("M"), "AE": f'=IF(B{r}="","",IF(COUNTIF($B${STU_FIRST}:$B${STU_LAST},B{r})>1,"مكرر!",""))',
+                 "AD": M("L"), "AE": f'=IF(B{r}="","",IF(COUNTIF($B${STU_FIRST}:$B${STU_LAST},B{r})>1,"مكرر!",""))',
                  "AF": f'=IF(AND(B{r}<>"",F{r}="نشط",OR(Dash_Class="الكل",D{r}=Dash_Class)),1,0)',
                  "AG": f'=IF(OR(AF{r}=0,Dash_DayIdx=0),"",INDEX(DB_Code,{1 + ci * DB_BLOCK + i - 1}+(Dash_DayIdx-1)*{SLOTS}))',
                  "AJ": f'=IF(AF{r}=0,0,IF(W{r}=Dash_Date,Thr_Critical,IF(V{r}=Dash_Date,Thr_High,IF(U{r}=Dash_Date,Thr_Repeated,IF(T{r}=Dash_Date,Thr_FollowUp,0)))))',
@@ -59,7 +59,9 @@ def build_master(wb):
                  "AO": f'=IF(AND(AF{r}=1,Q{r}<>"",Q{r}>=Thr_Critical),L{r}*1000+(999-ROW()),"")',
                  "AP": f'=IF(AND(B{r}<>"",F{r}="نشط",OR(Rpt_Class="الكل",D{r}=Rpt_Class)),1,0)',
                  "AQ": f'=IF(AND(AP{r}=1,Q{r}<>"",Q{r}>0),L{r}*1000+(999-ROW()),"")',
-                 "AU": ci + 1, "AV": i}
+                 "AU": ci + 1, "AV": i,
+                 "AW": f'=IF(OR(AP{r}=0,Rpt_DayIdx=0),"",INDEX(DB_Code,{1 + ci * DB_BLOCK + i - 1}+(Rpt_DayIdx-1)*{SLOTS}))',
+                 "AX": f'=IF(AND(AP{r}=1,OR(AW{r}="A",AW{r}="E")),COUNTIFS($AP${STU_FIRST}:AP{r},1,$AW${STU_FIRST}:AW{r},"A")+COUNTIFS($AP${STU_FIRST}:AP{r},1,$AW${STU_FIRST}:AW{r},"E"),"")'}
             att, tot, ab = period_counts(S, rr, "Dash_PStart", "Dash_PEnd")
             f["AH"] = f'=IF(AF{r}=0,"",{att})'; f["AI"] = f'=IF(AF{r}=0,"",{tot})'
             att2, tot2, ab2 = period_counts(S, rr, "Rpt_PStart", "Rpt_PEnd")
@@ -75,7 +77,7 @@ def build_master(wb):
                 ws[f"{col}{r}"].font = font(8, False, MUTED)
     for col, name in STU_NAMES.items():
         define(wb, name, f"{cq(ws.title)}${col}${STU_FIRST}:${col}${STU_LAST}")
-    tab = Table(displayName="tblStudents", ref=f"A4:AV{STU_LAST}")
+    tab = Table(displayName="tblStudents", ref=f"A4:AX{STU_LAST}")
     tab.tableStyleInfo = TableStyleInfo(name="TableStyleLight1", showRowStripes=True)
     ws.add_table(tab)
     ws.freeze_panes = "D5"
@@ -107,11 +109,11 @@ def build_db(wb):
                 ws.cell(r, 2, f"={P}$B$2")
                 ws.cell(r, 3, f'=IF({P}$B{rr}="","",{P}$B{rr})')
                 ws.cell(r, 4, f'=IF(C{r}="","",{P}$C{rr})')
-                ws.cell(r, 5, f'=IF(OR(C{r}="",{P}$I{rr}<>"نشط",{P}{col}$6<>1,{P}$W{rr}>A{r}),"",IF({P}{col}{rr}<>"",{P}{col}{rr},IF({P}{col}$7="✓","حاضر","")))')
+                ws.cell(r, 5, f'=IF(OR(C{r}="",{P}{col}$6<>1,{P}$U{rr}>A{r}),"",IF({P}{col}{rr}<>"",{P}{col}{rr},IF({P}{col}$7="✓","حاضر","")))')
                 ws.cell(r, 6, f'=IF(E{r}="","",IF(E{r}="حاضر","P",IF(E{r}="غائب","A",IF(E{r}="بعذر","E",IF(E{r}="متأخر","L","")))))')
                 ws.cell(r, 7, f'=IF(F{r}="A",1,0)')
                 ws.cell(r, 9, f'=IF(OR(F{r}="A",F{r}="E"),1,0)')
-                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غائب",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$W{rr}),"")')
+                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غائب",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$U{rr}),"")')
                 ws.cell(r, 10, f'=I{r}' if r == DB_FIRST else f'=J{r-1}+I{r}')
                 r += 1
     assert r - 1 == DB_LAST

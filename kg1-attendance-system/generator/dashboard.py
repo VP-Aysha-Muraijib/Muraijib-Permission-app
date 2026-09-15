@@ -53,7 +53,7 @@ def build_calc(wb):
         "Total_Kids": ("إجمالي الأطفال (حسب الفلتر)", '=SUM(Stu_InFilter)', None),
         "Rec_Days": ("عدد الأيام المسجَّلة", '=COUNTIF(Cal_Reg,">0")', None),
         "Cls_Active": ("عدد الصفوف المفعّلة", '=COUNTIF(ClassActive,"نعم")', None),
-        "Cls_Confirmed": ("صفوف أكّدت تسجيل اليوم", '=IF(Dash_DayIdx=0,0,' + '+'.join(f'(INDEX({cq(cn)}${DC0}$7:${DC1}$7,Dash_DayIdx)="✓")' for cn in CLASSES) + ')', None),
+        "Cls_Confirmed": ("صفوف محصورة لهذا اليوم", '=IF(Dash_DayIdx=0,0,' + '+'.join(f'(INDEX({cq(cn)}${DC0}$7:${DC1}$7,Dash_DayIdx)="✓")' for cn in CLASSES) + ')', None),
         "Best_Class": ("الصف الأعلى حضورًا", f'=IFERROR(INDEX({cq(DASH)}$F$31:$F$37,MATCH(MAX({cq(DASH)}$J$31:$J$37),{cq(DASH)}$J$31:$J$37,0)),"—")', None),
         "Low_Class": ("الصف الأقل حضورًا", f'=IFERROR(INDEX({cq(DASH)}$F$31:$F$37,MATCH(MIN({cq(DASH)}$J$31:$J$37),{cq(DASH)}$J$31:$J$37,0)),"—")', None),
     }
@@ -119,13 +119,11 @@ def build_dashboard(wb, calc_rows):
     for c in range(2, 17):
         ws.column_dimensions[L(c)].width = 11.5
     # title
-    put(ws, "A1", "نظام متابعة وتحليل الحضور والغياب", f=font(20, True, NAVY), al=ALIGN_R); ws.row_dimensions[1].height = 34
-    put(ws, "A2", '=SchoolName&" – قسم "&SectionName', f=font(13, False, TEAL), al=ALIGN_R)
-    put(ws, "A3", "Smart Attendance Analytics System  |  Dashboard", f=font(9, False, MUTED, True), al=ALIGN_R)
+    ws.row_dimensions[1].height = 30
+    letterhead(ws, (7, 10), rows=(1, 3))
+    put(ws, "A3", '="نظام متابعة وتحليل الحضور والغياب – قسم "&SectionName&"   |   Smart Attendance Analytics System"', f=font(14, True, NAVY), al=ALIGN_R)
     put(ws, "A4", '="العام الدراسي: "&AcademicYear&"   |   "&CurrentTerm&"   |   آخر يوم مسجَّل: "&TEXT(LastRecorded,"dd/mm/yyyy")&"   |   أيام مسجَّلة: "&Rec_Days', f=font(9, True, NAVY), al=ALIGN_R)
-    ws.row_dimensions[2].height = 18; ws.row_dimensions[3].height = 14; ws.row_dimensions[4].height = 22
-    add_logo(ws, "ministry_logo.png", 13, 1, 14, 4)
-    add_logo(ws, "charter_logo.png", 15, 1, 16, 4)
+    ws.row_dimensions[2].height = 20; ws.row_dimensions[3].height = 24; ws.row_dimensions[4].height = 20
     # selectors
     put(ws, "A5", "التاريخ (فارغ = آخر يوم مسجَّل)", f=font(9, True, NAVY), al=ALIGN_R)
     input_cell(ws, "B5", None, nf="dd/mm/yyyy")
@@ -215,7 +213,7 @@ def build_dashboard(wb, calc_rows):
     rows = [("إجمالي الأطفال", "=Total_Kids", None), ("الحاضرون (حاضر + متأخر)", "=Today_Att", None), ("الغائبون (بدون عذر)", "=Today_A", None),
             ("الغياب بعذر", "=Today_E", None), ("المتأخرون", "=Today_L", None), ("نسبة الحضور اليوم", '=IF(Today_Rate="","—",Today_Rate)', "0.0%"),
             ("الصف الأعلى حضورًا", "=Best_Class", None), ("الصف الأقل حضورًا", "=Low_Class", None),
-            ("الصفوف التي أكّدت تسجيل اليوم", '=Cls_Confirmed&" من "&Cls_Active', None)]
+            ("الصفوف المحصورة لهذا اليوم", '=Cls_Confirmed&" من "&Cls_Active', None)]
     for i, (lab, fm, nf) in enumerate(rows):
         r = 30 + i
         put(ws, f"A{r}", lab, f=font(10), al=ALIGN_R, b=bottom())
@@ -306,10 +304,11 @@ def build_dashboard(wb, calc_rows):
     # links
     put(ws, "A74", "انتقال سريع:", f=font(9, True, NAVY), al=ALIGN_R)
     links = [("B74", SHEETS["daily"], "الحضور اليومي"), ("D74", SHEETS["fu"], "قائمة المتابعة"), ("F74", SHEETS["alog"], "سجل الغياب"), ("H74", SHEETS["clog"], "سجل التواصل"),
-             ("J74", SHEETS["prof"], "ملف الطفل"), ("L74", SHEETS["trend"], "الاتجاهات"), ("N74", SHEETS["rpt"], "التقرير"), ("P74", SHEETS["guide"], "الدليل")]
+             ("J74", SHEETS["prof"], "ملف الطفل"), ("L74", SHEETS["trend"], "الاتجاهات"), ("N74", SHEETS["rpt"], "🖨 طباعة تقرير يومي/أسبوعي/شهري"), ("P74", SHEETS["guide"], "الدليل")]
     for ref, sh, lab in links:
         put(ws, ref, f'=HYPERLINK("#{q(sh)}!A1","{lab} ⬅")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
-    approval_block(ws, "N76", "N77", "N78")
+    approval_block(ws, "A76", "A77", "A78")
+    principal_block(ws, "O76", "O77", "O78")
     ws.freeze_panes = "A6"
     ws.print_area = "A1:P78"
     ws.page_setup.orientation = "landscape"; ws.page_setup.paperSize = ws.PAPERSIZE_A4

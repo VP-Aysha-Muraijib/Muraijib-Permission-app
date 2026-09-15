@@ -28,9 +28,8 @@ def make_students():
     profiles = {(0, 0): (0, False), (0, 1): (2, False), (0, 2): (3, True), (0, 3): (5, False), (0, 4): (10, False), (0, 5): (16, False),
                 (1, 4): (10, True), (2, 3): (5, True), (2, 5): (15, False), (3, 19): (6, False), (4, 19): (1, False),
                 (1, 0): (0, False), (2, 0): (0, False), (3, 0): (0, False), (4, 0): (0, False), (3, 5): (11, False), (4, 4): (7, False)}
-    out[CLASSES[3]][19]["status"] = "منسحب"
-    out[CLASSES[4]][19]["join"] = dt.date(2026, 10, 5)      # joined late (day index 25)
-    out[CLASSES[4]][7]["status"] = "منقول"
+    out[CLASSES[3]][19]["phone2"] = "0501234567"
+    out[CLASSES[0]][0]["phone2"] = "0559876543"
     for ci in range(ACTIVE_CLASSES):
         for i, s in enumerate(out[CLASSES[ci]]):
             n_abs, today = profiles.get((ci, i), (random.choice([0, 0, 0, 1, 1, 2, 2, 3, 4]), False))
@@ -54,7 +53,7 @@ def make_students():
 
 def confirmed(ci, d):
     if d >= REC_DAYS: return False
-    if ci == 4 and d == TODAY_IDX: return False     # KG1-E forgot to confirm today
+    if ci == 4 and d == TODAY_IDX: return False     # class 5 has not completed today's count yet
     return True
 
 def make_contacts(students):
