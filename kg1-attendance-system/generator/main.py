@@ -84,6 +84,17 @@ def build(path, with_demo=True, real=None):
                 ws[f"B{r}"] = s["id"]; ws[f"C{r}"] = s["name"]; ws[f"K{r}"] = s["guardian"]; ws[f"J{r}"] = s["phone"]
                 for j, ph in enumerate(([s["phone"]] + s["extra"])[:4]):
                     ws[f"{['Z','AA','AB','AC'][j]}{r}"] = ph
+    # normalise data validations to Excel's canonical form (no leading "=", messages enabled)
+    for ws in wb.worksheets:
+        for dv in ws.data_validations.dataValidation:
+            for attr in ("formula1", "formula2"):
+                v = getattr(dv, attr)
+                if isinstance(v, str) and v.startswith("="):
+                    setattr(dv, attr, v[1:])
+            if dv.showErrorMessage is None or (dv.showErrorMessage is False and not getattr(dv, "_keep_soft", False)):
+                dv.showErrorMessage = True
+            dv.showInputMessage = True
+            dv.showDropDown = False
     wb.calculation.fullCalcOnLoad = True
     wb.save(path)
     print("saved", path, "in", round(time.time() - t0, 1), "s")

@@ -89,12 +89,12 @@ def build_settings(wb):
     section(ws, f"A{r}", "حالات الحضور (كما تُكتب في سجل الصف)", "Attendance statuses", 4); r += 1
     header_row(ws, r, 1, ["الحالة", "الرمز الداخلي", "يُحتسب حضورًا", "الرمز المختصر"], height=24); r += 1
     s0 = r
-    for lab, code, pres, sym in [("حاضر", "P", "نعم", "✓"), ("غائب", "A", "لا", "✕"), ("بعذر", "E", "لا", "○"), ("متأخر", "L", "نعم", "م")]:
+    for lab, code, pres, sym in [("غياب بعذر", "E", "لا", "○"), ("غياب بدون عذر", "A", "لا", "✕"), ("حاضر", "P", "نعم", "✓"), ("متأخر", "L", "نعم", "م")]:
         put(ws, f"A{r}", lab, f=font(10, True), al=ALIGN_C, b=box()); put(ws, f"B{r}", code, f=font(10), al=ALIGN_C, b=box())
         put(ws, f"C{r}", pres, f=font(10), al=ALIGN_C, b=box()); put(ws, f"D{r}", sym, f=font(10), al=ALIGN_C, b=box()); r += 1
     names["StatusLabels"] = f"{cq(ws.title)}$A${s0}:$A${s0+3}"; names["StatusCodes"] = f"{cq(ws.title)}$B${s0}:$B${s0+3}"
     names["StatusSymbols"] = f"{cq(ws.title)}$D${s0}:$D${s0+3}"
-    put(ws, f"A{r}", "«بعذر» = غياب بعذر. الخلية الفارغة لا تُحتسب أبدًا إلا إذا وُضعت علامة ✓ في صف «تأكيد تسجيل اليوم» فتُعتبر حضورًا.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, f"A{r}", "الخلية الفارغة في أي يوم ضمن «الحصر مكتمل حتى» تُعتبر حضورًا؛ تُختار الحالات الأخرى من القائمة.", f=font(9, False, MUTED, True), al=ALIGN_R)
     r += 2
     section(ws, f"A{r}", "الصفوف", "Classes", 4); r += 1
     header_row(ws, r, 1, ["الصف", "مفعّل؟", "اسم الورقة", "ملاحظة"], height=24); r += 1
@@ -174,7 +174,7 @@ def build_calendar(wb):
     ws = wb.create_sheet(SHEETS["cal"])
     setup_sheet(ws, tab="9CA3AF")
     title_block(ws, "التقويم الدراسي", "يُبنى تلقائيًا من الإعدادات (العطلات، الفصول) ومن سجلات الصفوف — لا يحتاج إلى إدخال", "Academic calendar (auto)")
-    hdr = ["التاريخ", "اليوم", "الشهر", "مفتاح الشهر", "الأسبوع الدراسي", "الفصل", "عطلة؟", "يوم دراسي", "المسجَّلون", "حاضر", "غائب", "بعذر", "متأخر", "نسبة الحضور", "تم التسجيل؟", "ترتيب اليوم المسجَّل"]
+    hdr = ["التاريخ", "اليوم", "الشهر", "مفتاح الشهر", "الأسبوع الدراسي", "الفصل", "عطلة؟", "يوم دراسي", "المسجَّلون", "حاضر", "غياب بدون عذر", "غياب بعذر", "متأخر", "نسبة الحضور", "تم التسجيل؟", "ترتيب اليوم المسجَّل"]
     header_row(ws, 4, 1, hdr, widths=[12, 10, 14, 10, 9, 12, 8, 8, 10, 8, 8, 8, 8, 10, 10, 10])
     for i, d in enumerate(DATES):
         r = CAL_FIRST + i

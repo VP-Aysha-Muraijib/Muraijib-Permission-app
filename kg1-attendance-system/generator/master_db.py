@@ -23,7 +23,7 @@ def period_counts(S, rr, start, end):
     D = f"{cq(S)}${DC0}$5:${DC1}$5"; SCH = f"{cq(S)}${DC0}$6:${DC1}$6"; CONF = f"{cq(S)}${DC0}$7:${DC1}$7"
     crit = f'{SCH},1,{D},">="&MAX({cq(S)}$U{rr},{start}),{D},"<="&{end}'
     P = f'COUNTIFS({RNG},"حاضر",{crit})+COUNTIFS({CONF},"✓",{crit})-COUNTIFS({RNG},"<>",{CONF},"✓",{crit})'
-    A = f'COUNTIFS({RNG},"غائب",{crit})'; E = f'COUNTIFS({RNG},"بعذر",{crit})'; Lt = f'COUNTIFS({RNG},"متأخر",{crit})'
+    A = f'COUNTIFS({RNG},"غياب بدون عذر",{crit})'; E = f'COUNTIFS({RNG},"غياب بعذر",{crit})'; Lt = f'COUNTIFS({RNG},"متأخر",{crit})'
     att = f'{P}+IF(LateAsPresent="نعم",{Lt},0)'
     tot = f'{P}+{A}+{E}+{Lt}'
     ab = f'{A}+{E}'
@@ -110,10 +110,10 @@ def build_db(wb):
                 ws.cell(r, 3, f'=IF({P}$B{rr}="","",{P}$B{rr})')
                 ws.cell(r, 4, f'=IF(C{r}="","",{P}$C{rr})')
                 ws.cell(r, 5, f'=IF(OR(C{r}="",{P}{col}$6<>1,{P}$U{rr}>A{r}),"",IF({P}{col}{rr}<>"",{P}{col}{rr},IF({P}{col}$7="✓","حاضر","")))')
-                ws.cell(r, 6, f'=IF(E{r}="","",IF(E{r}="حاضر","P",IF(E{r}="غائب","A",IF(E{r}="بعذر","E",IF(E{r}="متأخر","L","")))))')
+                ws.cell(r, 6, f'=IF(E{r}="","",IF(E{r}="حاضر","P",IF(E{r}="غياب بدون عذر","A",IF(E{r}="غياب بعذر","E",IF(E{r}="متأخر","L","")))))')
                 ws.cell(r, 7, f'=IF(F{r}="A",1,0)')
                 ws.cell(r, 9, f'=IF(OR(F{r}="A",F{r}="E"),1,0)')
-                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غائب",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$U{rr}),"")')
+                ws.cell(r, 8, f'=IF(I{r}=1,COUNTIFS({P}${DC0}{rr}:{col}{rr},"غياب بدون عذر",{P}${DC0}$6:{col}$6,1,{P}${DC0}$5:{col}$5,">="&{P}$U{rr}),"")')
                 ws.cell(r, 10, f'=I{r}' if r == DB_FIRST else f'=J{r-1}+I{r}')
                 r += 1
     assert r - 1 == DB_LAST
@@ -186,8 +186,8 @@ def build_absence_log(wb):
     ws.conditional_formatting.add(rg, FormulaRule(formula=[f'AND($F{ALOG_FIRST}<>"",$F{ALOG_FIRST}>=Thr_High)'], fill=fill(DORG_F), font=Font(name=FONT, bold=True, color=DORG_T)))
     ws.conditional_formatting.add(rg, FormulaRule(formula=[f'AND($F{ALOG_FIRST}<>"",$F{ALOG_FIRST}>=Thr_Repeated)'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     ws.conditional_formatting.add(rg, FormulaRule(formula=[f'AND($F{ALOG_FIRST}<>"",$F{ALOG_FIRST}>=Thr_FollowUp)'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
-    ws.conditional_formatting.add(f"E{ALOG_FIRST}:E{ALOG_LAST}", FormulaRule(formula=[f'$E{ALOG_FIRST}="غائب"'], font=Font(name=FONT, bold=True, color=ABS_T)))
-    ws.conditional_formatting.add(f"E{ALOG_FIRST}:E{ALOG_LAST}", FormulaRule(formula=[f'$E{ALOG_FIRST}="بعذر"'], font=Font(name=FONT, color=EXC_T)))
+    ws.conditional_formatting.add(f"E{ALOG_FIRST}:E{ALOG_LAST}", FormulaRule(formula=[f'$E{ALOG_FIRST}="غياب بدون عذر"'], font=Font(name=FONT, bold=True, color=ABS_T)))
+    ws.conditional_formatting.add(f"E{ALOG_FIRST}:E{ALOG_LAST}", FormulaRule(formula=[f'$E{ALOG_FIRST}="غياب بعذر"'], font=Font(name=FONT, color=EXC_T)))
     ws.conditional_formatting.add(f"H{ALOG_FIRST}:H{ALOG_LAST}", FormulaRule(formula=[f'ISNUMBER(SEARCH("مطلوب",$H{ALOG_FIRST}))'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     ws.freeze_panes = "A6"
     protect(ws)

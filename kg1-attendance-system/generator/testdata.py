@@ -38,12 +38,12 @@ def make_students():
             random.shuffle(pool)
             days = sorted(pool[: n_abs - (1 if today else 0)])
             if today: days.append(TODAY_IDX)
-            for d in days: s["grid"][d] = "غائب"
+            for d in days: s["grid"][d] = "غياب بدون عذر"
             free = [d for d in range(start, REC_DAYS) if s["grid"][d] is None and d != TODAY_IDX]
             random.shuffle(free)
             n_exc = random.choice([0, 0, 0, 1, 1, 2]) if (ci, i) not in {(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)} else 0
             n_late = random.choice([0, 0, 1, 1, 2, 3]) if (ci, i) not in {(0, 0)} else 0
-            for d in free[:n_exc]: s["grid"][d] = "بعذر"
+            for d in free[:n_exc]: s["grid"][d] = "غياب بعذر"
             for d in free[n_exc:n_exc + n_late]: s["grid"][d] = "متأخر"
             # a few explicit "حاضر" entries to show the option
             if i in (1, 2):
@@ -61,7 +61,7 @@ def make_contacts(students):
     def nth_abs(s, n):
         c = 0
         for d in range(NDAYS):
-            if s["grid"][d] == "غائب":
+            if s["grid"][d] == "غياب بدون عذر":
                 c += 1
                 if c == n: return DATES[d]
         return None

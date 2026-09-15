@@ -32,16 +32,16 @@ for ci, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
             v = s["grid"][d]
             if v: eff[d] = v
             elif testdata.confirmed(ci, d): eff[d] = "حاضر"
-        P = eff.count("حاضر"); A = eff.count("غائب"); E = eff.count("بعذر"); Lt = eff.count("متأخر")
+        P = eff.count("حاضر"); A = eff.count("غياب بدون عذر"); E = eff.count("غياب بعذر"); Lt = eff.count("متأخر")
         tot = P + A + E + Lt
         rate = (P + Lt) / tot if tot else None
         level = 15 if A >= 15 else 10 if A >= 10 else 5 if A >= 5 else 3 if A >= 3 else 0
-        absdates = [DATES[d] for d in range(NDAYS) if eff[d] == "غائب"]
+        absdates = [DATES[d] for d in range(NDAYS) if eff[d] == "غياب بدون عذر"]
         reached = {n: (absdates[n - 1] if len(absdates) >= n else None) for n in (3, 5, 10, 15)}
         lastc = max([l[0] for l in logs if l[1] == s["id"]], default=None)
         contacted = None if not active else ("—" if level == 0 else ("نعم" if (lastc and lastc >= reached[level]) else "لا"))
         model[s["id"]] = dict(cls=cn, ci=ci, slot=i, active=active, P=P, A=A, E=E, L=Lt, tot=tot, rate=rate, level=level, reached=reached,
-                              absdates=absdates, lastc=lastc, contacted=contacted, name=s["name"], events=sum(1 for v in eff if v in ("غائب", "بعذر")),
+                              absdates=absdates, lastc=lastc, contacted=contacted, name=s["name"], events=sum(1 for v in eff if v in ("غياب بدون عذر", "غياب بعذر")),
                               status_today=eff[testdata.TODAY_IDX], today_level=next((n for n in (15, 10, 5, 3) if reached[n] == DATES[testdata.TODAY_IDX]), 0))
 
 # ---- registers
@@ -63,7 +63,7 @@ for cn in CLASSES[:ACTIVE_CLASSES]:
 # summary rows for today
 ws = wb[CLASSES[0]]; col = L(DATE_COL0 + testdata.TODAY_IDX)
 act = [model[s["id"]] for s in students[CLASSES[0]] if model[s["id"]]["active"]]
-check("A today abs", ws[f"{col}{SUM_ROW['abs']}"].value, sum(1 for m in act if m["status_today"] == "غائب"))
+check("A today abs", ws[f"{col}{SUM_ROW['abs']}"].value, sum(1 for m in act if m["status_today"] == "غياب بدون عذر"))
 check("A today reg", ws[f"{col}{SUM_ROW['reg']}"].value, sum(1 for m in act if m["status_today"]))
 wsE = wb[CLASSES[4]]; check("E today reg (unconfirmed)", wsE[f"{col}{SUM_ROW['reg']}"].value, 0)
 # ---- master
@@ -74,7 +74,7 @@ for ci, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
         check(f"master r{r} id", wm[f"B{r}"].value, s["id"]); check(f"master r{r} class", wm[f"D{r}"].value, cn)
         if m["active"]:
             check(f"master r{r} abs", wm[f"L{r}"].value, m["A"]); check(f"master r{r} rate", wm[f"O{r}"].value, m["rate"])
-            check(f"master r{r} today", wm[f"AG{r}"].value, {"حاضر": "P", "غائب": "A", "بعذر": "E", "متأخر": "L", None: None}[m["status_today"]])
+            check(f"master r{r} today", wm[f"AG{r}"].value, {"حاضر": "P", "غياب بدون عذر": "A", "غياب بعذر": "E", "متأخر": "L", None: None}[m["status_today"]])
             check(f"master r{r} lvltoday", wm[f"AJ{r}"].value, m["today_level"])
 # ---- dashboard
 wd = wb[SHEETS["dash"]]; wc = wb[SHEETS["calc"]]
@@ -82,7 +82,7 @@ actives = [m for m in model.values() if m["active"]]
 check("dash date", to_date(wc["B3"].value), DATES[testdata.TODAY_IDX])
 check("kpi total", wd["A8"].value, len(actives))
 check("kpi present today", wd["C8"].value, sum(1 for m in actives if m["status_today"] in ("حاضر", "متأخر")))
-check("kpi absent today", wd["E8"].value, sum(1 for m in actives if m["status_today"] in ("غائب", "بعذر")))
+check("kpi absent today", wd["E8"].value, sum(1 for m in actives if m["status_today"] in ("غياب بدون عذر", "غياب بعذر")))
 reg_t = sum(1 for m in actives if m["status_today"]); att_t = sum(1 for m in actives if m["status_today"] in ("حاضر", "متأخر"))
 check("kpi rate today", wd["G8"].value, att_t / reg_t)
 for col, n in zip("IKMO", (3, 5, 10, 15)):
@@ -147,7 +147,7 @@ check("absence log first row filled", wa["A6"].value is not None, True)
 check("absence log row after last blank", wa[f"A{6+sum(m['events'] for m in actives)}"].value, None)
 # absence log cum for a known critical student (A slot 6): find rows with that name
 mA6 = model[students[CLASSES[0]][5]["id"]]
-rows = [r for r in range(6, 400) if wa[f"B{r}"].value == mA6["name"] and wa[f"E{r}"].value == "غائب"]
+rows = [r for r in range(6, 400) if wa[f"B{r}"].value == mA6["name"] and wa[f"E{r}"].value == "غياب بدون عذر"]
 check("alog A6 cum sequence", [wa[f"F{r}"].value for r in rows], list(range(1, mA6["A"] + 1)))
 check("alog A6 dates", [to_date(wa[f"A{r}"].value) for r in rows], mA6["absdates"])
 # calendar
@@ -167,7 +167,7 @@ check("daily class5 not counted", wdy[f"C{11+SLOTS+3+2+4}"].value, "غير مح�
 # report (month, all)
 wr = wb[SHEETS["rpt"]]
 check("report kids", wr["A8"].value, len(actives)); check("report rate (daily)", wr["G8"].value, att_t / reg_t)
-absent_today = sorted([m for m in actives if m["status_today"] in ("غائب", "بعذر")], key=lambda m: (m["ci"], m["slot"]))
+absent_today = sorted([m for m in actives if m["status_today"] in ("غياب بدون عذر", "غياب بعذر")], key=lambda m: (m["ci"], m["slot"]))
 check("report absentees", [wr[f"A{74+k}"].value for k in range(len(absent_today) + 1)], [m["name"] for m in absent_today] + [None])
 check("report day row", (to_date(wr["A46"].value), wr["C46"].value, wr["A47"].value), (DATES[testdata.TODAY_IDX], reg_t, None))
 # trends monthly Nov row (Aug=row r1+2 ... ) : find by label

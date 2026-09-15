@@ -34,7 +34,7 @@ def build_daily(wb):
     cards = [("اليوم", '=IF(Daily_DayIdx=0,"—",INDEX(Cal_Day,Daily_DayIdx))'), ("يوم دراسي؟", '=IF(Daily_DayIdx=0,"—",IF(INDEX(Cal_School,Daily_DayIdx)=1,"نعم","عطلة"))'),
              ("ضمن الحصر؟", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),"—",IF({conf}="✓","✓ محصور","غير محصور"))'),
              ("المسجَّلون", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["reg"]})'), ("حاضر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["pres"]})'),
-             ("غائب", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["abs"]})'), ("بعذر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["exc"]})'),
+             ("غياب بدون عذر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["abs"]})'), ("غياب بعذر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["exc"]})'),
              ("متأخر", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),0,{sums["late"]})'), ("نسبة الحضور", f'=IF(OR(Daily_DayIdx=0,Daily_ClsIdx=0),"—",IF({sums["rate"]}="","—",{sums["rate"]}))')]
     for j, (lab, fm) in enumerate(cards):
         c = 2 + j
@@ -58,14 +58,14 @@ def build_daily(wb):
         put(ws, f"G{r}", f'=IF(B{r}="","",INDEX(Stu_Status,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"H{r}", f'=IF(B{r}="","",INDEX(Stu_ContactReq,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
     rg = f"D12:D{11+SLOTS}"
-    for val, bg, fg in [("حاضر", GREEN_F, GREEN_T), ("غائب", ABS_F, ABS_T), ("بعذر", EXC_F, EXC_T), ("متأخر", LATE_F, LATE_T), ("غير محصور", YEL_F, YEL_T)]:
+    for val, bg, fg in [("حاضر", GREEN_F, GREEN_T), ("غياب بدون عذر", ABS_F, ABS_T), ("غياب بعذر", EXC_F, EXC_T), ("متأخر", LATE_F, LATE_T), ("غير محصور", YEL_F, YEL_T)]:
         ws.conditional_formatting.add(rg, FormulaRule(formula=[f'$D12="{val}"'], fill=fill(bg), font=Font(name=FONT, bold=True, color=fg)))
     ws.conditional_formatting.add(f"G12:G{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("حرجة",$G12))'], fill=fill(RED_F), font=Font(name=FONT, bold=True, color=RED_T)))
     ws.conditional_formatting.add(f"G12:G{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("⚠",$G12))'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
     ws.conditional_formatting.add(f"H12:H{11+SLOTS}", FormulaRule(formula=['ISNUMBER(SEARCH("مطلوب",$H12))'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     r0 = 11 + SLOTS + 3
     section(ws, f"A{r0}", "جميع الصفوف في هذا اليوم", "All classes – selected day", 8)
-    list_header(ws, r0 + 1, 1, ["", "الصف", "ضمن الحصر؟", "المسجَّلون", "حاضر", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
+    list_header(ws, r0 + 1, 1, ["", "الصف", "ضمن الحصر؟", "المسجَّلون", "حاضر", "غياب بدون عذر", "غياب بعذر", "متأخر", "نسبة الحضور"])
     for k, cn in enumerate(CLASSES):
         r = r0 + 2 + k
         put(ws, f"B{r}", f'=IF(INDEX(ClassActive,{k+1})="نعم",{cq(cn)}$B$2,"")', f=font(10, True), al=ALIGN_C, b=bottom())
@@ -185,7 +185,7 @@ def build_trends(wb):
         put(ws, (r, first_col + 5), f'=IF(OR($A{r}="",{c0}{r}=0),"",({c1}{r}-IF(LateAsPresent="نعم",0,{c4}{r}))/{c0}{r})', f=font(9, True, TEAL), al=ALIGN_C, b=bottom(), nf="0.0%")
     # 1. daily – last 15 recorded days
     section(ws, "A6", "الاتجاه اليومي – آخر 15 يومًا مسجَّلًا", "Daily trend", 8)
-    list_header(ws, 7, 1, ["التاريخ", "اليوم", "المسجَّلون", "الحاضرون", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
+    list_header(ws, 7, 1, ["التاريخ", "اليوم", "المسجَّلون", "الحاضرون", "غياب بدون عذر", "غياب بعذر", "متأخر", "نسبة الحضور"])
     for k in range(1, 16):
         r = 7 + k; n = f"(Rec_Days-15+{k})"
         put(ws, f"A{r}", f'=IF({n}<1,"",INDEX(Cal_Date,MATCH({n},Cal_RecIdx,0)))', f=font(9, True), al=ALIGN_C, b=bottom(), nf="dd/mm")
@@ -209,7 +209,7 @@ def build_trends(wb):
         put(ws, f"S{r}", w, f=font(8, False, MUTED)); put(ws, f"T{r}", f'=COUNTIFS(Cal_Week,{w},Cal_Reg,">0")', f=font(8, False, MUTED))
         put(ws, f"U{r}", f'=IF(T{r}>0,COUNTIF($T$7:T{r},">0"),"")', f=font(8, False, MUTED))
     put(ws, "S5", f'=COUNTIF(T7:T{6+nweeks},">0")', f=font(8, True, MUTED)); define(wb, "Rec_Weeks", f"{cq(ws.title)}$S$5")
-    list_header(ws, r0 + 1, 1, ["الأسبوع", "من – إلى", "المسجَّلون", "الحاضرون", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
+    list_header(ws, r0 + 1, 1, ["الأسبوع", "من – إلى", "المسجَّلون", "الحاضرون", "غياب بدون عذر", "غياب بعذر", "متأخر", "نسبة الحضور"])
     for k in range(1, 11):
         r = r0 + 1 + k; n = f"(Rec_Weeks-10+{k})"
         put(ws, f"A{r}", f'=IF({n}<1,"",INDEX($S$7:$S${6+nweeks},MATCH({n},$U$7:$U${6+nweeks},0)))', f=font(9, True), al=ALIGN_C, b=bottom(), nf='"الأسبوع "0')
@@ -227,7 +227,7 @@ def build_trends(wb):
     # 3. monthly
     r1 = r0 + 14
     section(ws, f"A{r1}", "التحليل الشهري", "Monthly Attendance Overview", 8)
-    list_header(ws, r1 + 1, 1, ["الشهر", "أيام الدراسة المسجَّلة", "المسجَّلون (طفل×يوم)", "الحضور", "غائب", "بعذر", "متأخر", "متوسط نسبة الحضور"])
+    list_header(ws, r1 + 1, 1, ["الشهر", "أيام الدراسة المسجَّلة", "المسجَّلون (طفل×يوم)", "الحضور", "غياب بدون عذر", "غياب بعذر", "متأخر", "متوسط نسبة الحضور"])
     months = []
     y, m = YEAR_START.year, YEAR_START.month
     while (y, m) <= (YEAR_END.year, YEAR_END.month):
@@ -251,7 +251,7 @@ def build_trends(wb):
     # 4. terms + year
     r2 = mr1 + 3
     section(ws, f"A{r2}", "الفصول الدراسية والعام", "Terms & academic year", 8)
-    list_header(ws, r2 + 1, 1, ["الفترة", "أيام الدراسة المسجَّلة", "المسجَّلون (طفل×يوم)", "الحضور", "غائب", "بعذر", "متأخر", "متوسط نسبة الحضور"])
+    list_header(ws, r2 + 1, 1, ["الفترة", "أيام الدراسة المسجَّلة", "المسجَّلون (طفل×يوم)", "الحضور", "غياب بدون عذر", "غياب بعذر", "متأخر", "متوسط نسبة الحضور"])
     for i in range(4):
         r = r2 + 2 + i
         if i < 3:

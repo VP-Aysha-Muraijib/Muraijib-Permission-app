@@ -33,7 +33,7 @@ def build_register(wb, cname, idx):
     dvc = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح",
                          prompt="كل يوم دوام حتى هذا التاريخ يُعتبر محصورًا: من لم يُسجَّل له غياب يُعتبر حاضرًا. فارغ = حتى اليوم", promptTitle="الحصر مكتمل حتى")
     ws.add_data_validation(dvc); dvc.add(ws["K2"])
-    put(ws, "A3", "الحصر: كل الأطفال حاضرون افتراضيًا. في عمود اليوم اختاري من القائمة «غائب» أو «بعذر» أو «متأخر» لمن غاب فقط. الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, "A3", "الحصر: كل الأطفال حاضرون افتراضيًا. في عمود اليوم اختاري من القائمة المنسدلة «غياب بعذر» أو «غياب بدون عذر» لمن غاب فقط (و«متأخر» عند الحاجة). الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
     put(ws, "H3", "الانتقال إلى تاريخ:", f=font(10, True, NAVY), al=ALIGN_R)
     input_cell(ws, "I3", None, nf="dd/mm/yyyy")
     put(ws, "J3", f'=IF($I$3="","⬅ اختاري تاريخًا",IFERROR(HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+MATCH($I$3,{DATES_R},0)),"⬅ فتح عمود "&TEXT($I$3,"dd/mm/yyyy")),"⚠ ليس يوم دوام"))', f=font(10, True, "1D4ED8"), al=ALIGN_R)
@@ -50,7 +50,7 @@ def build_register(wb, cname, idx):
         ws[f"{col}8"].fill = fill(MUTED)
     for i, d in enumerate(DATES):
         c = DATE_COL0 + i; col = L(c)
-        ws.column_dimensions[col].width = 7.2
+        ws.column_dimensions[col].width = 12.5
         put(ws, (4, c), AR_MONTHS[d.month - 1] if (i == 0 or DATES[i-1].month != d.month) else "", f=font(8, True, NAVY), al=Alignment(horizontal="right"))
         put(ws, (5, c), d, nf="dd/mm", f=font(9, True), al=ALIGN_C, b=box())
         put(ws, (6, c), f"={cq(SHEETS['cal'])}$H${CAL_FIRST + i}", nf='"";"";"عطلة"', f=font(8, False, MUTED), al=ALIGN_C)
@@ -63,8 +63,8 @@ def build_register(wb, cname, idx):
         f = {}
         f["A"] = f'=IF($B{r}="","",ROW()-{REG_FIRST-1})'
         f["U"] = f'=IF($B{r}="","",YearStart)'
-        f["D"] = G0(f'COUNTIFS({RNG(r)},"غائب",{crit})')
-        f["E"] = G0(f'COUNTIFS({RNG(r)},"بعذر",{crit})')
+        f["D"] = G0(f'COUNTIFS({RNG(r)},"غياب بدون عذر",{crit})')
+        f["E"] = G0(f'COUNTIFS({RNG(r)},"غياب بعذر",{crit})')
         f["F"] = G0(f'COUNTIFS({RNG(r)},"متأخر",{crit})')
         f["N"] = G0(f'COUNTIFS({RNG(r)},"حاضر",{crit})+COUNTIFS({CONF},"✓",{crit})-COUNTIFS({RNG(r)},"<>",{CONF},"✓",{crit})')
         f["M"] = G0(f'$N{r}+$D{r}+$E{r}+$F{r}')
@@ -72,7 +72,7 @@ def build_register(wb, cname, idx):
         f["O"] = f'=IF($M{r}="","",IF($M{r}=0,"",($D{r}+$E{r})/$M{r}))'
         f["T"] = f'=IF($D{r}="","",IF($D{r}>=Thr_Critical,Thr_Critical,IF($D{r}>=Thr_High,Thr_High,IF($D{r}>=Thr_Repeated,Thr_Repeated,IF($D{r}>=Thr_FollowUp,Thr_FollowUp,0)))))'
         f["H"] = f'=IF($B{r}="","",INDEX(LevelLabels,MATCH($T{r},LevelValues,0)))'
-        f["P"] = f'=IF($D{r}="","",IF($D{r}=0,"",_xlfn.MAXIFS({DATES_R},{RNG(r)},"غائب",{crit})))'
+        f["P"] = f'=IF($D{r}="","",IF($D{r}=0,"",_xlfn.MAXIFS({DATES_R},{RNG(r)},"غياب بدون عذر",{crit})))'
         f["R"] = f'=IF($B{r}="","",IF(_xlfn.MAXIFS(Log_Date,Log_ID,$B{r})=0,"",_xlfn.MAXIFS(Log_Date,Log_ID,$B{r})))'
         f["S"] = f'=IF($R{r}="","",IFERROR(INDEX(Log_Method,MATCH($B{r}&"|"&$R{r},Log_Key,0)),""))'
         f["Q"] = f'=IF($T{r}="","",IF($T{r}=0,"—",IF(AND($R{r}<>"",$R{r}>=IF($T{r}=Thr_Critical,$Y{r},IF($T{r}=Thr_High,$X{r},IF($T{r}=Thr_Repeated,$W{r},$V{r})))),"نعم","لا")))'
@@ -80,7 +80,7 @@ def build_register(wb, cname, idx):
         for col, fm in f.items():
             put(ws, f"{col}{r}", fm, f=font(10), al=ALIGN_C, b=box())
         for col, thr in zip(["V", "W", "X", "Y"], ["Thr_FollowUp", "Thr_Repeated", "Thr_High", "Thr_Critical"]):
-            ws[f"{col}{r}"] = ArrayFormula(f"{col}{r}", f'=IF($D{r}="","",IFERROR(SMALL(IF(({RNG(r)}="غائب")*({SCH}=1)*({DATES_R}>=$U{r}),{DATES_R}),{thr}),""))')
+            ws[f"{col}{r}"] = ArrayFormula(f"{col}{r}", f'=IF($D{r}="","",IFERROR(SMALL(IF(({RNG(r)}="غياب بدون عذر")*({SCH}=1)*({DATES_R}>=$U{r}),{DATES_R}),{thr}),""))')
             style(ws[f"{col}{r}"], f=font(10), al=ALIGN_C, b=box(), nf="dd/mm/yyyy")
         for col in ["P", "R", "U"]:
             ws[f"{col}{r}"].number_format = "dd/mm/yyyy"
@@ -93,12 +93,13 @@ def build_register(wb, cname, idx):
         ws[f"C{r}"].font = font(10, True, TXT)
         # phone dropdown: the visible cell lists that child's numbers from the hidden block Z:AC
         dvp = DataValidation(type="list", formula1=f"=$Z${r}:$AC${r}", allow_blank=True, showErrorMessage=False, prompt="اختاري الرقم من القائمة (أرقام ولي الأمر المسجَّلة)", promptTitle="رقم التواصل")
+        dvp._keep_soft = True
         ws.add_data_validation(dvp); dvp.add(ws[f"J{r}"])
         for i in range(NDAYS):
             c = ws.cell(r, DATE_COL0 + i)
-            c.protection = UNLOCKED; c.font = font(9); c.alignment = ALIGN_C; c.border = box("EEF0F3")
+            c.protection = UNLOCKED; c.font = font(8); c.alignment = ALIGN_C; c.border = box("EEF0F3")
         ws.row_dimensions[r].height = 20
-    labels = {"abs": "غائب", "exc": "بعذر", "late": "متأخر", "pres": "حاضر", "reg": "المحصورون", "rate": "نسبة الحضور"}
+    labels = {"abs": "غياب بدون عذر", "exc": "غياب بعذر", "late": "متأخر", "pres": "حاضر", "reg": "المحصورون", "rate": "نسبة الحضور"}
     put(ws, f"A{SUM_ROW['abs']-1}", "ملخص اليوم (تلقائي)", f=font(10, True, NAVY), al=ALIGN_R)
     for key, r in SUM_ROW.items():
         put(ws, f"C{r}", labels[key], f=font(10, True, NAVY), al=ALIGN_R, bg=LIGHT)
@@ -107,14 +108,14 @@ def build_register(wb, cname, idx):
             c = DATE_COL0 + i; col = L(c)
             base = f'$U${REG_FIRST}:$U${REG_LAST},"<="&{col}$5'
             stu = f'{col}${REG_FIRST}:{col}${REG_LAST}'
-            if key == "abs": fm = f'=IF({col}$6=1,COUNTIFS({stu},"غائب",{base}),0)'
-            elif key == "exc": fm = f'=IF({col}$6=1,COUNTIFS({stu},"بعذر",{base}),0)'
+            if key == "abs": fm = f'=IF({col}$6=1,COUNTIFS({stu},"غياب بدون عذر",{base}),0)'
+            elif key == "exc": fm = f'=IF({col}$6=1,COUNTIFS({stu},"غياب بعذر",{base}),0)'
             elif key == "late": fm = f'=IF({col}$6=1,COUNTIFS({stu},"متأخر",{base}),0)'
             elif key == "pres": fm = f'=IF({col}$6=1,COUNTIFS({stu},"حاضر",{base})+IF({col}$7="✓",COUNTIFS($B${REG_FIRST}:$B${REG_LAST},"<>",{base})-COUNTIFS({stu},"<>",{base}),0),0)'
             elif key == "reg": fm = f'={col}{SUM_ROW["abs"]}+{col}{SUM_ROW["exc"]}+{col}{SUM_ROW["late"]}+{col}{SUM_ROW["pres"]}'
             else: fm = f'=IF({col}{SUM_ROW["reg"]}=0,"",({col}{SUM_ROW["pres"]}+IF(LateAsPresent="نعم",{col}{SUM_ROW["late"]},0))/{col}{SUM_ROW["reg"]})'
             put(ws, (r, c), fm, f=font(9, True if key in ("reg", "rate") else False, NAVY if key in ("reg", "rate") else TXT), al=ALIGN_C, bg=LIGHT, nf="0%" if key == "rate" else "0")
-    dv = DataValidation(type="list", formula1="=StatusLabels", allow_blank=True, error="اختاري: غائب / بعذر / متأخر (أو حاضر)", errorTitle="حالة غير صحيحة", prompt="اتركيها فارغة للحاضر، واختاري غائب / بعذر / متأخر", promptTitle="حالة الحضور")
+    dv = DataValidation(type="list", formula1="=StatusLabels", allow_blank=True, error="اختاري من القائمة: غياب بعذر / غياب بدون عذر / حاضر / متأخر", errorTitle="حالة غير صحيحة", prompt="الجميع حاضر افتراضيًا – اختاري «غياب بعذر» أو «غياب بدون عذر» لمن غاب", promptTitle="حالة الحضور")
     ws.add_data_validation(dv); dv.add(f"{DC0}{REG_FIRST}:{DC1}{REG_LAST}")
     dv4 = DataValidation(type="custom", formula1=f"COUNTIF(Stu_ID,B{REG_FIRST})<=1", allow_blank=True, error="هذا الرقم الطلابي مسجَّل مسبقًا لطفل آخر", errorTitle="رقم طلابي مكرر", prompt="رقم فريد لكل طفل (يُكتب مرة واحدة)", promptTitle="الرقم الطلابي")
     ws.add_data_validation(dv4); dv4.add(f"B{REG_FIRST}:B{REG_LAST}")
@@ -122,8 +123,8 @@ def build_register(wb, cname, idx):
     ws.add_data_validation(dv6); dv6.add(ws["B2"])
     grid = f"{DC0}{REG_FIRST}:{DC1}{REG_LAST}"
     ws.conditional_formatting.add(grid, FormulaRule(formula=[f"{DC0}$6=0"], fill=fill(GRAY_F), stopIfTrue=True))
-    ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"غائب"'], fill=fill(ABS_F), font=Font(name=FONT, bold=True, color=ABS_T)))
-    ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"بعذر"'], fill=fill(EXC_F), font=Font(name=FONT, color=EXC_T)))
+    ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"غياب بدون عذر"'], fill=fill(ABS_F), font=Font(name=FONT, bold=True, color=ABS_T)))
+    ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"غياب بعذر"'], fill=fill(EXC_F), font=Font(name=FONT, color=EXC_T)))
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"متأخر"'], fill=fill(LATE_F), font=Font(name=FONT, color=LATE_T)))
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"حاضر"'], font=Font(name=FONT, color=GREEN_T)))
     ws.conditional_formatting.add(grid, FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1,{DC0}{REG_FIRST}="",$B{REG_FIRST}<>"")'], fill=fill("FAFAFA"), font=Font(name=FONT, color="C0C4CC")))

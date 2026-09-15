@@ -92,7 +92,7 @@ def build_report(wb):
     # ---- period day-by-day breakdown (daily / weekly / monthly)
     R = "Rpt_Class"
     section(ws, "A44", "تفصيل أيام الفترة (للتقرير اليومي والأسبوعي والشهري)", None, 8)
-    list_header(ws, 45, 1, ["التاريخ", "اليوم", "المسجَّلون", "الحاضرون", "غائب", "بعذر", "متأخر", "نسبة الحضور"])
+    list_header(ws, 45, 1, ["التاريخ", "اليوم", "المسجَّلون", "الحاضرون", "غياب بدون عذر", "غياب بعذر", "متأخر", "نسبة الحضور"])
     show = 'OR(Rpt_Period="يوم",Rpt_Period="الأسبوع",Rpt_Period="الشهر")'
     for k in range(1, 24):
         r = 45 + k
@@ -124,8 +124,8 @@ def build_report(wb):
         put(ws, f"E{r}", G(f"INDEX(Stu_Status,$J{r})"), f=font(9, True), al=ALIGN_C, b=None)
         put(ws, f"F{r}", G(f"INDEX(Stu_Contacted,$J{r})"), f=font(10, True), al=ALIGN_C, b=None)
         put(ws, f"G{r}", G(f"INDEX(Stu_Phone,$J{r})"), f=font(10), al=ALIGN_C, b=None); ws.merge_cells(f"G{r}:H{r}")
-    ws.conditional_formatting.add("C74:C103", FormulaRule(formula=['$C74="غائب"'], fill=fill(ABS_F), font=Font(name=FONT, bold=True, color=ABS_T)))
-    ws.conditional_formatting.add("C74:C103", FormulaRule(formula=['$C74="بعذر"'], fill=fill(EXC_F), font=Font(name=FONT, color=EXC_T)))
+    ws.conditional_formatting.add("C74:C103", FormulaRule(formula=['$C74="غياب بدون عذر"'], fill=fill(ABS_F), font=Font(name=FONT, bold=True, color=ABS_T)))
+    ws.conditional_formatting.add("C74:C103", FormulaRule(formula=['$C74="غياب بعذر"'], fill=fill(EXC_F), font=Font(name=FONT, color=EXC_T)))
     ws.conditional_formatting.add("E74:E103", FormulaRule(formula=['ISNUMBER(SEARCH("حرجة",$E74))'], fill=fill(RED_F), font=Font(name=FONT, bold=True, color=RED_T)))
     ws.conditional_formatting.add("E74:E103", FormulaRule(formula=['ISNUMBER(SEARCH("⚠",$E74))'], fill=fill(YEL_F), font=Font(name=FONT, bold=True, color=YEL_T)))
     ws.conditional_formatting.add("F74:F103", FormulaRule(formula=['$F74="لا"'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
@@ -160,7 +160,7 @@ GUIDE = [
     ("h2", "الاستخدام اليومي (أقل من دقيقة لكل صف)"),
     ("s", "الخطوة 1: افتحي ورقة الصف واضغطي رابط «الانتقال إلى عمود اليوم» أعلى الورقة. للإدخال بأثر رجعي: اختاري التاريخ من خانة «الانتقال إلى تاريخ سابق» ثم اضغطي الرابط المجاور، أو استخدمي ورقة «الحضور اليومي»."),
     ("s", "الإدخال بأثر رجعي: لكل يوم دراسي عمود جاهز منذ بداية العام، فيمكن تسجيل غياب أي يوم سابق؛ وما دام التاريخ ضمن «الحصر مكتمل حتى» يُعتبر الباقون حاضرين."),
-    ("s", "الخطوة 2: كل الأطفال حاضرون افتراضيًا. في عمود اليوم اختاري من القائمة المنسدلة «غائب» أو «بعذر» أو «متأخر» لمن غاب أو تأخر فقط."),
+    ("s", "الخطوة 2: كل الأطفال حاضرون افتراضيًا. في عمود اليوم اختاري من القائمة المنسدلة «غياب بعذر» أو «غياب بدون عذر» لمن غاب فقط (و«متأخر» عند الحاجة)."),
     ("s", "الخطوة 3: خانة «الحصر مكتمل حتى» أعلى الورقة: كل يوم دوام حتى هذا التاريخ يُعتبر محصورًا (الفارغ = حاضر). اتركيها فارغة ليُحتسب حتى اليوم تلقائيًا، أو ضعي تاريخًا أقدم إذا لم تُكملي حصر الأيام الأخيرة بعد."),
     ("s", "الخطوة 4: احفظي الملف، ثم افتحي «لوحة المتابعة» لمشاهدة نسب الحضور وتنبيهات اليوم ومن وصل إلى حد التنبيه."),
     ("s", "الخطوة 5: تواصلي مع أولياء الأمور المطلوبين، وسجّلي كل تواصل في ورقة «سجل التواصل» (التاريخ + الرقم الطلابي + الطريقة + النتيجة). يتحول عمود «تم التواصل؟» إلى نعم تلقائيًا."),
