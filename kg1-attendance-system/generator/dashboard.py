@@ -122,8 +122,10 @@ def build_dashboard(wb, calc_rows):
     put(ws, "A1", "نظام متابعة وتحليل الحضور والغياب", f=font(20, True, NAVY), al=ALIGN_R); ws.row_dimensions[1].height = 34
     put(ws, "A2", '=SchoolName&" – قسم "&SectionName', f=font(13, False, TEAL), al=ALIGN_R)
     put(ws, "A3", "Smart Attendance Analytics System  |  Dashboard", f=font(9, False, MUTED, True), al=ALIGN_R)
-    put(ws, "L2", '="العام الدراسي: "&AcademicYear&"   |   "&CurrentTerm', f=font(10, True, NAVY), al=ALIGN_R)
-    put(ws, "L3", '="آخر يوم مسجَّل: "&TEXT(LastRecorded,"dd/mm/yyyy")&"   |   أيام مسجَّلة: "&Rec_Days', f=font(9, False, MUTED), al=ALIGN_R)
+    put(ws, "A4", '="العام الدراسي: "&AcademicYear&"   |   "&CurrentTerm&"   |   آخر يوم مسجَّل: "&TEXT(LastRecorded,"dd/mm/yyyy")&"   |   أيام مسجَّلة: "&Rec_Days', f=font(9, True, NAVY), al=ALIGN_R)
+    ws.row_dimensions[2].height = 18; ws.row_dimensions[3].height = 14; ws.row_dimensions[4].height = 22
+    add_logo(ws, "ministry_logo.png", 13, 1, 14, 4)
+    add_logo(ws, "charter_logo.png", 15, 1, 16, 4)
     # selectors
     put(ws, "A5", "التاريخ (فارغ = آخر يوم مسجَّل)", f=font(9, True, NAVY), al=ALIGN_R)
     input_cell(ws, "B5", None, nf="dd/mm/yyyy")
@@ -136,7 +138,7 @@ def build_dashboard(wb, calc_rows):
     define(wb, "Dash_DateInput", f"{cq(DASH)}$B$5"); define(wb, "Dash_Class", f"{cq(DASH)}$E$5"); define(wb, "Dash_Period", f"{cq(DASH)}$I$5")
     dv = DataValidation(type="list", formula1="=FilterClassList", allow_blank=False, error="اختاري صفًا أو «الكل»", errorTitle="قيمة غير صحيحة"); ws.add_data_validation(dv); dv.add(ws["E5"])
     dv2 = DataValidation(type="list", formula1="=PeriodList", allow_blank=False); ws.add_data_validation(dv2); dv2.add(ws["I5"])
-    dv3 = DataValidation(type="date", operator="between", formula1="YearStart", formula2="YearEnd", allow_blank=True, error="أدخلي تاريخًا ضمن العام الدراسي أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح"); ws.add_data_validation(dv3); dv3.add(ws["B5"])
+    dv3 = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح", prompt="اختاري أي تاريخ سابق لعرض بياناته؛ فارغ = آخر يوم مسجَّل", promptTitle="التاريخ"); ws.add_data_validation(dv3); dv3.add(ws["B5"])
     # KPI cards
     cards = [("إجمالي أطفال KG1", "=Total_Kids", '="نشط – "&Dash_Class', None, NAVY),
              ("الحاضرون اليوم", "=Today_Att", '="منهم متأخرون: "&Today_L', None, GREEN_T),
@@ -264,7 +266,7 @@ def build_dashboard(wb, calc_rows):
     lc.y_axis.scaling.min = 0; lc.y_axis.scaling.max = 1; lc.y_axis.number_format = "0%"; lc.x_axis.number_format = "dd/mm"
     labels(lc)
     lc.legend = None
-    place(ws, lc, 1, 47, 5, 58)
+    place(ws, lc, 2, 47, 5, 58)
     # ---- lists
     section(ws, "A60", "الأعلى حضورًا ⭐", "Top Attendance", 5)
     section(ws, "F60", "أطفال يحتاجون دعمًا في الحضور", "Students Requiring Attendance Support", 6)
@@ -307,8 +309,9 @@ def build_dashboard(wb, calc_rows):
              ("J74", SHEETS["prof"], "ملف الطفل"), ("L74", SHEETS["trend"], "الاتجاهات"), ("N74", SHEETS["rpt"], "التقرير"), ("P74", SHEETS["guide"], "الدليل")]
     for ref, sh, lab in links:
         put(ws, ref, f'=HYPERLINK("#{q(sh)}!A1","{lab} ⬅")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    approval_block(ws, "N76", "N77", "N78")
     ws.freeze_panes = "A6"
-    ws.print_area = "A1:P74"
+    ws.print_area = "A1:P78"
     ws.page_setup.orientation = "landscape"; ws.page_setup.paperSize = ws.PAPERSIZE_A4
     ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 1; ws.sheet_properties.pageSetUpPr.fitToPage = True
     protect(ws)

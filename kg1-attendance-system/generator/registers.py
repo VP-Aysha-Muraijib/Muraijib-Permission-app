@@ -26,9 +26,14 @@ def build_register(wb, cname, idx):
     put(ws, "G2", f'=COUNTIF({CONF},"✓")', f=font(11, True, TEAL), al=ALIGN_C)
     put(ws, "H2", "نسبة حضور الصف:", f=font(10, True), al=ALIGN_R)
     put(ws, "I2", f'=IF(SUM(${DC0}${SUM_ROW["reg"]}:${DC1}${SUM_ROW["reg"]})=0,"",(SUM(${DC0}${SUM_ROW["pres"]}:${DC1}${SUM_ROW["pres"]})+IF(LateAsPresent="نعم",SUM(${DC0}${SUM_ROW["late"]}:${DC1}${SUM_ROW["late"]}),0))/SUM(${DC0}${SUM_ROW["reg"]}:${DC1}${SUM_ROW["reg"]}))', f=font(11, True, TEAL), al=ALIGN_C, nf="0.0%")
-    put(ws, "K2", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(TODAY(),{DATES_R},1),1)),"⬅ الانتقال إلى عمود اليوم")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
-    put(ws, "A3", "الإدخال: اكتبي حالة كل طفل في عمود التاريخ (حاضر / غائب / بعذر / متأخر). الأسرع: سجّلي الغائبين والمتأخرين فقط ثم ضعي ✓ في صف «تأكيد تسجيل اليوم» ليُعتبر الباقون حاضرين.", f=font(9, False, MUTED, True), al=ALIGN_R)
-    put(ws, "K3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(_xlfn.MAXIFS({DATES_R},{CONF},"✓"),{DATES_R},0),1)),"⬅ الانتقال إلى آخر يوم مسجَّل")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    put(ws, "K2", "الانتقال إلى تاريخ سابق:", f=font(10, True, NAVY), al=ALIGN_R)
+    input_cell(ws, "L2", None, nf="dd/mm/yyyy")
+    put(ws, "M2", f'=IF($L$2="","⬅ اختاري تاريخًا من القائمة",IFERROR(HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+MATCH($L$2,{DATES_R},0)),"⬅ فتح عمود "&TEXT($L$2,"dd/mm/yyyy")),"⚠ التاريخ ليس يوم دوام"))', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    dvd = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة (أو اكتبي التاريخ بصيغة يوم/شهر/سنة)", errorTitle="تاريخ غير صحيح", prompt="لإدخال الحضور بأثر رجعي: اختاري التاريخ ثم اضغطي الرابط المجاور", promptTitle="تاريخ سابق")
+    ws.add_data_validation(dvd); dvd.add(ws["L2"])
+    put(ws, "K3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(TODAY(),{DATES_R},1),1)),"⬅ الانتقال إلى عمود اليوم")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    put(ws, "A3", "الإدخال: في عمود أي تاريخ (سابق أو حالي) سجّلي الغائبين والمتأخرين فقط ثم ضعي ✓ في صف «تأكيد تسجيل اليوم» ليُعتبر الباقون حاضرين. الأعمدة الرمادية عطلات.", f=font(9, False, MUTED, True), al=ALIGN_R)
+    put(ws, "M3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(_xlfn.MAXIFS({DATES_R},{CONF},"✓"),{DATES_R},0),1)),"⬅ الانتقال إلى آخر يوم مسجَّل")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
     # date meta rows labels
     lab_col = L(DATE_COL0 - 1)
     for r, t in [(4, "الشهر"), (5, "التاريخ"), (6, "يوم دراسي"), (7, "تأكيد تسجيل اليوم ✓")]:

@@ -12,7 +12,7 @@ def build_daily(wb):
     ws.column_dimensions["A"].width = 6
     for c, w in zip("BCDEFGHIJ", [13, 24, 13, 8, 12, 16, 16, 12, 12]):
         ws.column_dimensions[c].width = w
-    title_block(ws, "الحضور اليومي", "اختاري التاريخ والصف لمراجعة حالة التسجيل. الإدخال نفسه يتم في ورقة الصف داخل عمود اليوم — الرابط ينقلك إليه مباشرة.", "Daily Attendance – review & navigation")
+    title_block(ws, "الحضور اليومي", "اختاري أي تاريخ (سابق أو حالي) والصف: تظهر حالة التسجيل، ويأخذك الرابط مباشرة إلى عمود ذلك التاريخ في ورقة الصف لإدخال الحضور — يصلح للإدخال بأثر رجعي.", "Daily Attendance – review & navigation")
     put(ws, "A4", "التاريخ", f=font(10, True, NAVY), al=ALIGN_R); input_cell(ws, "B4", None, nf="dd/mm/yyyy")
     put(ws, "C4", "(فارغ = آخر يوم مسجَّل)", f=font(8, False, MUTED, True), al=ALIGN_R)
     put(ws, "D4", "الصف", f=font(10, True, NAVY), al=ALIGN_R); input_cell(ws, "E4", CLASSES[0])
@@ -24,7 +24,7 @@ def build_daily(wb):
     put(ws, "B5", f'=IF(Daily_DayIdx=0,"⚠ التاريخ ليس يومًا دراسيًا في التقويم",HYPERLINK("#\'"&Daily_Class&"\'!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+Daily_DayIdx),"⬅ فتح عمود هذا اليوم في سجل الصف "&Daily_Class&" للتسجيل"))', f=font(11, True, "1D4ED8"), al=ALIGN_R)
     ws.row_dimensions[5].height = 22
     dv = DataValidation(type="list", formula1="=ActiveClassList", allow_blank=False, error="اختاري صفًا مفعّلًا", errorTitle="قيمة غير صحيحة"); ws.add_data_validation(dv); dv.add(ws["E4"])
-    dv2 = DataValidation(type="date", operator="between", formula1="YearStart", formula2="YearEnd", allow_blank=True, error="أدخلي تاريخًا ضمن العام الدراسي", errorTitle="تاريخ غير صحيح"); ws.add_data_validation(dv2); dv2.add(ws["B4"])
+    dv2 = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة", errorTitle="تاريخ غير صحيح", prompt="اختاري التاريخ (السابق أو الحالي) الذي تريدين تسجيله أو مراجعته", promptTitle="التاريخ"); ws.add_data_validation(dv2); dv2.add(ws["B4"])
     # day cards
     sums = {}
     for key in SUM_ROW:

@@ -163,3 +163,27 @@ def protect(ws, password=None):
     p.selectUnlockedCells = False
     if password:
         p.password = password
+
+
+APPROVER = "نعيمة الكتبي"
+import os
+ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+
+def add_logo(ws, name, c0, r0, c1, r1):
+    """Place a logo PNG inside a cell rectangle (1-based, inclusive) - works in RTL sheets."""
+    from openpyxl.drawing.image import Image as XLImage
+    from openpyxl.drawing.spreadsheet_drawing import TwoCellAnchor, AnchorMarker
+    path = os.path.join(ASSETS, name)
+    if not os.path.exists(path):
+        return
+    img = XLImage(path)
+    a = TwoCellAnchor(editAs="oneCell")
+    a._from = AnchorMarker(col=c0 - 1, colOff=40000, row=r0 - 1, rowOff=20000)
+    a.to = AnchorMarker(col=c1, colOff=-40000, row=r1, rowOff=-20000)
+    img.anchor = a
+    ws.add_image(img)
+
+def approval_block(ws, label_ref, name_ref, date_ref, size=10):
+    put(ws, label_ref, "معتمد،", f=font(size, True, NAVY), al=ALIGN_R)
+    put(ws, name_ref, APPROVER, f=font(size + 1, True, NAVY), al=ALIGN_R)
+    put(ws, date_ref, '="التاريخ: "&TEXT(TODAY(),"dd/mm/yyyy")', f=font(size - 1, False, MUTED), al=ALIGN_R)

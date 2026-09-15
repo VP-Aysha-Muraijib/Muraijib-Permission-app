@@ -10,10 +10,17 @@ def build_report(wb):
     setup_sheet(ws, tab=NAVY)
     for c, w in zip("ABCDEFGH", [22, 11, 11, 11, 11, 12, 14, 18]):
         ws.column_dimensions[c].width = w
-    put(ws, "A1", "=SchoolName", f=font(16, True, NAVY), al=ALIGN_R)
-    put(ws, "A2", '="قسم "&SectionName&"   |   العام الدراسي "&AcademicYear', f=font(10, False, TEAL), al=ALIGN_R)
-    put(ws, "E1", "KG1 Attendance Summary", f=font(14, True, NAVY), al=Alignment(horizontal="left"))
-    put(ws, "E2", "ملخص الحضور والغياب", f=font(11, False, TEAL), al=Alignment(horizontal="left"))
+    ws.row_dimensions[1].height = 62
+    add_logo(ws, "ministry_logo.png", 2, 1, 3, 1)
+    add_logo(ws, "charter_logo.png", 7, 1, 8, 1)
+    cc = Alignment(horizontal="centerContinuous", vertical="center")
+    put(ws, "D1", "=SchoolName", f=font(16, True, NAVY), al=cc)
+    for col in "EF": ws[f"{col}1"].alignment = cc
+    put(ws, "A2", '="قسم "&SectionName&"   |   العام الدراسي "&AcademicYear', f=font(10, False, TEAL), al=cc)
+    for col in "BCDEFGH": ws[f"{col}2"].alignment = cc
+    put(ws, "A3", "KG1 Attendance Summary  |  ملخص الحضور والغياب", f=font(12, True, NAVY), al=cc)
+    for col in "BCDEFGH": ws[f"{col}3"].alignment = cc
+    ws.row_dimensions[3].height = 22
     put(ws, "A4", "نوع الفترة", f=font(9, True, NAVY), al=ALIGN_R); input_cell(ws, "B4", "الشهر")
     put(ws, "C4", "التاريخ", f=font(9, True, NAVY), al=ALIGN_R); input_cell(ws, "D4", None, nf="dd/mm/yyyy")
     put(ws, "E4", "الصف", f=font(9, True, NAVY), al=ALIGN_R); input_cell(ws, "F4", "الكل")
@@ -21,7 +28,7 @@ def build_report(wb):
     define(wb, "Rpt_Period", f"{cq(ws.title)}$B$4"); define(wb, "Rpt_DateInput", f"{cq(ws.title)}$D$4"); define(wb, "Rpt_Class", f"{cq(ws.title)}$F$4")
     dv = DataValidation(type="list", formula1="=RptPeriodList", allow_blank=False); ws.add_data_validation(dv); dv.add(ws["B4"])
     dv2 = DataValidation(type="list", formula1="=FilterClassList", allow_blank=False); ws.add_data_validation(dv2); dv2.add(ws["F4"])
-    dv3 = DataValidation(type="date", operator="between", formula1="YearStart", formula2="YearEnd", allow_blank=True, error="أدخلي تاريخًا ضمن العام الدراسي", errorTitle="تاريخ غير صحيح"); ws.add_data_validation(dv3); dv3.add(ws["D4"])
+    dv3 = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة", errorTitle="تاريخ غير صحيح"); ws.add_data_validation(dv3); dv3.add(ws["D4"])
     # hidden calc (column J/K – outside print area)
     ws.column_dimensions["J"].width = 20; ws.column_dimensions["K"].width = 14
     calc = [("Rpt_Date", "التاريخ الفعّال", '=IF(Rpt_DateInput="",LastRecorded,Rpt_DateInput)', "dd/mm/yyyy"),
@@ -82,8 +89,9 @@ def build_report(wb):
     ws.conditional_formatting.add("F26:F40", FormulaRule(formula=['$F26="لا"'], fill=fill(ORG_F), font=Font(name=FONT, bold=True, color=ORG_T)))
     put(ws, "A41", '=IF(COUNT(Stu_KeyRpt)=0,"لا توجد حالات تحتاج إلى متابعة ✓",IF(COUNT(Stu_KeyRpt)>15,"تُعرض أول 15 حالة من أصل "&COUNT(Stu_KeyRpt)&" – القائمة الكاملة في ورقة «قائمة المتابعة»",""))', f=font(9, False, MUTED, True), al=ALIGN_R)
     put(ws, "A44", "المسجّلة: ______________________", f=font(10), al=ALIGN_R)
-    put(ws, "E44", "مديرة الروضة: ______________________", f=font(10), al=ALIGN_R)
-    ws.print_area = "A1:H45"
+    approval_block(ws, "F44", "F45", "F46", size=11)
+    put(ws, "F47", "التوقيع: ______________________", f=font(10), al=ALIGN_R)
+    ws.print_area = "A1:H48"
     ws.page_setup.orientation = "portrait"; ws.page_setup.paperSize = ws.PAPERSIZE_A4
     ws.page_setup.fitToWidth = 1; ws.page_setup.fitToHeight = 1; ws.sheet_properties.pageSetUpPr.fitToPage = True
     ws.page_margins = PageMargins(left=0.5, right=0.5, top=0.6, bottom=0.6)
@@ -102,7 +110,8 @@ GUIDE = [
     ("s", "3. طفل التحق متأخرًا؟ اكتبي «تاريخ الالتحاق» فلا تُحتسب الأيام السابقة له. طفل انسحب أو انتقل؟ غيّري «الحالة الدراسية» إلى منسحب/منقول ولا تحذفي صفه."),
     ("s", "4. الصفوف السبعة KG1-1 … KG1-7 جاهزة. لإيقاف صف (دمج أو إغلاق): في «الإعدادات» غيّري «مفعّل» إلى لا وأخفي ورقته؛ يمكن إعادة تفعيله في أي وقت دون فقد البيانات."),
     ("h2", "الاستخدام اليومي (أقل من دقيقة لكل صف)"),
-    ("s", "الخطوة 1: افتحي ورقة الصف واضغطي رابط «الانتقال إلى عمود اليوم» أعلى الورقة (أو استخدمي ورقة «الحضور اليومي» للانتقال إلى أي تاريخ)."),
+    ("s", "الخطوة 1: افتحي ورقة الصف واضغطي رابط «الانتقال إلى عمود اليوم» أعلى الورقة. للإدخال بأثر رجعي: اختاري التاريخ من خانة «الانتقال إلى تاريخ سابق» ثم اضغطي الرابط المجاور، أو استخدمي ورقة «الحضور اليومي»."),
+    ("s", "الإدخال بأثر رجعي: لكل يوم دراسي عمود جاهز منذ بداية العام، فيمكن تعبئة أي عدد من الأيام السابقة بالترتيب الذي تريدين، مع وضع ✓ في صف التأكيد لكل يوم اكتمل تسجيله."),
     ("s", "الخطوة 2: في عمود اليوم اكتبي حالة الغائبين والمتأخرين فقط من القائمة المنسدلة: غائب / بعذر / متأخر (يمكن كتابة «حاضر» أيضًا لكن لا حاجة لذلك)."),
     ("s", "الخطوة 3: ضعي ✓ في صف «تأكيد تسجيل اليوم» أعلى العمود. عندها فقط يُعتبر كل طفل لم تُكتب له حالة حاضرًا. بدون ✓ لا يُحتسب اليوم لهؤلاء الأطفال (الخلية الفارغة لا تعني غيابًا ولا حضورًا)."),
     ("s", "الخطوة 4: احفظي الملف، ثم افتحي «لوحة المتابعة» لمشاهدة نسب الحضور وتنبيهات اليوم ومن وصل إلى حد التنبيه."),
