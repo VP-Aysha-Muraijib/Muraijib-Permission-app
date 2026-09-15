@@ -2,6 +2,7 @@
 from common import *
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.worksheet.table import Table, TableStyleInfo
+from openpyxl.formatting.rule import FormulaRule
 import datetime as dt
 
 TERMS = [("الفصل الأول", dt.date(2026, 8, 31), dt.date(2026, 12, 11)),
@@ -197,11 +198,23 @@ def build_calendar(wb):
              "Cal_Reg": "I", "Cal_Pres": "J", "Cal_Abs": "K", "Cal_Exc": "L", "Cal_Late": "M", "Cal_Rate": "N", "Cal_Recorded": "O", "Cal_RecIdx": "P"}
     for k, c in names.items():
         define(wb, k, f"{cq(ws.title)}${c}${CAL_FIRST}:${c}${CAL_LAST}")
+    # weeks table (R..V): number, from, to, school days, label used by the week picker in every register
+    nweeks = (YEAR_END - YEAR_START).days // 7 + 1
+    header_row(ws, 4, 18, ["الأسبوع", "من", "إلى", "أيام الدوام", "تسمية الأسبوع"], widths=[8, 11, 11, 8, 30])
+    for w in range(1, nweeks + 1):
+        r = 4 + w
+        put(ws, f"R{r}", w, f=font(10), al=ALIGN_C)
+        put(ws, f"S{r}", YEAR_START + dt.timedelta(days=7 * (w - 1)), f=font(10), al=ALIGN_C, nf="dd/mm/yyyy")
+        put(ws, f"T{r}", f"=S{r}+4", f=font(10), al=ALIGN_C, nf="dd/mm/yyyy")
+        put(ws, f"U{r}", f'=COUNTIFS(Cal_Week,R{r},Cal_School,1)', f=font(10), al=ALIGN_C)
+        put(ws, f"V{r}", f'="الأسبوع "&R{r}&": "&TEXT(S{r},"dd/mm")&" – "&TEXT(T{r},"dd/mm")&IF(U{r}=0,"  (إجازة)",IF(U{r}<5,"  (عطلة جزئية)",""))', f=font(10), al=ALIGN_R)
+    for col, name in {"R": "Week_No", "S": "Week_From", "U": "Week_Days", "V": "Week_Label"}.items():
+        define(wb, name, f"{cq(ws.title)}${col}$5:${col}${4+nweeks}")
+    ws.conditional_formatting.add(f"R5:V{4+nweeks}", FormulaRule(formula=["$U5=0"], fill=fill(GRAY_F), font=Font(name=FONT, color=MUTED)))
     tab = Table(displayName="tblCalendar", ref=f"A4:P{CAL_LAST}")
     tab.tableStyleInfo = TableStyleInfo(name="TableStyleLight1", showRowStripes=True)
     ws.add_table(tab)
     ws.freeze_panes = "A5"
-    from openpyxl.formatting.rule import FormulaRule
     ws.conditional_formatting.add(f"A{CAL_FIRST}:P{CAL_LAST}", FormulaRule(formula=[f"$H{CAL_FIRST}=0"], fill=fill(GRAY_F), font=Font(name=FONT, color=MUTED)))
     ws.conditional_formatting.add(f"A{CAL_FIRST}:A{CAL_LAST}", FormulaRule(formula=[f"$A{CAL_FIRST}=TODAY()"], fill=fill(BLUE_F), font=Font(name=FONT, bold=True)))
     protect(ws)

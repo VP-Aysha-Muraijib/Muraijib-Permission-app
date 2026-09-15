@@ -4,7 +4,7 @@ from openpyxl import Workbook
 from common import *
 from settings_cal import build_settings, build_calendar
 from registers import build_register
-from master_db import build_master, build_db, build_contact_log, build_absence_log, build_followup
+from master_db import build_master, build_classdaily, build_events, build_contact_log, build_absence_log, build_followup
 from dashboard import build_calc, build_dashboard
 from others import build_daily, build_profile, build_trends
 from report_guide import build_report, build_guide
@@ -42,7 +42,8 @@ def build(path, with_demo=True, real=None):
     build_calendar(wb)
     regs = [build_register(wb, cn, i) for i, cn in enumerate(CLASSES)]
     build_master(wb)
-    build_db(wb)
+    build_classdaily(wb)
+    build_events(wb)
     build_contact_log(wb)
     build_absence_log(wb)
     build_followup(wb)
@@ -54,7 +55,7 @@ def build(path, with_demo=True, real=None):
     build_report(wb)
     build_guide(wb)
     # sheet order
-    order = [SHEETS["dash"], SHEETS["daily"]] + CLASSES + [SHEETS["fu"], SHEETS["alog"], SHEETS["clog"], SHEETS["prof"], SHEETS["trend"], SHEETS["rpt"], SHEETS["stu"], SHEETS["cal"], SHEETS["set"], SHEETS["guide"], SHEETS["db"], SHEETS["calc"]]
+    order = [SHEETS["dash"], SHEETS["daily"]] + CLASSES + [SHEETS["fu"], SHEETS["alog"], SHEETS["clog"], SHEETS["prof"], SHEETS["trend"], SHEETS["rpt"], SHEETS["stu"], SHEETS["cal"], SHEETS["set"], SHEETS["guide"], SHEETS["cd"], SHEETS["ev"], SHEETS["calc"]]
     wb._sheets = [wb[n] for n in order]
     wb.active = 0
     if with_demo:

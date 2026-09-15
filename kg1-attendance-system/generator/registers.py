@@ -43,7 +43,13 @@ def build_register(wb, cname, idx):
     put(ws, "K3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH(TODAY(),{DATES_R},1),1)),"⬅ عمود اليوم")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
     put(ws, "L3", f'=HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+IFERROR(MATCH($L$2,{DATES_R},1),1)),"⬅ آخر يوم محصور")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
     put(ws, (1, DATE_COL0), "الحضور – اختاري حالة الطفل من القائمة في عمود اليوم (حاضر افتراضيًا)", f=font(12, True, TEAL), al=ALIGN_R)
-    put(ws, "M3", f'=HYPERLINK("#{q(S)}!D{REG_FIRST}","⬅ الإحصائيات وبيانات التواصل")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    put(ws, "H1", "الانتقال إلى أسبوع:", f=font(10, True, NAVY), al=ALIGN_R)
+    input_cell(ws, "I1", None, al=ALIGN_R)
+    put(ws, "J1", f'=IF($I$1="","⬅ اختاري أسبوعًا",IFERROR(HYPERLINK("#{q(S)}!"&ADDRESS({REG_FIRST},{DATE_COL0-1}+MATCH(INDEX(Week_From,MATCH($I$1,Week_Label,0)),{DATES_R},0)),"⬅ فتح أيام الأسبوع"),"⚠ أسبوع غير معروف"))', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    dvw = DataValidation(type="list", formula1="=Week_Label", allow_blank=True, error="اختاري أسبوعًا من القائمة", errorTitle="أسبوع غير معروف", prompt="أسابيع العام الدراسي؛ أسابيع الإجازة معلَّمة (إجازة)", promptTitle="الأسبوع")
+    ws.add_data_validation(dvw); dvw.add(ws["I1"])
+    put(ws, "K1", f'=HYPERLINK("#{q(S)}!D{REG_FIRST}","⬅ الإحصائيات وبيانات التواصل")', f=font(10, True, "1D4ED8"), al=ALIGN_R)
+    ws["I1"].font = font(9, True, NAVY)
     lab_col = L(DATE_COL0 - 1)
     for r, t in [(4, "الشهر"), (5, "التاريخ"), (6, "يوم دراسي"), (7, "محصور ✓")]:
         put(ws, f"{lab_col}{r}", t, f=font(9, True, NAVY), al=ALIGN_R)
@@ -54,7 +60,9 @@ def build_register(wb, cname, idx):
     for i, d in enumerate(DATES):
         c = DATE_COL0 + i; col = L(c)
         ws.column_dimensions[col].width = 12.5
-        put(ws, (4, c), AR_MONTHS[d.month - 1] if (i == 0 or DATES[i-1].month != d.month) else "", f=font(8, True, NAVY), al=Alignment(horizontal="right"))
+        wk = (d - YEAR_START).days // 7 + 1
+        lab = (AR_MONTHS[d.month - 1] + " · " if (i == 0 or DATES[i-1].month != d.month) else "") + (f"أ{wk}" if d.weekday() == 0 else "")
+        put(ws, (4, c), lab, f=font(8, True, NAVY), al=Alignment(horizontal="right"))
         put(ws, (5, c), d, nf="dd/mm", f=font(9, True), al=ALIGN_C, b=box())
         put(ws, (6, c), f"={cq(SHEETS['cal'])}$H${CAL_FIRST + i}", nf='"";"";"عطلة"', f=font(8, False, MUTED), al=ALIGN_C)
         put(ws, (7, c), f'=IF(AND({col}$6=1,{col}$5<={CUTOFF_CELL}),"✓","")', f=font(9, True, GREEN_T), al=ALIGN_C)

@@ -207,3 +207,20 @@ RC = {"num": "A", "id": "B", "name": "C", "abs": "D", "exc": "E", "late": "F", "
       "lastcontact": "R", "method": "S", "level": "T", "start": "U", "d3": "V", "d5": "W", "d10": "X", "d15": "Y",
       "ph1": "Z", "ph2": "AA", "ph3": "AB", "ph4": "AC"}
 CUTOFF_CELL = "$L$2"      # effective "counted up to" date inside each register sheet
+
+# ---- cross-sheet helpers (no background database): pick a class grid / counted-row by class index
+def GRID(c_expr):
+    return "CHOOSE(" + c_expr + "," + ",".join(f"{cq(cn)}${DC0}${REG_FIRST}:${DC1}${REG_LAST}" for cn in CLASSES) + ")"
+
+def CONFROW(c_expr):
+    return "CHOOSE(" + c_expr + "," + ",".join(f"{cq(cn)}${DC0}$7:${DC1}$7" for cn in CLASSES) + ")"
+
+DATES_ROW = f"{cq(CLASSES[0])}${DC0}$5:${DC1}$5"
+
+def CODE_OF(val_expr):
+    """Arabic status cell -> P/A/E/L (blank cell on a counted day = present)."""
+    return f'IF({val_expr}="","P",IFERROR(INDEX(StatusCodes,MATCH({val_expr},StatusLabels,0)),""))'
+
+SHEETS["cd"] = "ملخص_الصفوف"
+SHEETS["ev"] = "أحداث_الغياب"
+EV_PER_STUDENT = 20

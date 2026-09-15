@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from common import *
 from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.worksheet.formula import ArrayFormula
 from openpyxl.formatting.rule import FormulaRule, ColorScaleRule
 from openpyxl.chart import BarChart, LineChart, Reference
 from openpyxl.chart.label import DataLabelList
@@ -51,8 +52,8 @@ def build_daily(wb):
         put(ws, f"A{r}", f'=IF(B{r}="","",{i})', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"B{r}", f'=IF(Daily_ClsIdx=0,"",INDEX(Stu_ID,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"C{r}", f'=IF(B{r}="","",INDEX(Stu_Name,{mrow}))', f=font(10, True), al=ALIGN_R, b=bottom())
-        code = f'INDEX(DB_Code,1+(Daily_ClsIdx-1)*{DB_BLOCK}+(Daily_DayIdx-1)*{SLOTS}+{i-1})'
-        put(ws, f"E{r}", f'=IF(OR(B{r}="",Daily_DayIdx=0),"",{code})', f=font(10), al=ALIGN_C, b=bottom())
+        val = f"INDEX({GRID('Daily_ClsIdx')},{i},Daily_DayIdx)"; cf = f"INDEX({CONFROW('Daily_ClsIdx')},Daily_DayIdx)"
+        put(ws, f"E{r}", f'=IF(OR(B{r}="",Daily_DayIdx=0),"",IF({cf}<>"✓","",{CODE_OF(val)}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"D{r}", f'=IF(B{r}="","",IF(INDEX(Stu_StStatus,{mrow})<>"نشط","غير نشط",IF(Daily_DayIdx=0,"—",IF(E{r}="","غير محصور",INDEX(StatusLabels,MATCH(E{r},StatusCodes,0))))))', f=font(10, True), al=ALIGN_C, b=bottom())
         put(ws, f"F{r}", f'=IF(B{r}="","",INDEX(Stu_Abs,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"G{r}", f'=IF(B{r}="","",INDEX(Stu_Status,{mrow}))', f=font(10), al=ALIGN_C, b=bottom())
@@ -94,7 +95,18 @@ def build_profile(wb):
     dv = DataValidation(type="list", formula1="=Stu_Name", allow_blank=True, error="اختاري اسمًا من القائمة", errorTitle="اسم غير موجود"); ws.add_data_validation(dv); dv.add(ws["B4"])
     put(ws, "AD4", '=IFERROR(MATCH($B$4,Stu_Name,0),"")', f=font(8, False, MUTED), al=ALIGN_C); define(wb, "Prof_Row", f"{cq(ws.title)}$AD$4")
     put(ws, "AE4", '=IF(Prof_Row="","",INDEX(Stu_ID,Prof_Row))', f=font(8, False, MUTED), al=ALIGN_C); define(wb, "Prof_ID", f"{cq(ws.title)}$AE$4")
-    put(ws, "AF4", '=IF(Prof_Row="","",1+(INDEX(Stu_C,Prof_Row)-1)*%d+(INDEX(Stu_I,Prof_Row)-1))' % DB_BLOCK, f=font(8, False, MUTED), al=ALIGN_C); define(wb, "Prof_Base", f"{cq(ws.title)}$AF$4")
+    put(ws, "AF4", '=IF(Prof_Row="","",INDEX(Stu_C,Prof_Row))', f=font(8, False, MUTED), al=ALIGN_C); define(wb, "Prof_C", f"{cq(ws.title)}$AF$4")
+    put(ws, "AC4", '=IF(Prof_Row="","",INDEX(Stu_I,Prof_Row))', f=font(8, False, MUTED), al=ALIGN_C); define(wb, "Prof_I", f"{cq(ws.title)}$AC$4")
+    # hidden mirror of the selected child's register row (statuses), the class's counted-day row and the dates
+    for j in range(NDAYS):
+        c = 2 + j
+        ws.cell(60, c, f'=IF(Prof_Row="","",INDEX({GRID("Prof_C")},Prof_I,{j+1}))')
+        ws.cell(61, c, f'=IF(Prof_Row="","",INDEX({CONFROW("Prof_C")},{j+1}))')
+        ws.cell(62, c, f"={cq(CLASSES[0])}{L(DATE_COL0 + j)}$5").number_format = "dd/mm/yyyy"
+    put(ws, "A60", "صف الطفل (مرآة)", f=font(8, False, MUTED)); put(ws, "A61", "محصور", f=font(8, False, MUTED)); put(ws, "A62", "التاريخ", f=font(8, False, MUTED))
+    for rr in (60, 61, 62): ws.row_dimensions[rr].hidden = True
+    MROW = f"$B$60:${L(1 + NDAYS)}$60"; MCONF = f"$B$61:${L(1 + NDAYS)}$61"; MDATES = f"$B$62:${L(1 + NDAYS)}$62"
+    define(wb, "Prof_Statuses", f"{cq(ws.title)}{MROW}"); define(wb, "Prof_Counted", f"{cq(ws.title)}{MCONF}"); define(wb, "Prof_Dates", f"{cq(ws.title)}{MDATES}")
     put(ws, "A5", '=IF($B$4="","⬆ اختاري اسم الطفل من القائمة المنسدلة",IF(Prof_Row="","⚠ الاسم غير موجود في قائمة الأطفال",""))', f=font(9, False, ORG_T, True), al=ALIGN_R)
     G = lambda e: f'=IF(Prof_Row="","",{e})'
     info = [("الرقم الطلابي", "INDEX(Stu_ID,Prof_Row)", None), ("الصف", "INDEX(Stu_Class,Prof_Row)", None), ("الحالة الدراسية", "INDEX(Stu_StStatus,Prof_Row)", None),
@@ -124,8 +136,9 @@ def build_profile(wb):
     ws.row_dimensions[18].height = 24
     for k in range(1, 21):
         r = 18 + k
-        put(ws, f"A{r}", G(f'IF(_xlfn.MINIFS(DB_Date,DB_ID,Prof_ID,DB_IsAbs,1,DB_Cum,{k})=0,"",{k})'), f=font(9), al=ALIGN_C, b=bottom())
-        merged(f"B{r}:E{r}", G(f'IF(_xlfn.MINIFS(DB_Date,DB_ID,Prof_ID,DB_IsAbs,1,DB_Cum,{k})=0,"",_xlfn.MINIFS(DB_Date,DB_ID,Prof_ID,DB_IsAbs,1,DB_Cum,{k}))'), f=font(9, True), al=ALIGN_C, b=bottom(), nf="dd/mm/yyyy")
+        ws[f"B{r}"] = ArrayFormula(f"B{r}", f'=IF(Prof_Row="","",IFERROR(SMALL(IF((Prof_Statuses="غياب بدون عذر")*(Prof_Counted="✓"),Prof_Dates),{k}),""))')
+        style(ws[f"B{r}"], f=font(9, True), al=ALIGN_C, b=bottom(), nf="dd/mm/yyyy"); ws.merge_cells(f"B{r}:E{r}")
+        put(ws, f"A{r}", f'=IF(B{r}="","",{k})', f=font(9), al=ALIGN_C, b=bottom())
         merged(f"F{r}:H{r}", f'=IF(B{r}="","",INDEX(Cal_Day,MATCH(B{r},Cal_Date,0)))', f=font(9), al=ALIGN_C, b=bottom())
         if k <= 10:
             merged(f"J{r}:M{r}", G(f'IFERROR(INDEX(Log_Date,MATCH({k},Log_Seq,0)),"")'), f=font(9, True), al=ALIGN_C, b=bottom(), nf="dd/mm/yyyy")
@@ -151,7 +164,8 @@ def build_profile(wb):
         r = 43 + i
         put(ws, f"A{r}", f"{AR_MONTHS[m-1]} {y}", f=font(9, True, NAVY), al=ALIGN_R, b=box(), bg=LIGHT)
         for d in range(1, 32):
-            fm = f'=IF(Prof_Row="","",IFERROR(IF(DAY(DATE({y},{m},{d}))<>{d},"",INDEX(StatusSymbols,MATCH(INDEX(DB_Code,Prof_Base+(MATCH(DATE({y},{m},{d}),Cal_Date,0)-1)*{SLOTS}),StatusCodes,0))),""))'
+            ix = f"MATCH(DATE({y},{m},{d}),Prof_Dates,0)"
+            fm = f'=IF(Prof_Row="","",IFERROR(IF(DAY(DATE({y},{m},{d}))<>{d},"",IF(INDEX(Prof_Counted,{ix})<>"✓","",IF(INDEX(Prof_Statuses,{ix})="","✓",INDEX(StatusSymbols,MATCH(INDEX(Prof_Statuses,{ix}),StatusLabels,0))))),""))'
             put(ws, (r, 1 + d), fm, f=font(9, True), al=ALIGN_C, b=box("EEF0F3"))
         ws.row_dimensions[r].height = 18
     grid = f"B43:AF{42+len(months)}"
@@ -271,8 +285,8 @@ def build_trends(wb):
         put(ws, f"A{r}", f"=A{src}", f=font(9, True), al=ALIGN_R, b=bottom())
         for k in range(NCLS):
             col = L(2 + k); cls = f"{col}${r3+1}"
-            P = f'COUNTIFS(DB_Class,{cls},DB_Date,">="&$I{src},DB_Date,"<="&$J{src},DB_Code,"P")'; Lt = f'COUNTIFS(DB_Class,{cls},DB_Date,">="&$I{src},DB_Date,"<="&$J{src},DB_Code,"L")'
-            reg = "+".join(f'COUNTIFS(DB_Class,{cls},DB_Date,">="&$I{src},DB_Date,"<="&$J{src},DB_Code,"{c}")' for c in "PAEL")
+            P = f'SUMIFS(CD_Pres,CD_Class,{cls},CD_Date,">="&$I{src},CD_Date,"<="&$J{src})'; Lt = f'SUMIFS(CD_Late,CD_Class,{cls},CD_Date,">="&$I{src},CD_Date,"<="&$J{src})'
+            reg = f'SUMIFS(CD_Reg,CD_Class,{cls},CD_Date,">="&$I{src},CD_Date,"<="&$J{src})'
             put(ws, f"{col}{r}", f'=IF(INDEX(ClassActive,{k+1})<>"نعم","",IF(({reg})=0,"",({P}+IF(LateAsPresent="نعم",{Lt},0))/({reg})))', f=font(9), al=ALIGN_C, b=bottom(), nf="0.0%")
     ws.conditional_formatting.add(f"B{r3+2}:{L(1+NCLS)}{r3+1+len(months)}", ColorScaleRule(start_type="num", start_value=0.8, start_color="F8B4B4", mid_type="num", mid_value=0.9, mid_color="FFF4CC", end_type="num", end_value=1, end_color="C8E6C9"))
     put(ws, f"A{r3+2+len(months)}", "التلوين: أحمر < 80% · أصفر ≈ 90% · أخضر = 100%. الخلايا الفارغة = لا توجد بيانات مسجَّلة.", f=font(8, False, MUTED, True), al=ALIGN_R)

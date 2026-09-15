@@ -22,11 +22,14 @@ def labels(chart, fmt="0%"):
 CALC = SHEETS["calc"]; DASH = SHEETS["dash"]
 
 def class_counts(cls_expr, code, date_expr=None, start=None, end=None):
-    """COUNTIFS over the database, with optional class filter ('الكل' = all)."""
-    crit = f'DB_Code,"{code}"'
-    if date_expr: crit += f',DB_Date,{date_expr}'
-    if start: crit += f',DB_Date,">="&{start},DB_Date,"<="&{end}'
-    return f'IF({cls_expr}="الكل",COUNTIFS({crit}),COUNTIFS({crit},DB_Class,{cls_expr}))'
+    """Count of P/A/E/L over the class-day summary table (tblClassDaily), optional class filter ('الكل' = all)."""
+    col = {"P": "CD_Pres", "A": "CD_Abs", "E": "CD_Exc", "L": "CD_Late"}[code]
+    crit = ""
+    if date_expr: crit += f',CD_Date,{date_expr}'
+    if start: crit += f',CD_Date,">="&{start},CD_Date,"<="&{end}'
+    if not crit:
+        return f'IF({cls_expr}="الكل",SUM({col}),SUMIFS({col},CD_Class,{cls_expr}))'
+    return f'IF({cls_expr}="الكل",SUMIFS({col}{crit}),SUMIFS({col}{crit},CD_Class,{cls_expr}))'
 
 def build_calc(wb):
     ws = wb.create_sheet(CALC)
@@ -228,8 +231,8 @@ def build_dashboard(wb, calc_rows):
         put(ws, f"H{r}", G(f'COUNTIFS(Stu_Class,$F{r},Stu_Today,"P",Stu_StStatus,"نشط")+COUNTIFS(Stu_Class,$F{r},Stu_Today,"L",Stu_StStatus,"نشط")'), f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"I{r}", G(f'COUNTIFS(Stu_Class,$F{r},Stu_Today,"A",Stu_StStatus,"نشط")+COUNTIFS(Stu_Class,$F{r},Stu_Today,"E",Stu_StStatus,"نشط")'), f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"J{r}", G(f'IF(H{r}+I{r}=0,"",(COUNTIFS(Stu_Class,$F{r},Stu_Today,"P",Stu_StStatus,"نشط")+IF(LateAsPresent="نعم",COUNTIFS(Stu_Class,$F{r},Stu_Today,"L",Stu_StStatus,"نشط"),0))/(H{r}+I{r}))'), f=font(10, True, TEAL), al=ALIGN_C, b=bottom(), nf="0.0%")
-        att = f'COUNTIFS(DB_Class,$F{r},DB_Date,">="&Dash_MStart,DB_Date,"<="&Dash_MEnd,DB_Code,"P")+IF(LateAsPresent="نعم",COUNTIFS(DB_Class,$F{r},DB_Date,">="&Dash_MStart,DB_Date,"<="&Dash_MEnd,DB_Code,"L"),0)'
-        reg = "+".join(f'COUNTIFS(DB_Class,$F{r},DB_Date,">="&Dash_MStart,DB_Date,"<="&Dash_MEnd,DB_Code,"{c}")' for c in "PAEL")
+        att = f'{class_counts(f"$F{r}", "P", start="Dash_MStart", end="Dash_MEnd")}+IF(LateAsPresent="نعم",{class_counts(f"$F{r}", "L", start="Dash_MStart", end="Dash_MEnd")},0)'
+        reg = f'SUMIFS(CD_Reg,CD_Class,$F{r},CD_Date,">="&Dash_MStart,CD_Date,"<="&Dash_MEnd)'
         put(ws, f"K{r}", G(f'IF(({reg})=0,"",({att})/({reg}))'), f=font(10), al=ALIGN_C, b=bottom(), nf="0.0%")
         put(ws, f"L{r}", G(f'COUNTIFS(Stu_Class,$F{r},Stu_StStatus,"نشط",Stu_Level,">="&Thr_FollowUp)'), f=font(10), al=ALIGN_C, b=bottom())
         put(ws, f"M{r}", G(f'COUNTIFS(Stu_Class,$F{r},Stu_StStatus,"نشط",Stu_Level,">="&Thr_High)'), f=font(10), al=ALIGN_C, b=bottom())
