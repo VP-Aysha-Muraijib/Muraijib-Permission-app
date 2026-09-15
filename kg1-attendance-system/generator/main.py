@@ -85,12 +85,16 @@ def build(path, with_demo=True, real=None):
                 for j, ph in enumerate(([s["phone"]] + s["extra"])[:4]):
                     ws[f"{['Z','AA','AB','AC'][j]}{r}"] = ph
     # normalise data validations to Excel's canonical form (no leading "=", messages enabled)
+    names = {n: dn.attr_text for n, dn in wb.defined_names.items()}
     for ws in wb.worksheets:
         for dv in ws.data_validations.dataValidation:
             for attr in ("formula1", "formula2"):
                 v = getattr(dv, attr)
                 if isinstance(v, str) and v.startswith("="):
-                    setattr(dv, attr, v[1:])
+                    v = v[1:]
+                if isinstance(v, str) and v in names:      # resolve defined names to direct references
+                    v = names[v]
+                setattr(dv, attr, v)
             if dv.showErrorMessage is None or (dv.showErrorMessage is False and not getattr(dv, "_keep_soft", False)):
                 dv.showErrorMessage = True
             dv.showInputMessage = True

@@ -29,7 +29,8 @@ def build_register(wb, cname, idx):
     put(ws, "I2", f'=IF(SUM(${DC0}${SUM_ROW["reg"]}:${DC1}${SUM_ROW["reg"]})=0,"",(SUM(${DC0}${SUM_ROW["pres"]}:${DC1}${SUM_ROW["pres"]})+IF(LateAsPresent="نعم",SUM(${DC0}${SUM_ROW["late"]}:${DC1}${SUM_ROW["late"]}),0))/SUM(${DC0}${SUM_ROW["reg"]}:${DC1}${SUM_ROW["reg"]}))', f=font(11, True, TEAL), al=ALIGN_C, nf="0.0%")
     put(ws, "J2", "الحصر مكتمل حتى:", f=font(10, True, NAVY), al=ALIGN_R)
     input_cell(ws, "K2", None, nf="dd/mm/yyyy")
-    put(ws, "L2", '=IF($K$2="",MIN(TODAY(),YearEnd),$K$2)', f=font(10, True, TEAL), al=ALIGN_C, nf='"يُحتسب حتى "dd/mm/yyyy')
+    put(ws, "L2", '=IF($K$2="",MIN(TODAY(),YearEnd),$K$2)', f=font(10, True, TEAL), al=ALIGN_C, nf='dd/mm/yyyy')
+    put(ws, "L1", "يُحتسب حتى (تلقائي):", f=font(8, False, MUTED), al=ALIGN_C)
     dvc = DataValidation(type="list", formula1="=Cal_Date", allow_blank=True, error="اختاري يوم دوام من القائمة أو اتركي الخلية فارغة", errorTitle="تاريخ غير صحيح",
                          prompt="كل يوم دوام حتى هذا التاريخ يُعتبر محصورًا: من لم يُسجَّل له غياب يُعتبر حاضرًا. فارغ = حتى اليوم", promptTitle="الحصر مكتمل حتى")
     ws.add_data_validation(dvc); dvc.add(ws["K2"])
@@ -115,7 +116,7 @@ def build_register(wb, cname, idx):
             elif key == "reg": fm = f'={col}{SUM_ROW["abs"]}+{col}{SUM_ROW["exc"]}+{col}{SUM_ROW["late"]}+{col}{SUM_ROW["pres"]}'
             else: fm = f'=IF({col}{SUM_ROW["reg"]}=0,"",({col}{SUM_ROW["pres"]}+IF(LateAsPresent="نعم",{col}{SUM_ROW["late"]},0))/{col}{SUM_ROW["reg"]})'
             put(ws, (r, c), fm, f=font(9, True if key in ("reg", "rate") else False, NAVY if key in ("reg", "rate") else TXT), al=ALIGN_C, bg=LIGHT, nf="0%" if key == "rate" else "0")
-    dv = DataValidation(type="list", formula1="=StatusLabels", allow_blank=True, error="اختاري من القائمة: غياب بعذر / غياب بدون عذر / حاضر / متأخر", errorTitle="حالة غير صحيحة", prompt="الجميع حاضر افتراضيًا – اختاري «غياب بعذر» أو «غياب بدون عذر» لمن غاب", promptTitle="حالة الحضور")
+    dv = DataValidation(type="list", formula1='"غياب بعذر,غياب بدون عذر,حاضر,متأخر"', allow_blank=True, error="اختاري من القائمة: غياب بعذر / غياب بدون عذر / حاضر / متأخر", errorTitle="حالة غير صحيحة", prompt="الجميع حاضر افتراضيًا – اختاري «غياب بعذر» أو «غياب بدون عذر» لمن غاب", promptTitle="حالة الحضور")
     ws.add_data_validation(dv); dv.add(f"{DC0}{REG_FIRST}:{DC1}{REG_LAST}")
     dv4 = DataValidation(type="custom", formula1=f"COUNTIF(Stu_ID,B{REG_FIRST})<=1", allow_blank=True, error="هذا الرقم الطلابي مسجَّل مسبقًا لطفل آخر", errorTitle="رقم طلابي مكرر", prompt="رقم فريد لكل طفل (يُكتب مرة واحدة)", promptTitle="الرقم الطلابي")
     ws.add_data_validation(dv4); dv4.add(f"B{REG_FIRST}:B{REG_LAST}")
@@ -129,6 +130,7 @@ def build_register(wb, cname, idx):
     ws.conditional_formatting.add(grid, CellIsRule(operator="equal", formula=['"حاضر"'], font=Font(name=FONT, color=GREEN_T)))
     ws.conditional_formatting.add(grid, FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1,{DC0}{REG_FIRST}="",$B{REG_FIRST}<>"")'], fill=fill("FAFAFA"), font=Font(name=FONT, color="C0C4CC")))
     ws.conditional_formatting.add(f"{DC0}4:{DC1}8", FormulaRule(formula=[f"{DC0}$5=TODAY()"], fill=fill(BLUE_F)))
+    ws.conditional_formatting.add(f"{DC0}4:{DC1}8", FormulaRule(formula=[f"{DC0}$5={CUTOFF_CELL}"], fill=fill(TEAL_L)))
     ws.conditional_formatting.add(f"{DC0}7:{DC1}7", FormulaRule(formula=[f'AND({DC0}$7="",{DC0}$6=1,COUNTA({DC0}${REG_FIRST}:{DC0}${REG_LAST})>0)'], fill=fill(YEL_F), font=Font(name=FONT, color=YEL_T)))
     ws.conditional_formatting.add(f"{DC0}5:{DC1}6", FormulaRule(formula=[f"{DC0}$6=0"], fill=fill(GRAY_F), font=Font(name=FONT, color=MUTED)))
     lvl = f"A{REG_FIRST}:I{REG_LAST}"
