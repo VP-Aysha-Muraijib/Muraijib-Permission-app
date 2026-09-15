@@ -62,11 +62,11 @@ for cn in CLASSES[:ACTIVE_CLASSES]:
         exp_status = {0: "منتظم", 3: "⚠ يحتاج متابعة", 5: "⚠ غياب متكرر", 10: "⚠ غياب مرتفع", 15: "🔴 حالة حرجة"}[m["level"]]
         check(f"{cn} r{r} status", ws[f"G{r}"].value, exp_status)
 # summary rows for today
-ws = wb["KG1-A"]; col = L(DATE_COL0 + testdata.TODAY_IDX)
-act = [model[s["id"]] for s in students["KG1-A"] if model[s["id"]]["active"]]
+ws = wb[CLASSES[0]]; col = L(DATE_COL0 + testdata.TODAY_IDX)
+act = [model[s["id"]] for s in students[CLASSES[0]] if model[s["id"]]["active"]]
 check("A today abs", ws[f"{col}{SUM_ROW['abs']}"].value, sum(1 for m in act if m["status_today"] == "غائب"))
 check("A today reg", ws[f"{col}{SUM_ROW['reg']}"].value, sum(1 for m in act if m["status_today"]))
-wsE = wb["KG1-E"]; check("E today reg (unconfirmed)", wsE[f"{col}{SUM_ROW['reg']}"].value, 0)
+wsE = wb[CLASSES[4]]; check("E today reg (unconfirmed)", wsE[f"{col}{SUM_ROW['reg']}"].value, 0)
 # ---- master
 wm = wb[SHEETS["stu"]]
 for ci, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
@@ -126,7 +126,7 @@ for k, cn in enumerate(CLASSES[:ACTIVE_CLASSES]):
     regc = sum(1 for m in ms if m["status_today"]); attc = sum(1 for m in ms if m["status_today"] in ("حاضر", "متأخر"))
     check(f"cls {cn} rate", wd[f"J{r}"].value, (attc / regc) if regc else None)
     check(f"cls {cn} 3+", wd[f"L{r}"].value, sum(1 for m in ms if m["A"] >= 3))
-check("spare class rows blank", (wd["F36"].value, wd["F37"].value), (None, None))
+check("class rows 6-7", (wd["F36"].value, wd["F37"].value), (CLASSES[5], CLASSES[6]))
 # top attendance ordering & support list
 top = sorted([m for m in actives if m["tot"] > 0], key=lambda m: (-round(m["rate"] * 10000), -m["P"], m["ci"], m["slot"]))[:10]
 check("top10 names", [wd[f"A{62+k}"].value for k in range(10)], [("⭐ " if k < 3 else "") + m["name"] for k, m in enumerate(top)])
@@ -147,7 +147,7 @@ check("absence log total", wa["B3"].value, sum(m["events"] for m in actives))
 check("absence log first row filled", wa["A6"].value is not None, True)
 check("absence log row after last blank", wa[f"A{6+sum(m['events'] for m in actives)}"].value, None)
 # absence log cum for a known critical student (A slot 6): find rows with that name
-mA6 = model[students["KG1-A"][5]["id"]]
+mA6 = model[students[CLASSES[0]][5]["id"]]
 rows = [r for r in range(6, 400) if wa[f"B{r}"].value == mA6["name"] and wa[f"E{r}"].value == "غائب"]
 check("alog A6 cum sequence", [wa[f"F{r}"].value for r in rows], list(range(1, mA6["A"] + 1)))
 check("alog A6 dates", [to_date(wa[f"A{r}"].value) for r in rows], mA6["absdates"])
@@ -160,10 +160,10 @@ check("cal today registered", wcal[f"I{CAL_FIRST + testdata.TODAY_IDX}"].value, 
 wp = wb[SHEETS["prof"]]
 check("profile abs", wp["N9"].value, mA6["A"])
 check("profile absdates", [to_date(wp[f"B{19+k}"].value) for k in range(min(20, mA6["A"]))], mA6["absdates"][:20])
-check("profile contacts", [wp[f"N{19+k}"].value for k in range(2)], [l[2] for l in logs if l[1] == students["KG1-A"][5]["id"]][:2])
+check("profile contacts", [wp[f"N{19+k}"].value for k in range(2)], [l[2] for l in logs if l[1] == students[CLASSES[0]][5]["id"]][:2])
 # daily sheet (KG1-A, last recorded day)
 wdy = wb[SHEETS["daily"]]
-check("daily class reg", wdy["E8"].value, sum(1 for m in actives if m["cls"] == "KG1-A" and m["status_today"]))
+check("daily class reg", wdy["E8"].value, sum(1 for m in actives if m["cls"] == CLASSES[0] and m["status_today"]))
 check("daily E unconfirmed", wdy[f"C{11+SLOTS+3+2+4}"].value, "لم يُؤكَّد")
 # report (month, all)
 wr = wb[SHEETS["rpt"]]

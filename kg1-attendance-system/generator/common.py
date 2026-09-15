@@ -31,8 +31,8 @@ while _d <= YEAR_END:
     _d += dt.timedelta(days=1)
 NDAYS = len(DATES)                 # 218
 SLOTS = 30                         # student capacity per class sheet
-CLASSES = ["KG1-A", "KG1-B", "KG1-C", "KG1-D", "KG1-E", "KG1-F", "KG1-G"]
-ACTIVE_CLASSES = 5                 # F, G are spare (hidden)
+CLASSES = ["KG1-1", "KG1-2", "KG1-3", "KG1-4", "KG1-5", "KG1-6", "KG1-7"]
+ACTIVE_CLASSES = 7
 NCLS = len(CLASSES)
 
 # register layout

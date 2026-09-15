@@ -102,7 +102,7 @@ def build_settings(wb):
         put(ws, f"A{r}", cname, f=font(10, True), al=ALIGN_C, b=box())
         input_cell(ws, f"B{r}", "نعم" if i < ACTIVE_CLASSES else "لا")
         put(ws, f"C{r}", cname, f=font(10, False, MUTED), al=ALIGN_C, b=box())
-        put(ws, f"D{r}", "" if i < ACTIVE_CLASSES else "ورقة احتياطية مخفية – لإضافة صف: أظهر الورقة، غيّر «مفعّل» إلى نعم واكتب اسم الصف في خلية الصف داخل الورقة", f=font(9, False, MUTED), al=ALIGN_RW, b=box())
+        put(ws, f"D{r}", "" if i < ACTIVE_CLASSES else "غير مفعّل – لا يظهر في اللوحة والتقارير", f=font(9, False, MUTED), al=ALIGN_RW, b=box())
         # filter list in column G
         put(ws, f"G{cl0 + 1 + i}", f'=IF(B{r}="نعم",A{r},"")', f=font(10), al=ALIGN_C)
         r += 1
