@@ -12,7 +12,8 @@ let tReq = 0, tT = 0, tAsg = 0;
 A.SUBJECTS.forEach(s => {
   const a = I.analyze(s);
   const rows = a.rows.map(r => ({
-    teacher: r.teacher, role: r.role, isNew: r.isNew, vacancy: r.vacancy, load: r.load,
+    teacher: r.teacher, role: r.role, isNew: r.isNew, vacancy: r.vacancy,
+    parallel: r.parallel, load: r.load,
     grades: [...new Set(r.sections.map(x => +x.split('/')[0]))].sort((x, y) => x - y),
     classes: I.formatSections(s, r.sections)
   }));
@@ -28,5 +29,21 @@ A.SUBJECTS.forEach(s => {
     coordinator: a.coordinator, coordinatorTitle: a.coordinatorTitle, note: a.note, rows
   });
 });
+/* جداول الصفوف: كل شعبة والمعلمات اللواتي يدرّسنها */
+out.grades = I.GRADES.map(g => {
+  const m = I.classMatrix(g);
+  return {
+    grade: g, nameAr: A.GRADE_NAME[g],
+    classes: m.secs.map(sec => sec.grade + '/' + sec.label),
+    totals: m.totals, teachers: m.teachers, gaps: m.gaps, dups: m.dups,
+    rows: m.rows.map(r => ({
+      subject: r.subject.nameAr, id: r.subject.id,
+      periods: r.cells.map(c => c.periods).filter(v => v > 0)
+        .filter((v, i, a) => a.indexOf(v) === i).join(' / '),
+      cells: r.cells.map(c => c.periods ? c.list : null)
+    }))
+  };
+});
+
 out.totals = { required: tReq, assigned: tAsg, teachers: tT, classes: A.SECTIONS.length, subjects: A.SUBJECTS.length };
 process.stdout.write(JSON.stringify(out, null, 1));

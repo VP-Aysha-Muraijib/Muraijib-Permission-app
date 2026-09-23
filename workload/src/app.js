@@ -142,7 +142,7 @@ window.APP = window.APP || {};
       teacher: (en && r.teacherEn) ? r.teacherEn : r.teacher,
       note: (en && r.noteEn) ? r.noteEn : (r.note || ''),
       role: (en && r.roleEn) ? r.roleEn : (r.role || ''),
-      isNew: !!r.isNew, vacancy: !!r.vacancy,
+      isNew: !!r.isNew, vacancy: !!r.vacancy, parallel: !!r.parallel,
       loadOverride: (r.loadOverride != null) ? r.loadOverride : null,
       sections: (r.sections || []).filter(id => sectionById[id])
     }));
@@ -175,8 +175,8 @@ window.APP = window.APP || {};
 
     const applicable = applicableSections(subject);
     const totalRequired = applicable.reduce((s, sec) => s + periodsOf(subject, sec.id), 0);
-    const assigned = rows.reduce((s, r) => s + (r.vacancy ? 0 : r.load), 0);
-    const withLoad = rows.filter(r => r.load > 0 && !r.vacancy);
+    const assigned = rows.reduce((s, r) => s + ((r.vacancy || r.parallel) ? 0 : r.load), 0);
+    const withLoad = rows.filter(r => r.load > 0 && !r.vacancy && !r.parallel);
     const avg = withLoad.length ? assigned / withLoad.length : 0;
     const loads = withLoad.map(r => r.load);
     const max = loads.length ? Math.max.apply(null, loads) : 0;
@@ -184,12 +184,12 @@ window.APP = window.APP || {};
 
     /* الشعب غير المسندة + المكرّرة */
     const seen = {}, covered = {}, dup = [];
-    rows.forEach(r => r.sections.forEach(id => {
+    rows.filter(r => !r.parallel).forEach(r => r.sections.forEach(id => {
       if (seen[id] && !rotating) dup.push(id); else seen[id] = r.teacher;
       if (!r.vacancy) covered[id] = r.teacher;
     }));
     const uncovered = applicable.filter(s => !covered[s.id]).map(s => s.id);
-    const vacancyPeriods = rows.filter(r => r.vacancy).reduce((s, r) => s + r.load, 0);
+    const vacancyPeriods = rows.filter(r => r.vacancy && !r.parallel).reduce((s, r) => s + r.load, 0);
 
     return {
       subject, rows, totalRequired, assigned, rotating, en,
@@ -204,25 +204,44 @@ window.APP = window.APP || {};
     };
   }
 
+  /* ── نصوص جداول الصفوف ────────────────────────────────────────────── */
+  const GT = {
+    title: g => 'توزيع المعلمات على شعب ' + A.GRADE_NAME[g],
+    hSubject:'المادة', hPeriods:'حصص', hTotal:'المجموع',
+    classCount:'عدد الشعب', perClass:'حصص الشعبة الأسبوعية', teachers:'عدد المعلمات',
+    none:'—', vacancy:'شاغر *',
+    wGap:'شعب بلا معلمة', wDup:'شعب مسندة إلى أكثر من معلمة',
+    note:'تُدرَّس حصص الجوجيتسو ضمن حصص التربية البدنية نفسها، ولذلك تظهر المدرّبة إلى جانب معلمة المادة.'
+  };
+
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   /* ══ العرض ═══════════════════════════════════════════════════════════ */
   function render() {
-    $('#pages').innerHTML = A.SUBJECTS.map(renderPage).join('');
+    $('#pages').innerHTML = A.SUBJECTS.map(renderPage).join('') +
+                            GRADES.map(renderClassPage).join('');
     renderNav();
     bindPageActions();
   }
 
   function renderNav() {
-    $('#nav').innerHTML = A.SUBJECTS.map(s => {
+    const gradeNav = '<div class="nav-sep">جداول الصفوف</div>' + GRADES.map(g => {
+      const m = classMatrix(g);
+      const state = m.gaps.length || m.dups.length ? 'gap' : 'ok';
+      return '<a href="#g-' + g + '" class="nav-item ' + state + '">' +
+        '<span>' + esc(A.GRADE_NAME[g]) + '</span>' +
+        '<span class="nav-badge">' + m.secs.length + ' شعبة · ' + m.teachers + ' معلمة</span>' +
+        '</a>';
+    }).join('');
+    $('#nav').innerHTML = '<div class="nav-sep">جداول المواد</div>' + A.SUBJECTS.map(s => {
       const a = analyze(s);
       const state = a.rows.length === 0 ? 'wait' : (a.uncovered.length ? 'gap' : 'ok');
       return '<a href="#p-' + s.id + '" class="nav-item ' + state + '">' +
         '<span>' + esc(s.nameAr) + '</span>' +
         '<span class="nav-badge">' + (a.rows.length ? a.rows.length + ' معلمة' : 'بانتظار البيانات') + '</span>' +
         '</a>';
-    }).join('');
+    }).join('') + gradeNav;
   }
 
   function renderPage(subject) {
@@ -248,7 +267,7 @@ window.APP = window.APP || {};
 
     const totals = a.rows.length
       ? '<tr class="tr-total">' +
-        '<td colspan="4">' + t.total(a.rows.filter(r => r.load > 0 && !r.vacancy).length) +
+        '<td colspan="4">' + t.total(a.rows.filter(r => r.load > 0 && !r.vacancy && !r.parallel).length) +
           (a.vacancyPeriods ? ' &nbsp;·&nbsp; ' + t.vacancyTotal(a.vacancyPeriods) : '') + '</td>' +
         '<td class="c-load">' + a.assigned + '</td><td></td></tr>'
       : '';
@@ -261,12 +280,12 @@ window.APP = window.APP || {};
     if (a.duplicates.length)
       warn.push('<div class="warn"><b>' + t.wDup + ':</b> ' + esc(sectionLabels(subject, a.duplicates)) + '</div>');
     const std = A.SCHOOL.standardLoad || 24;
-    const over = a.rows.filter(r => !r.vacancy && r.load > (A.SCHOOL.overloadThreshold || 30));
+    const over = a.rows.filter(r => !r.vacancy && !r.parallel && r.load > (A.SCHOOL.overloadThreshold || 30));
     if (over.length)
       warn.push('<div class="warn"><b>' + t.wOver + ':</b> ' +
         over.map(r => esc(r.teacher) + ' — ' + r.load + ' ' + t.period).join(' · ') +
         t.wOverTail(std, Math.ceil(a.assigned / std), a.assigned) + '</div>');
-    const under = a.rows.filter(r => !r.vacancy && r.load > 0 && r.load < std / 2);
+    const under = a.rows.filter(r => !r.vacancy && !r.parallel && r.load > 0 && r.load < std / 2);
     if (under.length)
       warn.push('<div class="note-box"><b>' + t.wUnder + ':</b> ' +
         under.map(r => esc(r.teacher) + ' — ' + r.load + ' ' + t.period).join(' · ') +
@@ -317,6 +336,144 @@ window.APP = window.APP || {};
       '<span class="sign-name">' + esc(principalName(a.en)) + '</span><span class="sign-line"></span></div>' +
   '</footer>' +
 '</section>';
+  }
+
+  /* ══ جداول الصفوف — كل شعبة والمعلمات اللواتي يدرّسنها ═══════════════ */
+  const GRADES = [5, 6, 7, 8];
+  const gradeSections = g => A.SECTIONS.filter(s => s.grade === g);
+
+  function cellTeachers(subject, sectionId) {
+    const d = DIST[subject.id] || { rows: [] };
+    const out = [];
+    (d.rows || []).forEach(r => {
+      if ((r.sections || []).indexOf(sectionId) < 0) return;
+      out.push({
+        name: r.vacancy ? GT.vacancy : (r.teacher || ''),
+        role: r.role || '', vacancy: !!r.vacancy, parallel: !!r.parallel
+      });
+    });
+    return out;
+  }
+
+  function classMatrix(g) {
+    const secs = gradeSections(g);
+    const rows = A.SUBJECTS.map(sub => ({
+      subject: sub,
+      cells: secs.map(sec => ({
+        sec: sec, periods: periodsOf(sub, sec.id), list: cellTeachers(sub, sec.id)
+      }))
+    })).filter(r => r.cells.some(c => c.periods > 0));
+
+    const totals = secs.map((sec, j) => rows.reduce((s, r) => s + r.cells[j].periods, 0));
+    const names = {}, gaps = [], dups = [];
+    rows.forEach(r => r.cells.forEach(c => {
+      if (!c.periods) return;
+      const main = c.list.filter(x => !x.parallel && !x.vacancy);
+      if (!main.length && !c.list.some(x => x.vacancy))
+        gaps.push(c.sec.grade + '/' + c.sec.label + ' — ' + r.subject.nameAr);
+      if (main.length > 1)
+        dups.push(c.sec.grade + '/' + c.sec.label + ' — ' + r.subject.nameAr);
+      c.list.forEach(x => { if (!x.vacancy) names[x.name] = 1; });
+    }));
+    return { grade: g, secs: secs, rows: rows, totals: totals,
+             gaps: gaps, dups: dups, teachers: Object.keys(names).length };
+  }
+
+  function renderClassPage(g) {
+    const m = classMatrix(g);
+    const head = '<tr>' +
+      '<th class="m-sub">' + GT.hSubject + '</th>' +
+      '<th class="m-per">' + GT.hPeriods + '</th>' +
+      m.secs.map(sec => '<th class="m-cell">' + esc(sec.grade + '/' + sec.label) + '</th>').join('') +
+      '</tr>';
+
+    const body = m.rows.map(r => {
+      const per = r.cells.map(c => c.periods).filter(v => v > 0);
+      const uniq = per.filter((v, i, a) => a.indexOf(v) === i);
+      return '<tr>' +
+        '<td class="m-sub">' + esc(r.subject.nameAr) + '</td>' +
+        '<td class="m-per">' + uniq.join(' / ') + '</td>' +
+        r.cells.map(c => {
+          if (!c.periods) return '<td class="m-cell is-na">' + GT.none + '</td>';
+          if (!c.list.length) return '<td class="m-cell is-gap">' + GT.none + '</td>';
+          return '<td class="m-cell">' + c.list.map(x =>
+            '<span class="m-t' + (x.vacancy ? ' is-vac' : '') + (x.parallel ? ' is-par' : '') + '">' +
+            esc(x.name) + (x.role ? '<i>' + esc(x.role) + '</i>' : '') + '</span>').join('') +
+            '</td>';
+        }).join('') + '</tr>';
+    }).join('');
+
+    const total = '<tr class="tr-total">' +
+      '<td class="m-sub">' + GT.hTotal + '</td><td class="m-per"></td>' +
+      m.totals.map(v => '<td class="m-cell">' + v + '</td>').join('') + '</tr>';
+
+    const warn = [];
+    if (m.gaps.length)
+      warn.push('<div class="warn"><b>' + GT.wGap + ' (' + m.gaps.length + '):</b> ' +
+        esc(m.gaps.join(' · ')) + '</div>');
+    if (m.dups.length)
+      warn.push('<div class="warn"><b>' + GT.wDup + ':</b> ' + esc(m.dups.join(' · ')) + '</div>');
+    warn.push('<div class="note-box">' + GT.note + '</div>');
+
+    return '' +
+'<section class="page page-matrix" id="g-' + g + '" dir="rtl" data-grade="' + g + '">' +
+  '<div class="page-tools no-print">' +
+    '<button class="btn sm" data-act="xlsx-grade" data-g="' + g + '">Excel لهذا الصف</button>' +
+  '</div>' +
+  '<header class="sheet-head">' +
+    '<div class="letterhead-img" role="img" aria-label="' + esc(A.SCHOOL.nameAr) + '"></div>' +
+    '<div class="rule-double"></div>' +
+  '</header>' +
+  '<div class="doc-title">' +
+    '<h2>' + esc(GT.title(g)) + '</h2>' +
+    '<div class="doc-year">' + esc(STR.ar.year(A.SCHOOL.year)) + '</div>' +
+    '<div class="doc-rule"></div>' +
+  '</div>' +
+  '<div class="meta-strip">' +
+    '<span><b>' + GT.classCount + ':</b> ' + m.secs.length + '</span>' +
+    '<span><b>' + GT.perClass + ':</b> ' + m.totals[0] + '</span>' +
+    '<span><b>' + GT.teachers + ':</b> ' + m.teachers + '</span>' +
+  '</div>' +
+  '<table class="grid matrix">' +
+    '<thead>' + head + '</thead><tbody>' + body + total + '</tbody>' +
+  '</table>' +
+  warn.join('') +
+  '<footer class="sheet-foot">' +
+    '<div class="sign"><span class="sign-role">' + STR.ar.signDeputy + '</span>' +
+      '<span class="sign-name">' + esc(A.SCHOOL.deputy) + '</span><span class="sign-line"></span></div>' +
+    '<div class="sign"><span class="sign-role">' + STR.ar.signPrincipal + '</span>' +
+      '<span class="sign-name">' + esc(A.SCHOOL.principal) + '</span><span class="sign-line"></span></div>' +
+  '</footer>' +
+'</section>';
+  }
+
+  function gradeSheet(g) {
+    const m = classMatrix(g);
+    const H = v => ({ v: v, style: 'head' });
+    const rows = [];
+    const w = 2 + m.secs.length;
+    const pad = a => { while (a.length < w) a.push(''); return a; };
+    rows.push(pad([{ v: GT.title(g) + ' — ' + A.SCHOOL.year, style: 'title' }]));
+    rows.push(pad([{ v: A.SCHOOL.nameAr + ' · ' + A.SCHOOL.nameEn, style: 'title' }]));
+    rows.push(pad([]));
+    rows.push([H(GT.hSubject), H(GT.hPeriods)].concat(m.secs.map(sec => H(sec.grade + '/' + sec.label))));
+    m.rows.forEach(r => {
+      const per = r.cells.map(c => c.periods).filter(v => v > 0).filter((v, i, a) => a.indexOf(v) === i);
+      rows.push([r.subject.nameAr, { v: per.join(' / '), style: 'num' }].concat(
+        r.cells.map(c => !c.periods ? '—'
+          : c.list.map(x => x.name + (x.role ? ' (' + x.role + ')' : '')).join(' + ') || '—')));
+    });
+    rows.push([{ v: GT.hTotal, style: 'total' }, { v: '', style: 'total' }]
+      .concat(m.totals.map(v => ({ v: v, style: 'total' }))));
+    rows.push(pad([]));
+    rows.push(pad([STR.ar.signDeputy, A.SCHOOL.deputy, STR.ar.signPrincipal, A.SCHOOL.principal]));
+    const colA = String.fromCharCode(65 + w - 1);
+    return {
+      name: A.GRADE_NAME[g], rtl: true, landscape: true,
+      cols: [30, 10].concat(m.secs.map(() => 22)),
+      merges: ['A1:' + colA + '1', 'A2:' + colA + '2'],
+      rows: rows
+    };
   }
 
   /* ══ التعديل ═════════════════════════════════════════════════════════ */
@@ -413,7 +570,7 @@ window.APP = window.APP || {};
       { v: r.load, style: 'num' }, ''
     ]));
     rows.push([
-      { v: t.total(a.rows.filter(r => r.load > 0 && !r.vacancy).length), style: 'total' },
+      { v: t.total(a.rows.filter(r => r.load > 0 && !r.vacancy && !r.parallel).length), style: 'total' },
       { v: '', style: 'total' }, { v: '', style: 'total' }, { v: '', style: 'total' },
       { v: a.assigned, style: 'total' }, { v: '', style: 'total' }
     ]);
@@ -449,7 +606,7 @@ window.APP = window.APP || {};
     let tReq = 0, tAsg = 0, tT = 0;
     A.SUBJECTS.forEach(s => {
       const a = analyze(s);
-      const n = a.rows.filter(r => r.load > 0 && !r.vacancy).length;
+      const n = a.rows.filter(r => r.load > 0 && !r.vacancy && !r.parallel).length;
       tReq += a.totalRequired; tAsg += a.assigned; tT += n;
       const gap = a.totalRequired - a.assigned;
       rows.push([s.nameAr, s.periods.general, { v: a.totalRequired, style: 'num' },
@@ -465,12 +622,19 @@ window.APP = window.APP || {};
 
   function exportXlsx(only) {
     const list = only ? A.SUBJECTS.filter(s => s.id === only) : A.SUBJECTS;
-    const sheets = only ? [sheetFor(list[0])] : [summarySheet()].concat(list.map(sheetFor));
+    const sheets = only ? [sheetFor(list[0])]
+      : [summarySheet()].concat(list.map(sheetFor)).concat(GRADES.map(gradeSheet));
     const bytes = A.buildXlsx(sheets);
     const name = only
       ? 'توزيع-' + list[0].nameAr.replace(/[\/\\?%*:|"<>]/g, '') + '-' + A.SCHOOL.year + '.xlsx'
       : 'توزيع-أنصبة-مريجب-ح2-' + A.SCHOOL.year + '.xlsx';
     A.downloadBlob(bytes, name,
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  }
+
+  function exportGradeXlsx(g) {
+    A.downloadBlob(A.buildXlsx([gradeSheet(g)]),
+      'توزيع-' + A.GRADE_NAME[g] + '-' + A.SCHOOL.year + '.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   }
 
@@ -497,6 +661,7 @@ window.APP = window.APP || {};
       if (act === 'edit') openEditor(s);
       if (act === 'xlsx-one') exportXlsx(s);
       if (act === 'csv-one') exportCsv(s);
+      if (act === 'xlsx-grade') exportGradeXlsx(Number(b.getAttribute('data-g')));
     });
   }
 
@@ -514,6 +679,7 @@ window.APP = window.APP || {};
   }
 
   A._internal = { analyze, formatSections, gradeNames, sectionLabels, periodsOf, applicableSections,
-                  sheetFor, summarySheet, setDist: d => { DIST = d; }, getDist: () => DIST };
+                  sheetFor, summarySheet, classMatrix, gradeSheet, GRADES,
+                  setDist: d => { DIST = d; }, getDist: () => DIST };
   A.boot = boot;
 })(window.APP);

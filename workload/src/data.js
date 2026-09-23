@@ -1,6 +1,7 @@
 /* ============================================================================
    data.js — بيانات توزيع الأنصبة · مدرسة مريجب للتعليم الأساسي ح2 · 2026-2027
-   النطاق: الصفوف 5-8 · مسار اللغة الثالثة · 28 شعبة
+   النطاق: الصفوف 5-8 · مسار اللغة الثالثة · 27 شعبة
+   المصدر: الجدول المدرسي المصدَّر بتاريخ 2026/09/22 (Teachers_22-9.pdf)
    ========================================================================== */
 window.APP = window.APP || {};
 (function (A) {
@@ -53,11 +54,11 @@ window.APP = window.APP || {};
 
     islamic: {
       coordinator: 'مريم خليفة الدرمكي',
+      note: 'توزيع الصفوف كاملة: لكل معلمة صفّ واحد بجميع شعبه.',
       rows: [
-        { teacher:'مريم خليفة الدرمكي', sections: R(5,1,5) },
-        { teacher:'بشرى الكعبي',        sections: ['5/6','5/7'].concat(R(6,1,4)), isNew:true },
-        { teacher:'جميلة صبيح الكعبي',  sections: ['6/5','6/6','6/7','7/6','7/7'] },
-        { teacher:'موزة سالم',          sections: R(7,1,5) },
+        { teacher:'مريم خليفة الدرمكي', sections: R(5,1,7) },
+        { teacher:'جميلة صبيح الكعبي',  sections: R(6,1,7) },
+        { teacher:'موزة سالم',          sections: R(7,1,7) },
         { teacher:'صفية الهاشمي',       sections: R(8,1,6), isNew:true }
       ]
     },
@@ -113,8 +114,8 @@ window.APP = window.APP || {};
     science: {
       coordinator: 'أنيتا', coordinatorEn: 'Anita',
       rows: [
-        { teacher:'هند زيدان',     teacherEn:'Hind Zidan',       sections: ['5/1','5/2','5/3','5/7'] },
-        { teacher:'صالحة السبوسي', teacherEn:'Salha Al Sabusi',  sections: ['5/4','5/5','5/6'] },
+        { teacher:'هند زيدان',     teacherEn:'Hind Zidan',       sections: ['5/1','5/3','5/5','5/7'] },
+        { teacher:'صالحة السبوسي', teacherEn:'Salha Al Sabusi',  sections: ['5/2','5/4','5/6'] },
         { teacher:'دارين محمد',    teacherEn:'Darin Mohamed',    sections: R(6,1,4) },
         { teacher:'فاطمة صبحي',    teacherEn:'Fatima Sobhi',     sections: ['6/5','7/5','7/6','7/7'] },
         { teacher:'رُدينة',        teacherEn:'Rodaina',          sections: ['6/6','6/7','8/5','8/6'], isNew:true },
@@ -127,16 +128,18 @@ window.APP = window.APP || {};
     ai_tech:    { coordinator:'Suhaila Alkatbi',
       note:'المادة تشمل الذكاء الاصطناعي وCCDI معاً، وتُدرَّس ببلوك من حصتين متتاليتين لكل شعبة.',
       rows: [
-        { teacher:'Hissa Alsabusi', sections: R(5,1,7).concat(R(7,1,3)) },
-        { teacher:'Suhaila Alkatbi', sections: R(6,1,7).concat(['7/4']) },
+        { teacher:'Hissa Alsabusi', sections: R(5,1,7).concat(R(7,1,2)) },
+        { teacher:'Suhaila Alkatbi', sections: R(6,1,7).concat(['7/3','7/4']) },
         { teacher:'Hissa Al Ahbabi', sections: R(7,5,7).concat(R(8,1,6)) }
       ] },
 
     pe:         { coordinator:'',
-      note:'تُدرَّس لشعبتين معاً في الحصة الواحدة، فالحصص الفعلية على جدول المعلمة 16 لدعاء مصطفى و14 لسندس. وتُدرَّس حصة الجوجيتسو ضمنها: ديانا للخامس والسابع، وجاك للسادس والثامن.',
+      note:'تُدرَّس لشعبتين معاً في الحصة الواحدة، فالحصص الفعلية على جدول المعلمة 16 لدعاء مصطفى و14 لسندس. ومدرّبتا الجوجيتسو تحضران الحصص نفسها مع معلمة التربية البدنية، فحصصهما غير مضافة إلى نصاب المادة.',
       rows: [
         { teacher:'دعاء مصطفى', sections: R(5,1,7).concat(R(7,1,7)) },
-        { teacher:'سندس',       sections: R(6,1,7).concat(R(8,1,6)) }
+        { teacher:'سندس',       sections: R(6,1,7).concat(R(8,1,6)) },
+        { teacher:'ديانا', role:'الجوجيتسو', parallel:true, sections: R(5,1,7).concat(R(7,1,7)) },
+        { teacher:'جاك',   role:'الجوجيتسو', parallel:true, sections: R(6,1,7).concat(R(8,1,6)) }
       ] },
 
     arts:       { coordinator:'أمل القبيسي', coordinatorTitle:'منسّقة الأنشطة',

@@ -71,8 +71,49 @@ function subjectSection(s, i){
 </section>`;
 }
 
+function gradeSection(g){
+  const head = `<tr><th scope="col" class="m-sub">المادة</th><th scope="col" class="m-per">حصص</th>${
+    g.classes.map(c=>`<th scope="col">${esc(c)}</th>`).join('')}</tr>`;
+  const body = g.rows.map(r=>`<tr>
+      <th scope="row" class="m-sub">${esc(r.subject)}</th>
+      <td class="m-per">${esc(r.periods)}</td>${
+      r.cells.map(list=>{
+        if(!list) return '<td class="m-cell na">—</td>';
+        if(!list.length) return '<td class="m-cell gap">—</td>';
+        return `<td class="m-cell">${list.map(x=>
+          `<span class="m-t${x.vacancy?' vac':''}${x.parallel?' par':''}">${esc(x.name)}${
+            x.role?`<i>${esc(x.role)}</i>`:''}</span>`).join('')}</td>`;
+      }).join('')}
+    </tr>`).join('');
+  return `<section class="rec" id="g-${g.grade}" dir="rtl" aria-labelledby="hg-${g.grade}">
+  <header class="rec-h">
+    <div class="rec-id">
+      <h2 id="hg-${g.grade}">${esc(g.nameAr)}</h2>
+      <p class="rec-meta">كل شعبة والمعلمات اللواتي يدرّسنها</p>
+    </div>
+    <dl class="rec-stats">
+      <div><dt>شعبة</dt><dd>${g.classes.length}</dd></div>
+      <div><dt>معلمة</dt><dd>${g.teachers}</dd></div>
+      <div><dt>حصص الشعبة</dt><dd>${g.totals[0]}</dd></div>
+    </dl>
+  </header>
+  <div class="tw"><table class="matrix">
+    <thead>${head}</thead>
+    <tbody>${body}</tbody>
+    <tfoot><tr><th scope="row" class="m-sub">المجموع</th><td class="m-per"></td>${
+      g.totals.map(v=>`<td class="m-cell">${v}</td>`).join('')}</tr></tfoot>
+  </table></div>
+  ${(g.gaps.length||g.dups.length)?`<p class="rec-note alert">${
+    esc([g.gaps.length?'شعب بلا معلمة: '+g.gaps.join(' · '):'',
+         g.dups.length?'شعب مكرّرة: '+g.dups.join(' · '):''].filter(Boolean).join(' — '))}</p>`:''}
+  <p class="rec-note">تُدرَّس حصص الجوجيتسو ضمن حصص التربية البدنية نفسها، ولذلك تظهر المدرّبة إلى جانب معلمة المادة.</p>
+</section>`;
+}
+
 const nav = D.subjects.map(s=>
   `<a href="#s-${s.id}"><span>${esc(s.nameAr)}</span><b>${s.teachers}</b></a>`).join('');
+const navG = (D.grades||[]).map(g=>
+  `<a href="#g-${g.grade}"><span>${esc(g.nameAr)}</span><b>${g.classes.length}</b></a>`).join('');
 
 const summaryRows = D.subjects.map(s=>`<tr>
   <th scope="row">${esc(s.nameAr)}</th>
@@ -169,6 +210,27 @@ nav.rail a{display:flex;justify-content:space-between;align-items:center;gap:10p
 nav.rail a:hover{background:var(--sand);border-inline-start-color:var(--bronze)}
 nav.rail a b{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--ink-3)}
 main{display:flex;flex-direction:column;gap:26px;min-width:0}
+
+/* ─ فواصل التنقّل وجداول الصفوف ─ */
+.rail-sep{display:block;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.4px;
+  color:var(--ink-3);padding:10px 12px 6px;border-bottom:1px solid var(--hair);margin-bottom:4px}
+.rail-sep:first-child{padding-top:2px}
+.part-h{margin:40px 0 18px;text-align:center}
+.part-h h2{font-family:var(--serif);font-size:24px;color:var(--bronze-deep);margin:0 0 4px}
+.part-h p{font-family:var(--naskh);font-size:13px;color:var(--ink-3);margin:0}
+table.matrix{font-size:12.5px;table-layout:fixed}
+table.matrix td,table.matrix th{padding:9px 4px}
+table.matrix th.m-sub{width:22%;text-align:start;font-size:12.5px;line-height:1.5}
+table.matrix .m-per{width:52px;font-family:var(--serif);font-weight:700}
+table.matrix .m-cell{font-size:11.5px;overflow-wrap:break-word;word-break:normal;text-align:center;line-height:1.5}
+table.matrix .m-cell.na{color:var(--ink-3)}
+table.matrix .m-cell.gap{color:var(--alert);font-weight:700}
+table.matrix .m-t{display:block}
+table.matrix .m-t + .m-t{margin-top:3px;padding-top:3px;border-top:1px dotted var(--line)}
+table.matrix .m-t.vac{color:var(--alert);font-weight:700}
+table.matrix .m-t.par{color:var(--ink-3)}
+table.matrix .m-t i{display:block;font-style:normal;font-size:9.5px;color:var(--ink-3);word-break:normal;overflow-wrap:normal}
+.rec-note.alert{color:var(--alert)}
 
 /* ─ record card ─ */
 .rec{background:var(--surface);border:1px solid var(--line);border-radius:3px;
@@ -282,9 +344,16 @@ footer{max-width:1180px;margin:0 auto;padding:0 28px 50px;text-align:center;
 </dl></div>
 
 <div class="wrap">
-  <nav class="rail" aria-label="المواد">${nav}</nav>
+  <nav class="rail" aria-label="التنقّل">
+    <b class="rail-sep">جداول المواد</b>${nav}
+    <b class="rail-sep">جداول الصفوف</b>${navG}
+  </nav>
   <main>
     ${D.subjects.map(subjectSection).join('\n')}
+
+    <div class="part-h" id="part-grades"><h2>جداول الصفوف</h2>
+      <p>لكل صف جدول يبيّن شعبه والمعلمات اللواتي يدرّسنها في كل مادة.</p></div>
+    ${(D.grades||[]).map(gradeSection).join('\n')}
 
     <section class="panel" aria-labelledby="sum-h">
       <h2 id="sum-h">ملخّص الأنصبة حسب المادة</h2>
