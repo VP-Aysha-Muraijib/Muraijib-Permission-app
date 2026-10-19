@@ -679,6 +679,66 @@ body {
 .en { display: none; }                  /* hide EN by default (AR mode) */
 .lang-en .ar { display: none !important; }  /* hide AR when EN active */
 .lang-en .en { display: inline !important; } /* show EN when EN active */
+
+/* ══ LIVE BOARD ══════════════════════════════════════════ */
+.live-bar {
+  background: var(--card);
+  border-bottom: 1.5px solid var(--line);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  color: var(--charcoal-soft);
+  flex-wrap: wrap;
+  min-height: 38px;
+}
+.live-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 0 rgba(34,197,94,.5);
+  animation: livePulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes livePulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}
+  50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}
+}
+.live-label {
+  font-weight: 700;
+  color: var(--mauve-deep);
+  white-space: nowrap;
+}
+.live-items {
+  display: flex; gap: 8px; flex-wrap: wrap; flex: 1;
+}
+.live-chip {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--charcoal);
+  display: flex; align-items: center; gap: 5px;
+  animation: fadeInChip .4s ease;
+}
+@keyframes fadeInChip { from{opacity:0;transform:scale(.9)} to{opacity:1;transform:scale(1)} }
+.live-chip .chip-name { font-weight: 600; }
+.live-chip .chip-time { color: var(--mauve); font-size: 11px; }
+.live-empty {
+  color: var(--charcoal-soft);
+  opacity: .6;
+  font-size: 12px;
+}
+.live-refresh {
+  margin-right: auto;
+  font-size: 11px;
+  color: var(--charcoal-soft);
+  opacity: .5;
+  white-space: nowrap;
+}
 </style>
 </head>
 <body class="lang-ar">
@@ -704,6 +764,9 @@ body {
       <a href="#section-dash">
         <span class="ar">لوحة البيانات</span><span class="en">Dashboard</span>
       </a>
+      <a href="#liveBar" style="color:var(--mauve-deep);font-weight:700">
+        <span style="color:#22c55e">●</span> <span class="ar">مباشر</span><span class="en">Live</span>
+      </a>
     </nav>
     <div class="bell-wrap" title="الإشعارات">
       <span class="bell-icon" id="bell">🔔</span>
@@ -711,6 +774,18 @@ body {
     </div>
 
   </div>
+</div>
+
+<!-- ── LIVE BOARD ── -->
+<div class="live-bar" id="liveBar">
+  <div class="live-dot"></div>
+  <span class="live-label ar">مباشر</span>
+  <span class="live-label en">Live</span>
+  <div class="live-items" id="liveItems">
+    <span class="live-empty ar">جاري التحميل…</span>
+    <span class="live-empty en">Loading…</span>
+  </div>
+  <span class="live-refresh" id="liveRefreshTime"></span>
 </div>
 
 <!-- ── HERO ── -->
@@ -1355,90 +1430,90 @@ const DATA = {
       ['أخرى رسمية',            'Other (Official)',         'other-official'],
     ],
   },
-  // كشف الموظفين الفعلي — مدرسة مريجب 2025/2026
+  // كشف الموظفين الفعلي — مدرسة مريجب 2026/2027
   staffList: [
+    // الإدارة العليا
+    { name:'اليازية نخيرة الظاهري',      job:'مديرة المدرسة',            dept:'الإدارة والدعم',    email:'Alyazya.Aldahri@moe.sch.ae',           phone:'504694449' },
+    { name:'عائشة عوض النعيمي',          job:'مساعد مدير مدرسة (مكلف)',  dept:'الإدارة والدعم',    email:'Aysha-Ak.Alnuaimi@moe.sch.ae',          phone:'504694449' },
+    { name:'نورة علي الكعبي',            job:'مساعد مدير مدرسة (مكلف)',  dept:'الإدارة والدعم',    email:'Noura-Am.Alkaabi@moe.sch.ae',           phone:'503366340' },
     // الهيئة الإدارية
-    { name:'اليازية نخيرة الظاهري',    job:'مديرة المدرسة',          dept:'الإدارة والدعم' },
-    { name:'عائشة عوض النعيمي',        job:'مساعدة المديرة',         dept:'الإدارة والدعم' },
-    { name:'سلمى مصبح الظاهري',        job:'مساعدة المديرة',         dept:'الإدارة والدعم' },
-    { name:'حليمة البلوشي',             job:'HOF Arabic',             dept:'اللغة العربية' },
-    { name:'أمل عبيد البلوشي',          job:'مسؤول تسجيل',            dept:'الإدارة والدعم' },
-    { name:'فاطمة محمد الشقفة',         job:'منسق شؤون إدارية',       dept:'الإدارة والدعم' },
-    { name:'مريم راشد الدرمكي',         job:'إداري / إدارية',         dept:'الإدارة والدعم' },
-    { name:'علياء ضاحي الحميري',        job:'أمينة سر',               dept:'الإدارة والدعم' },
-    { name:'شمة حارب الكتبي',           job:'أمينة سر',               dept:'الإدارة والدعم' },
-    { name:'مريم خلفان الظاهري',        job:'مساعد إداري',            dept:'الإدارة والدعم' },
-    { name:'علياء سالم الشامسي',        job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
-    { name:'هدى أحمد الكعبي',           job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
-    { name:'اليازية عبدالله الدرمكي',   job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
-    { name:'اليازية جمعة الخييلي',      job:'اختصاصية اجتماعية',      dept:'الإدارة والدعم' },
-    { name:'نرجس خميس الريسي',          job:'اختصاصية نفسية',         dept:'الإدارة والدعم' },
-    { name:'ثمينة سالم المحرزي',        job:'اختصاصي مصادر تعلم',    dept:'الإدارة والدعم' },
-    { name:'حصة سهيل المزروعي',         job:'اختصاصي مصادر تعلم',    dept:'الإدارة والدعم' },
-    { name:'مريم هلال الدرمكي',         job:'اختصاصية مختبر',         dept:'العلوم' },
-    { name:'رقية صالح الصوافي',         job:'اختصاصية مختبر',         dept:'العلوم' },
-    { name:'إيناس خالد',                job:'منسق أمن وسلامة',        dept:'الإدارة والدعم' },
-    // الهيئة التدريسية — التربية الإسلامية
-    { name:'مريم خليفة الدرمكي',        job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
-    { name:'جميلة صبيح الكعبي',         job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
-    { name:'موزة سالم المضاوي',         job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
-    { name:'خولة إبراهيم البلوشي',      job:'معلمة - تربية إسلامية',  dept:'التربية الإسلامية' },
+    { name:'هبة محمد الكمالي',           job:'منسق الشؤون الإدارية',     dept:'الإدارة والدعم',    email:'Heba.Alkamali@moe.sch.ae',             phone:'566549005' },
+    { name:'مريم راشد الدرمكي',          job:'منسق الشؤون الإدارية',     dept:'الإدارة والدعم',    email:'Mariam-Ro.Aldarmaki@moe.sch.ae',        phone:'509358808' },
+    { name:'أمل عبيد البلوشي',           job:'مسؤول التسجيل والقبول',    dept:'الإدارة والدعم',    email:'Amal.Albaloushi@moe.sch.ae',            phone:'501103444' },
+    { name:'علياء ضاحي الحميري',         job:'سكرتير',                   dept:'الإدارة والدعم',    email:'Alya.Alhamiri@moe.sch.ae',             phone:'506650202' },
+    { name:'شماء حارب الكتبي',           job:'سكرتير',                   dept:'الإدارة والدعم',    email:'Shamma-Hm.Alketbi@moe.sch.ae',          phone:'504996161' },
+    { name:'مريم خلفان الظاهري',         job:'مساعد إداري',              dept:'الإدارة والدعم',    email:'Mariam-Ka.Aldhaheri@moe.sch.ae',        phone:'506650559' },
+    { name:'إيناس خالد الصلبة',          job:'تنفيذي أمن وسلامة',        dept:'الإدارة والدعم',    email:'Enas.Alsalaba@moe.sch.ae',             phone:'507889955' },
+    // الهيئة الفنية
+    { name:'علياء سالم الشامسي',         job:'اختصاصي اجتماعي',          dept:'الإدارة والدعم',    email:'Alia-Sr.Alshamisi@moe.sch.ae',          phone:'504606061' },
+    { name:'هدى أحمد الكعبي',            job:'اختصاصي اجتماعي',          dept:'الإدارة والدعم',    email:'Huda-Ak.Alkaabi@moe.sch.ae',            phone:'503366533' },
+    { name:'اليازية عبدالله الدرمكي',    job:'اختصاصي اجتماعي',          dept:'الإدارة والدعم',    email:'Alyazia.Aldarmaki@moe.sch.ae',          phone:'503561967' },
+    { name:'اليازية جمعة الخييلي',       job:'اختصاصي اجتماعي',          dept:'الإدارة والدعم',    email:'Alyazi.Alkhyeli@moe.sch.ae',            phone:'558343378' },
+    { name:'نرجس خميس الريسي',           job:'اختصاصي نفسي',             dept:'الإدارة والدعم',    email:'Narjes.Alraisi@moe.sch.ae',             phone:'502334045' },
+    { name:'ثمنة سالم المحرمي',          job:'اختصاصي مصادر تعلم',       dept:'الإدارة والدعم',    email:'Thamna.Almuharrami@moe.sch.ae',         phone:'526662321' },
+    { name:'حصة سهيل المزروعي',          job:'اختصاصي مصادر تعلم',       dept:'الإدارة والدعم',    email:'Hessa.Almazrouei@moe.sch.ae',           phone:'507600602' },
+    { name:'مريم هلال الدرمكي',          job:'فني مختبر',                 dept:'العلوم',            email:'Mariam-Hm.Aldarmaki@moe.sch.ae',        phone:'506114105' },
+    { name:'رقية صالح الصوافي',          job:'فني مختبر',                 dept:'العلوم',            email:'Ruqaya.Alsawafi@moe.sch.ae',            phone:'504477247' },
     // اللغة العربية
-    { name:'موزة سعيد الشامسي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'راوية محمد الظاهري',        job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'جميلة علي الدرمكي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'سلامة حمد العامري',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'شيخة الشامسي',             job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'عائشة محمد الغيثي',         job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    { name:'منى محمد صقر',             job:'معلمة - لغة عربية',      dept:'اللغة العربية' },
-    // اللغة الإنجليزية
-    { name:'ناعمة عبدالله الكعبي',      job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    { name:'شمسة عزيز',                job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    { name:'فريال فياض أحمد',          job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    { name:'Robyn Canau',              job:'معلمة - لغة إنجليزية',       dept:'اللغة الإنجليزية' },
-    { name:'بشرى إمام خادم',           job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    { name:'أمنة الشامسي',             job:'معلمة - لغة إنجليزية',   dept:'اللغة الإنجليزية' },
-    // الرياضيات
-    { name:'Sheejamol Babu',           job:'معلمة - رياضيات',          dept:'الرياضيات' },
-    { name:'Rahila Naseeha',           job:'معلمة - رياضيات',          dept:'الرياضيات' },
-    { name:'سامية يحيى',               job:'معلمة - رياضيات',        dept:'الرياضيات' },
-    { name:'نمارق عبدالله',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
-    { name:'أمامة الفلاسي',            job:'معلمة - رياضيات',        dept:'الرياضيات' },
-    { name:'سمية سليم',                job:'معلمة - رياضيات',        dept:'الرياضيات' },
-    { name:'كنة الشامسي',              job:'معلمة - رياضيات',        dept:'الرياضيات' },
-    // تقنية المعلومات
-    { name:'حصة ناصر الأحبابي',        job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
-    { name:'سهيلة الكتبي',             job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
-    { name:'حصة السبوسي',              job:'معلمة - تقنية معلومات',  dept:'تقنية المعلومات' },
+    { name:'جميلة علي الدرمكي',          job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Jamila.Aldarmaki@moe.sch.ae',           phone:'503776567' },
+    { name:'موزة سعيد الشامسي',          job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Moza-Sa.Alshamisi@moe.sch.ae',          phone:'503322453' },
+    { name:'راوية محمد الظاهري',         job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Raweya.Aldhaheri@moe.sch.ae',           phone:'503306632' },
+    { name:'سلامة حمد العامري',          job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Salame.Alameri@moe.sch.ae',             phone:'526451414' },
+    { name:'شيخة سيف الشامسي',           job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'sheikha.alshamsi@moe.sch.ae',           phone:'522623776' },
+    { name:'عائشة محمد الغيثي',          job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Aysha.Alghaithi@moe.sch.ae',            phone:'502332363' },
+    { name:'منى محمد الظاهري',           job:'معلمة - لغة عربية',        dept:'اللغة العربية',     email:'Mona-Ms.Aldhaheri@moe.sch.ae',          phone:'506668096' },
+    // التربية الإسلامية
+    { name:'مريم خليفة الدرمكي',         job:'معلمة - تربية إسلامية',    dept:'التربية الإسلامية', email:'Mariam-Kj.Aldarmaki@moe.sch.ae',        phone:'504493694' },
+    { name:'جميلة صبيح الكعبي',          job:'معلمة - تربية إسلامية',    dept:'التربية الإسلامية', email:'Jamila.Alkaabi@moe.sch.ae',             phone:'506639388' },
+    { name:'موزة سالم المضاوي',          job:'معلمة - تربية إسلامية',    dept:'التربية الإسلامية', email:'Mouza.Almudawi@moe.sch.ae',             phone:'503333450' },
+    { name:'صفية حسن الهاشمي',           job:'معلمة - تربية إسلامية',    dept:'التربية الإسلامية', email:'Safeya.Alhashmi@moe.sch.ae',            phone:'504256566' },
     // الدراسات الاجتماعية
-    { name:'زلفة الظاهري',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
-    { name:'مريم العتيبة',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
-    { name:'الهن العفاري',             job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
-    { name:'موزة سيف',                 job:'معلمة - دراسات اجتماعية',dept:'الدراسات الاجتماعية' },
+    { name:'زلفة حمد الظاهري',           job:'معلمة - دراسات اجتماعية',  dept:'الدراسات الاجتماعية', email:'Zalfa.Aldhaheri@moe.sch.ae',          phone:'503323354' },
+    { name:'مريم محمد العتيبة',          job:'معلمة - دراسات اجتماعية',  dept:'الدراسات الاجتماعية', email:'Mariam.Alotaibi@moe.sch.ae',          phone:'507834778' },
+    { name:'الهن علي العفاري',           job:'معلمة - دراسات اجتماعية',  dept:'الدراسات الاجتماعية', email:'Alhan.Alefari@moe.sch.ae',            phone:'507773314' },
+    { name:'موزة سيف آل عبدالسلام',     job:'معلمة - دراسات اجتماعية',  dept:'الدراسات الاجتماعية', email:'Mouza.Aalabdulsalam@moe.sch.ae',      phone:'507312617' },
+    // اللغة الإنجليزية
+    { name:'Robyn Canau',               job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Robyn.Canau@moe.sch.ae',               phone:'501675392' },
+    { name:'Lisa Robinson',             job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Lisa.Robinson@moe.sch.ae',              phone:'504386290' },
+    { name:'Samantha Rhyn',             job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Samantha.Rhyn@moe.sch.ae',              phone:'562655795' },
+    { name:'ناعمة عبدالله الكعبي',      job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Naema-As.Alkaabi@moe.sch.ae',           phone:'503444116' },
+    { name:'شمسة عزيز المغربي',          job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Shamsa.almagharabi@moe.sch.ae',         phone:'504997377' },
+    { name:'فريال فياض البرازي',         job:'معلمة - لغة إنجليزية',     dept:'اللغة الإنجليزية',  email:'Ferial.Barazi@moe.sch.ae',              phone:'508399981' },
+    // الرياضيات
+    { name:'كنة مبارك الشامسي',          job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Kanna-M.Alshamsi@moe.sch.ae',           phone:'501302321' },
+    { name:'سامية يحيى حسن',             job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Samia.Hassan@moe.sch.ae',               phone:'503376981' },
+    { name:'نمارق عبدالله أحمد',         job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Namarig.Ahmed@moe.sch.ae',              phone:'505110607' },
+    { name:'أمامة فؤاد الفيالي',         job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Oumama.Alfeilali@moe.sch.ae',           phone:'504459396' },
+    { name:'سمية سليم',                  job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Sumaia.Alamawi@moe.sch.ae',             phone:'543137144' },
+    { name:'مها عبدالله مراد',            job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Maha-A.Murad@moe.sch.ae',               phone:'586717575' },
+    { name:'Sheejamol Babu',             job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Sheejamol.Babu@moe.sch.ae',             phone:'559697328' },
+    { name:'Rahila Naseeha',             job:'معلمة - رياضيات',          dept:'الرياضيات',         email:'Rahila.Naseeha@moe.sch.ae',             phone:'562022484' },
     // العلوم
-    { name:'مها محمد النعيمي',          job:'معلمة - علوم',           dept:'العلوم' },
-    { name:'Anita Raja',               job:'معلمة - علوم',       dept:'العلوم' },
-    { name:'دارين محمد',               job:'معلمة - علوم',           dept:'العلوم' },
-    { name:'صالحة السبوسي',            job:'معلمة - علوم',           dept:'العلوم' },
-    { name:'فاطمة صبحي',              job:'معلمة - علوم',           dept:'العلوم' },
-    { name:'هند زيدان',                job:'معلمة - علوم',           dept:'العلوم' },
-    // اللغة الفرنسية
-    { name:'حكيمة الهلالي',            job:'معلمة - لغة فرنسية',     dept:'الإدارة والدعم' },
-    { name:'هيبة غابري',               job:'معلمة - لغة فرنسية',     dept:'الإدارة والدعم' },
-    // فنون وموسيقى ودراما
-    { name:'صبرين حمدي',              job:'معلمة - دراما',           dept:'الفنون' },
-    { name:'جهان سلمان',               job:'معلمة - تربية موسيقية',  dept:'الفنون' },
-    { name:'أمل موسى القبيسي',         job:'معلمة - تربية فنية',     dept:'الفنون' },
-    // التربية الرياضية
-    { name:'سندس القلطي',              job:'معلمة - تربية رياضية',   dept:'التربية البدنية' },
-    { name:'هند خالد',                 job:'معلمة - تربية رياضية',   dept:'التربية البدنية' },
+    { name:'مها محمد النعيمي',            job:'معلمة - علوم',             dept:'العلوم',            email:'Maha-Ma.Alnuaimi@moe.sch.ae',           phone:'507600838' },
+    { name:'دارين محمد حسين',            job:'معلمة - علوم',             dept:'العلوم',            email:'Darin.Abdallah@moe.sch.ae',             phone:'508321505' },
+    { name:'صالحة مهير السبوسي',         job:'معلمة - علوم',             dept:'العلوم',            email:'Saleha.Alsubousi@moe.sch.ae',           phone:'506152215' },
+    { name:'فاطمة صبحي مصطفى',          job:'معلمة - علوم',             dept:'العلوم',            email:'fatma.ibrahim@moe.sch.ae',              phone:'501585706' },
+    { name:'هند زيدان',                  job:'معلمة - علوم',             dept:'العلوم',            email:'Hind.Zeidan@moe.sch.ae',                phone:'543134983' },
+    { name:'ردينة عبدالمنعم عمر',        job:'معلمة - علوم',             dept:'العلوم',            email:'Rudena.mohamed@moe.sch.ae',             phone:'563020966' },
+    { name:'Anitha Raja',               job:'معلمة - كيمياء',           dept:'العلوم',            email:'Anitha.Ram@moe.sch.ae',                 phone:'505425776' },
     // التربية الخاصة
-    { name:'أماني جعيد',               job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
-    { name:'العنود عبدربه البريكي',    job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
-    { name:'حمدة سيف الظاهري',        job:'معلمة - تربية خاصة',     dept:'الإدارة والدعم' },
-    // جيوجيتسو
-    { name:'Diana Menezes',            job:'معلمة - جيوجيتسو',       dept:'التربية البدنية' },
-    { name:'Jaqueline',                job:'معلمة - جيوجيتسو',       dept:'التربية البدنية' },
+    { name:'أماني جميل الجعيدي',         job:'معلمة - تربية خاصة',       dept:'الإدارة والدعم',    email:'Amani.Aljaidi@moe.sch.ae',              phone:'582353234' },
+    { name:'العنود عبدربه البريكي',      job:'معلمة - تربية خاصة',       dept:'الإدارة والدعم',    email:'AlAnoud.Albreiki@moe.sch.ae',           phone:'543368632' },
+    { name:'حمدة سيف الظاهري',           job:'معلمة - تربية خاصة',       dept:'الإدارة والدعم',    email:'Hamda-Sm.Aldhaheri@moe.sch.ae',         phone:'504599978' },
+    { name:'بلقيس علي الحارثي',          job:'مساعد صف (تربية خاصة)',    dept:'الإدارة والدعم',    email:'Balqees.Alharthi@moe.sch.ae',           phone:'555284155' },
+    // الأنشطة
+    { name:'سندس حمادي القلعي',          job:'معلمة - تربية رياضية',     dept:'التربية البدنية',   email:'Sondess.Bouzaida@moe.sch.ae',           phone:'554485508' },
+    { name:'دعاء مصطفى عبدالمنعم',      job:'معلمة - تربية رياضية',     dept:'التربية البدنية',   email:'Doaa-Ma.Mostafa@moe.sch.ae',            phone:'558831136' },
+    { name:'أمل موسى القبيسي',           job:'معلمة - فنون بصرية',       dept:'الفنون',            email:'Amal-Mj.Alqubaisi@moe.sch.ae',          phone:'506963698' },
+    { name:'صبرين محمد حمدي',            job:'معلمة - دراما / مسرح',     dept:'الفنون',            email:'Sabrine.Hamdi@moe.sch.ae',              phone:'504682537' },
+    { name:'جهان سلمان أبو عسلى',        job:'معلمة - فنون موسيقية',     dept:'الفنون',            email:'Jihan.Abouassali@moe.sch.ae',           phone:'507237239' },
+    // تقنية المعلومات
+    { name:'حصة ناصر الأحبابي',          job:'معلمة - ذكاء اصطناعي وتقنية', dept:'تقنية المعلومات', email:'Hessa.Alahbabi@moe.sch.ae',            phone:'506649194' },
+    { name:'سهيلة سعيد الكتبي',          job:'معلمة - ذكاء اصطناعي وتقنية', dept:'تقنية المعلومات', email:'Suhaila.Alketbi@moe.sch.ae',           phone:'502313327' },
+    { name:'حصة سعيد السبوسي',           job:'معلمة - ذكاء اصطناعي وتقنية', dept:'تقنية المعلومات', email:'Hessa.Alsubousi@moe.sch.ae',           phone:'502881191' },
+    // اللغات الأجنبية
+    { name:'حكيمة الحسين الهلالي',       job:'معلمة - لغة فرنسية',       dept:'اللغات الأجنبية',   email:'Hakima.Hlali@moe.sch.ae',               phone:'562989453' },
+    { name:'هيبة حبيب غابري',            job:'معلمة - لغة فرنسية',       dept:'اللغات الأجنبية',   email:'Hiba.Ghabri@moe.sch.ae',                phone:'557437693' },
   ],
 
   recentRequests: [],   // تبدأ البيانات من 25 مايو 2026
@@ -2186,6 +2261,69 @@ function logToSheets(data) {
     .then(r => r.ok ? console.log('[Sheets] logged ✓') : console.warn('[Sheets]', r.status))
     .catch(e => console.warn('[Sheets] offline:', e));
 }
+
+/* ── LIVE BOARD — يسحب بيانات الطلبات الحية من Sheets ──── */
+let _liveTimer = null;
+
+function fetchLiveData() {
+  const url = SHEETS_URL + '?action=live';
+  fetch(url)
+    .then(r => r.ok ? r.json() : null)
+    .then(json => {
+      if (json && Array.isArray(json.active)) renderLiveBoard(json.active);
+      else renderLiveBoard([]);
+      updateLiveTime();
+    })
+    .catch(() => {
+      // إذا فشل الاتصال نعرض رسالة هادئة
+      renderLiveBoard(null);
+      updateLiveTime();
+    });
+}
+
+function renderLiveBoard(active) {
+  const el = $('liveItems');
+  if (!el) return;
+  if (active === null) {
+    el.innerHTML = '<span class="live-empty ar">تعذّر الاتصال</span><span class="live-empty en">Connection error</span>';
+    return;
+  }
+  if (active.length === 0) {
+    el.innerHTML = '<span class="live-empty ar">لا يوجد موظف في إجازة الآن</span><span class="live-empty en">No active leaves now</span>';
+    return;
+  }
+  el.innerHTML = active.map(r => {
+    const name  = r.name  || '—';
+    const out   = r.out   || '';
+    const back  = r.back  || '';
+    const type  = r.type  || '';
+    const timeStr = (out && back) ? `${out} – ${back}` : (out || '');
+    return `<div class="live-chip">
+      <span class="chip-name">${name}</span>
+      ${type ? `<span class="chip-time">${type}</span>` : ''}
+      ${timeStr ? `<span class="chip-time">(${timeStr})</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function updateLiveTime() {
+  const el = $('liveRefreshTime');
+  if (!el) return;
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  el.textContent = `تحديث ${h}:${m}`;
+}
+
+function startLivePolling(intervalMs) {
+  // أول استدعاء فوري
+  fetchLiveData();
+  // تحديث دوري كل دقيقة (60 ث افتراضياً)
+  _liveTimer = setInterval(fetchLiveData, intervalMs || 60000);
+}
+
+// ابدأ اللوحة الحية عند تحميل الصفحة
+window.addEventListener('load', () => startLivePolling(60000));
 
 /* ── PWA / SERVICE WORKER ──────────────────────────────── */
 if ('serviceWorker' in navigator) {
