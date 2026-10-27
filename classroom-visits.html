@@ -1119,7 +1119,7 @@ function toast(msg, kind){
 const KEY = 'muraijib.cvms.v1';
 
 const DEFAULT_SETTINGS = {
-  observer: 'نائبة مدير المدرسة للشؤون الأكاديمية',
+  observer: 'عائشة النعيمي',
   observerEn: 'Academic Vice Principal',
   academicYear: '2026/2027',
   logo: '',
@@ -1167,6 +1167,9 @@ const Store = {
     const b = this.blank();
     for(const k of Object.keys(b)) if(this.db[k] == null) this.db[k] = b[k];
     this.db.settings = Object.assign({}, DEFAULT_SETTINGS, this.db.settings);
+    /* replace the old placeholder observer with the configured name, once */
+    if(this.db.settings.observer === 'نائبة مدير المدرسة للشؤون الأكاديمية')
+      this.db.settings.observer = DEFAULT_SETTINGS.observer;
     return this.db;
   },
   save(){
