@@ -515,6 +515,84 @@ table.pr-tbl tr{page-break-inside:avoid}
 .pr-note{font-size:8pt;color:#555;margin-top:4px}
 .pg-break{page-break-before:always}
 
+/* ── paper log (سجل ورقي) ── */
+.lg-cover{
+  position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
+  min-height:262mm;border:1.6px solid #4F6B45;border-radius:4px;padding:0 12mm 10mm;
+  background:#FCFBF7;overflow:hidden;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.lg-cover::before,.lg-cover::after{content:"";position:absolute;width:86mm;height:86mm;border-radius:50%;z-index:0}
+.lg-cover::before{top:-34mm;inset-inline-start:-30mm;background:radial-gradient(circle,rgba(201,168,76,.26),transparent 70%)}
+.lg-cover::after{bottom:-32mm;inset-inline-end:-28mm;background:radial-gradient(circle,rgba(79,107,69,.22),transparent 70%)}
+.lg-cover > *{position:relative;z-index:1;width:100%}
+.lg-band{
+  /* the centred flex column would otherwise collapse an empty band to zero width */
+  align-self:stretch;height:4.5mm;margin:0 -12mm 8mm;width:auto !important;
+  background:linear-gradient(90deg,#4F6B45,#C9A84C,#F0DFA8,#C9A84C,#4F6B45);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.lg-marks{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6mm}
+.lg-marks .m1{width:26mm;color:#111}
+.lg-marks .m2{width:30mm;color:#111}
+.lg-marks svg,.lg-marks img{display:block;width:100%;height:auto;max-height:26mm;object-fit:contain}
+.lg-sch{font-size:12.5pt;font-weight:800;color:#3B5233;line-height:1.6}
+.lg-sch span{display:block;font-size:9.5pt;font-weight:500;color:#555;letter-spacing:.3px}
+.lg-rule{height:1px;background:#D8D5C8;margin:6mm 14mm}
+.lg-cover .big{
+  font-size:22pt;font-weight:800;color:#2F4429;line-height:1.55;margin-top:4mm;
+  padding:7mm 6mm;border-block:1.4px solid #C9A84C;background:#fff;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.lg-cover .big span{display:block;font-size:12.5pt;font-weight:600;color:#4F6B45;margin-top:3mm;letter-spacing:.4px}
+.lg-cover .cyc{font-size:12pt;color:#111;margin-top:7mm;font-weight:700}
+.lg-cover .cyc span{display:block;font-size:9.5pt;font-weight:500;color:#555;margin-top:1mm}
+.lg-cover .yr{
+  display:inline-block;font-size:12pt;color:#3B5233;margin-top:4mm;font-weight:800;
+  border:1.3px solid #4F6B45;border-radius:20px;padding:1.5mm 9mm;background:#F6F9F3;width:auto !important;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.lg-owner{
+  border:1.5px solid #3B5233;border-radius:5px;padding:8px 14px;margin:14mm auto 0;
+  max-width:120mm;text-align:start;font-size:10pt;line-height:2.1;
+}
+.lg-owner .r{display:flex;gap:8px;align-items:baseline}
+.lg-owner .r > i{font-style:normal;color:#555;font-size:9pt;min-width:48mm}
+.lg-owner .r > b{flex:1;border-bottom:1px dotted #999;color:#111}
+.lg-src{margin-top:auto;font-size:8.5pt;color:#555;border-top:1px solid #CCC;padding-top:5px;line-height:1.8}
+.lg-head{display:flex;align-items:center;gap:8px;border-bottom:1.6px solid #4F6B45;padding-bottom:3px;margin-bottom:4px}
+.lg-head .m1{width:13mm;color:#111;flex-shrink:0}
+.lg-head .m2{width:16mm;color:#111;flex-shrink:0}
+.lg-head .m1 svg,.lg-head .m1 img,.lg-head .m2 svg,.lg-head .m2 img{display:block;width:100%;height:auto;max-height:13mm;object-fit:contain}
+.lg-head .t{flex:1;text-align:center;min-width:0}
+.lg-head .t .s{font-size:9pt;font-weight:800;color:#3B5233;line-height:1.4}
+.lg-head .t .ti{font-size:10.5pt;font-weight:800;color:#262B23;line-height:1.45}
+.lg-head .t .ti i{display:block;font-style:normal;font-size:7.4pt;font-weight:400;color:#666}
+.lg-teacher{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  border:1.5px solid #3B5233;border-radius:5px;padding:4px 10px;margin-bottom:5px;
+}
+.lg-teacher .nm{font-size:12pt;font-weight:800;color:#3B5233}
+.lg-teacher .nm span{font-size:8.5pt;font-weight:500;color:#555;margin-inline-start:7px}
+.lg-teacher .sh{font-size:8.5pt;color:#444}
+table.lg{width:100%;border-collapse:collapse;font-size:7pt;table-layout:fixed}
+table.lg th{background:#EDF2E9;border:1px solid #BFC9B7;padding:1.5px 4px;font-size:6.8pt;font-weight:700;color:#263320;line-height:1.3}
+table.lg td{border:1px solid #D6D6CE;padding:0.6px 4px;vertical-align:middle;color:#111;line-height:1.25}
+table.lg tr{page-break-inside:avoid}
+table.lg td.no{text-align:center;color:#666;font-size:7pt}
+table.lg td.bx{text-align:center}
+table.lg td.bx i{display:inline-block;width:8px;height:8px;border:1px solid #666;border-radius:2px}
+table.lg tr.dm td{background:#F3F7EF;font-weight:800;color:#3B5233;font-size:7.3pt;padding:1.2px 5px;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.lg tr.dm td span{font-weight:500;color:#5E6B57;font-size:7.2pt}
+.lg-fields{display:flex;flex-wrap:wrap;font-size:8.5pt;border:1px solid #CCC;border-radius:4px;padding:2px 4px;margin-bottom:5px}
+.lg-fields > div{width:25%;padding:2px 5px;box-sizing:border-box;display:flex;gap:4px;align-items:baseline}
+.lg-fields > div.w50{width:50%}
+.lg-fields .k{color:#555;font-size:7.6pt;white-space:nowrap}
+.lg-fields .v{flex:1;border-bottom:1px dotted #999;min-height:1.3em}
+.lg-split{display:flex;gap:7px}
+.lg-split > div{flex:1;min-width:0}
+
 @media print{
   html,body{background:#fff !important}
   body{font-size:10pt}
@@ -659,7 +737,9 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
 .wr-lines.h26{height:26mm}
 .wr-lines.h30{height:30mm}
 .wr-lines.h34{height:34mm}
+.wr-lines.h42{height:42mm}
 .wr-lines.h44{height:44mm}
+.wr-lines.h48{height:48mm}
 .wr-lines.h50{height:50mm}
 .wr-lines.h54{height:54mm}
 .wr-lines.h58{height:58mm}
@@ -669,6 +749,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
 }
 .pr-cb{display:inline-flex;align-items:flex-start;gap:4px;font-size:8.5pt;color:#111;line-height:1.9;width:33.33%;padding-inline-end:4px;box-sizing:border-box}
 .pr-cbs.c4 .pr-cb{width:25%;font-size:7.6pt;line-height:1.6}
+.pr-cbs.c5 .pr-cb{width:20%;font-size:7pt;line-height:1.5}
 .pr-cb b{display:inline-block;width:9px;height:9px;border:1px solid #555;border-radius:2px;flex-shrink:0;margin-top:4px}
 .pr-cb.on b{background:#3B5233;border-color:#3B5233;position:relative}
 .pr-cb.on b::after{content:"";position:absolute;inset-inline-start:2px;top:0px;width:3px;height:6px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
@@ -686,6 +767,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
 .pr-idbox{display:inline-block;border:1px solid #3B5233;border-radius:4px;padding:3px 8px;text-align:center;font-size:8pt;color:#3B5233;line-height:1.5;white-space:nowrap}
 .pr-idbox b{font-size:9.5pt;font-weight:800;letter-spacing:.4px;direction:ltr;unicode-bidi:isolate}
 .pr-two{display:flex;gap:8px}
+.lg-split > div > h4,
 .pr-two > div > h4{font-size:9pt;font-weight:800;color:#3B5233;border-bottom:1px solid #C9D3C2;padding-bottom:1px;margin-bottom:3px}
 .pr-two > *{flex:1;min-width:0}
 
@@ -707,7 +789,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
     <div class="emblem" id="mastEmblem"></div>
     <div class="mast-titles">
       <div class="mast-ministry">وزارة التربية والتعليم · <span class="en">Ministry of Education</span></div>
-      <div class="mast-school">مدرسة مريجب للتعليم الأساسي — الحلقة الثانية</div>
+      <div class="mast-school" id="mastSchool">مدرسة مريجب للتعليم الأساسي — الحلقة الثانية</div>
       <div class="mast-system">نظام متابعة الزيارات الصفية · <span class="en">Classroom Visits Monitoring System</span></div>
     </div>
     <div class="charter" id="mastCharter"></div>
@@ -899,6 +981,66 @@ const DOMAINS = [
     'Resources support lesson objectives.','PPT content is clear and academically appropriate.','Slides are readable and not overloaded.','Visuals support understanding.','Resources are age appropriate.']},
 ];
 
+/* ──────────────────────────────────────────────────────────────────────
+   Lesson Expectations — Cycle 1 & 2, 2026/2027
+   The seven domains of the school's "توقعات الحصة الدرسية" document, used
+   as the observation checklist in the printed paper log.
+   ────────────────────────────────────────────────────────────────────── */
+const LESSON_EXPECTATIONS = [
+  {ar:'روتين الحصة', en:'Lesson Routine', items:[
+    ['تسجيل حضور الطالبات عبر المنهل أو منصة التعلّم الذكي','Recording attendance via AlManhal or LMS'],
+    ['مشاركة قوانين المدرسة وإرشادات المواطنة الرقمية والتأكيد على التاءات الأربع','Sharing school rules and digital citizenship guidelines'],
+    ['تذكير الطالبات برؤية المدرسة ورسالتها مع الربط بالهوية الوطنية','Reminding students of the vision and mission, linked to national identity'],
+    ['تطبيق روتين المادة من خلال أنشطة تمهيدية مرتبطة بالدروس السابقة','Implementing the subject routine through introductory activities'],
+  ]},
+  {ar:'المخرجات التعليمية ومعايير النجاح', en:'Outcomes & Success Criteria', items:[
+    ['كتابة عنوان الدرس والأهداف التعليمية على السبورة بشكل واضح','Writing the lesson title and objectives clearly on the board'],
+    ['مشاركة مخرجات وأهداف الدرس مع الطالبات بصورة محددة وواضحة','Sharing clear learning outcomes with students'],
+    ['توضيح معايير النجاح المتوقعة للدرس','Presenting the success criteria for the lesson'],
+    ['عرض المفردات والمصطلحات الأساسية المرتبطة بالدرس','Introducing key vocabulary and terminology'],
+    ['نمذجة المخرج التعليمي أمام الطالبات لضمان وضوح التوقعات','Modeling the learning outcome for students'],
+    ['وضع علامة ✔ أمام كل مخرج تعليمي مكتوب على السبورة بعد تحقيقه','Placing a check mark next to each outcome once achieved'],
+  ]},
+  {ar:'الأنشطة', en:'Activities', items:[
+    ['ارتباط جميع الأنشطة بالمخرج أو الهدف التعليمي المحدد','Aligning all activities with the learning outcome'],
+    ['تزويد الطالبات بتعليمات وتوقعات واضحة قبل تنفيذ أي نشاط','Providing clear instructions and expectations before each activity'],
+    ['أنشطة تراعي الفروق الفردية بما في ذلك الطالبات أصحاب الهمم','Planning activities that address individual differences, including students of determination'],
+    ['دمج وتفعيل منصات التعلّم الذكي والبرامج المعتمدة أثناء الحصة','Integrating smart learning platforms and approved programs'],
+    ['ضمان الانتقال التدريجي والمنظم بين الأنشطة التعليمية','Ensuring smooth and gradual transitions between activities'],
+    ['توظيف استراتيجيات تدريس متنوعة (فردي – ثنائي – مجموعات)','Using varied teaching strategies (individual, pair, group)'],
+    ['أنشطة تدعم التعلّم النشط وأنشطة ممتدة لتعزيز الفهم','Planning activities that support active learning and extended opportunities'],
+    ['الاستخدام الأمثل للمساحات والأركان التعليمية بما يخدم أهداف الدرس','Optimal use of indoor and outdoor learning spaces'],
+  ]},
+  {ar:'طرح الأسئلة لتطوير التفكير', en:'Questioning to Develop Thinking', items:[
+    ['طرح أسئلة تحفّز مهارات التفكير العليا لدى الطالبات','Asking questions that stimulate higher-order thinking skills'],
+    ['تشجيع الطالبات على طرح أسئلة مفتوحة','Encouraging students to ask open-ended questions'],
+    ['إعطاء الطالبات الوقت الكافي للتفكير في الأسئلة المطروحة','Providing sufficient wait time to reflect on questions'],
+  ]},
+  {ar:'الربط والدمج', en:'Connection and Integration', items:[
+    ['ربط الخبرات الجديدة بالخبرات السابقة للطالبات','Connecting new experiences to prior knowledge'],
+    ['ربط الدرس بواقع الحياة اليومية وثقافة الإمارات والأحداث الجارية','Relating the lesson to daily life, UAE culture and current events'],
+    ['ربط الخبرة التعليمية بالمواد الدراسية الأخرى','Linking the learning experience to other subjects'],
+    ['دمج مهارات القراءة والكتابة والتحدث بوضوح ضمن الدرس','Integrating reading, writing and speaking skills'],
+  ]},
+  {ar:'إشراك الطالبات', en:'Actively Engaging Students', items:[
+    ['تهيئة بيئة صفية محفزة وجاذبة للطالبات','Creating a stimulating and engaging classroom environment'],
+    ['طرح أسئلة للتحقق من فهم الطالبات للمحتوى','Asking questions to check understanding of the content'],
+    ['إعطاء جميع الطالبات فرصًا للمشاركة وتحمّل مسؤولية تعلمهن','Giving all students opportunities to participate and take ownership of their learning'],
+    ['تقليل حديث المعلمة وإتاحة الفرصة الأكبر للطالبات للتحدث','Reducing teacher talk and increasing student talk'],
+    ['التشجيع والتحفيز المستمر للطالبات','Continuously encouraging and motivating students'],
+    ['دمج وتنويع المصادر التعليمية لدعم مشاركة جميع الطالبات','Diversifying learning resources to support all students'],
+    ['توزيع الأدوار وإعطاء الطالبات أدوارًا قيادية داخل الحصة','Assigning roles and giving students leadership roles'],
+  ]},
+  {ar:'التقييم', en:'Assessment', items:[
+    ['تطبيق أنشطة تدعم تحقيق المخرج التعليمي وتقييمه','Implementing activities that support the achievement and assessment of the outcome'],
+    ['تشجيع التقييم الذاتي وتقييم الأقران باستخدام معايير واضحة','Encouraging self- and peer-assessment using clear criteria'],
+    ['تقديم تغذية راجعة بنّاءة مع خطوات لاحقة لتطوير التعلم','Providing constructive feedback with next steps'],
+    ['تشجيع الطالبات على مشاركة أعمالهن للتأمل في تعلمهن','Encouraging students to share and present their work for reflection'],
+    ['تدوين الملاحظات حول أداء الطالبات في سجل ملاحظات المعلمة','Recording observations in the teacher observation log'],
+  ]},
+];
+const EXPECT_SCALE = [['مُتحقق','Met'], ['جزئيًا','Partly'], ['لم يُلاحظ','Not seen']];
+
 /* Visit lifecycle — Planned → Printed → Visited → Admin Notes → Feedback → Follow-up → Closed */
 const STAGES = [
   {id:'planned',  en:'Planned',            ar:'مخططة',            icon:'calendar'},
@@ -982,6 +1124,12 @@ const DEFAULT_SETTINGS = {
   academicYear: '2026/2027',
   logo: '',
   logoCharter: '',
+  schoolNameAr: 'مدرسة مريجب للتعليم الأساسي — الحلقة الثانية',
+  schoolNameEn: 'Muraijib Basic Education School — Cycle 2',
+  cycleAr: 'الحلقة الثانية',
+  cycleEn: 'Cycle 2',
+  schoolCode: '',
+  principal: '',
   activeTermId: 'term1',
   terms: [
     {id:'term1', name:'Term 1 — الفصل الأول', start:'2026-09-03', end:'2026-12-17'},
@@ -1035,6 +1183,19 @@ const Store = {
   },
   reset(){ this.db = this.blank(); this.save(); },
 };
+/* School identity: constants are the defaults, Settings may override them. */
+function SCH(){
+  const s = Store.db.settings;
+  return {
+    ministryAr: SCHOOL.ministryAr, ministryEn: SCHOOL.ministryEn,
+    nameAr: s.schoolNameAr || SCHOOL.nameAr,
+    nameEn: s.schoolNameEn || SCHOOL.nameEn,
+    cycle: s.cycleAr || 'الحلقة الثانية',
+    cycleEn: s.cycleEn || 'Cycle 2',
+    code: s.schoolCode || '', principal: s.principal || '',
+    systemAr: SCHOOL.systemAr, systemEn: SCHOOL.systemEn,
+  };
+}
 const DB = () => Store.db;
 const S  = () => Store.db.settings;
 
@@ -1424,6 +1585,7 @@ function render(){
   $('#mastYear').textContent = S().academicYear;
   $('#mastTerm').textContent = Model.activeTerm().name;
   $('#mastObserver').textContent = S().observer;
+  $('#mastSchool').textContent = SCH().nameAr;
   $('#mastEmblem').innerHTML = logoMoeHTML();
   $('#mastCharter').innerHTML = logoCharterHTML();
   $$('#view [data-nav]').forEach(b => b.onclick = () => go(b.dataset.nav, b.dataset.param || ''));
@@ -1697,6 +1859,7 @@ VIEWS.daily = function(){
   '<div class="page-head"><div class="page-title">الزيارات الصفية اليومية' +
     '<span class="sub en">Daily Classroom Visit Planner · ' + h(fmtLong(date)) + '</span></div>' +
     '<div class="page-actions">' +
+      '<button class="btn" id="btnPaperLog">' + ICON.book + ' السجل الورقي</button>' +
       '<button class="btn" id="btnPrintDay">' + ICON.print + ' طباعة خطة اليوم</button>' +
       '<button class="btn" id="btnBatch">' + ICON.file + ' طباعة نماذج زيارات اليوم</button>' +
       '<button class="btn" id="btnGenForm">' + ICON.note + ' إنشاء نموذج زيارة يومي</button>' +
@@ -1843,6 +2006,7 @@ VIEWS.after_daily = function(){
   const ea = $('#emptyAdd'); if(ea) ea.onclick = () => openVisitForm(null, currentDate());
   $('#btnGenForm').onclick = () => openVisitForm(null, currentDate(), {generate:true});
   $('#btnPrintDay').onclick = () => printDailyPlan(currentDate());
+  $('#btnPaperLog').onclick = openPaperLog;
   $('#btnBatch').onclick = () => openBatchPrint(currentDate());
 
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
@@ -2317,7 +2481,7 @@ function openVisitRecord(id, focusSection){
 function setPageOrientation(orient){
   $('#pageStyle').textContent =
     '@page{size:A4 ' + orient + ';margin:' + (orient === 'landscape' ? '9mm 8mm' : '12mm 10mm') + ';' +
-    '@bottom-center{content:counter(page) " / " counter(pages);font-size:8pt;color:#666}}';
+    '@bottom-center{content:counter(page) " / " counter(pages);font-size:8pt;color:#666;direction:ltr}}';
 }
 function doPrint(orient, html){
   setPageOrientation(orient);
@@ -2330,9 +2494,9 @@ function printHeader(titleAr, titleEn, metaItems){
   return '<div class="pr-head">' +
     '<div class="pr-emb">' + logoMoeHTML() + '</div>' +
     '<div class="pr-t">' +
-      '<div class="m">' + h(SCHOOL.ministryAr) + ' · <span class="en">' + h(SCHOOL.ministryEn) + '</span></div>' +
-      '<div class="s">' + h(SCHOOL.nameAr) + '</div>' +
-      '<div class="y">' + h(SCHOOL.nameEn) + ' · Academic Year ' + h(S().academicYear) + '</div>' +
+      '<div class="m">' + h(SCH().ministryAr) + ' · <span class="en">' + h(SCH().ministryEn) + '</span></div>' +
+      '<div class="s">' + h(SCH().nameAr) + '</div>' +
+      '<div class="y">' + h(SCH().nameEn) + ' · Academic Year ' + h(S().academicYear) + '</div>' +
     '</div>' +
     '<div class="pr-charter">' + logoCharterHTML() + '</div>' +
   '</div>' +
@@ -2341,7 +2505,7 @@ function printHeader(titleAr, titleEn, metaItems){
   (items.length ? '<div class="pr-strip">' + items.map(x => '<span>' + x + '</span>').join('') + '</div>' : '');
 }
 function printFooter(note){
-  return '<div class="pr-foot"><span>' + h(SCHOOL.nameAr) + ' — ' + h(SCHOOL.systemAr) + '</span>' +
+  return '<div class="pr-foot"><span>' + h(SCH().nameAr) + ' — ' + h(SCH().systemAr) + '</span>' +
     '<span class="en">' + h(note || '') + '</span>' +
     '<span class="en">Printed: ' + fmtDate(todayISO()) + '</span></div>';
 }
@@ -2515,6 +2679,240 @@ function weeklyPlanSheet(){
     '</tr></thead><tbody>' + (rows || '<tr><td colspan="12" style="text-align:center;padding:14px">No visits recorded in this period</td></tr>') + '</tbody></table>' +
     printFooter('Weekly Visit Plan') +
   '</div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   PAPER LOG  ·  السجل الورقي لملاحظات الحصة
+   An A4 booklet the Academic Vice Principal carries into lessons: a cover,
+   a nominal index of teachers, then two pages per observation built on the
+   seven domains of the Lesson Expectations document.
+   ══════════════════════════════════════════════════════════════════════ */
+function lgLines(cls){ return '<div class="wr-lines ' + cls + '"></div>'; }
+
+/* a tighter header than printHeader, so two observation sides fit on one sheet */
+function lgHeader(titleAr, titleEn){
+  const sc = SCH();
+  return '<div class="lg-head">' +
+    '<div class="m1">' + logoMoeHTML() + '</div>' +
+    '<div class="t">' +
+      '<div class="s">' + h(sc.nameAr) + ' <span class="en">· ' + h(sc.nameEn) + '</span></div>' +
+      '<div class="ti">' + h(titleAr) + ' <span class="en">· ' + h(titleEn) + '</span>' +
+        '<i>' + h(sc.ministryAr) + ' · <span class="en">Academic Year ' + h(S().academicYear) + '</span></i></div>' +
+    '</div>' +
+    '<div class="m2">' + logoCharterHTML() + '</div>' +
+  '</div>';
+}
+
+function paperLogCover(opts){
+  const sc = SCH(), s = S();
+  const row = (ar, en, val) => '<div class="r"><i>' + h(ar) + ' · <span class="en">' + h(en) + '</span></i>' +
+    '<b>' + h(val || '') + '</b></div>';
+  return '<div class="pr-sheet"><div class="lg-cover">' +
+    '<div class="lg-band"></div>' +
+    '<div class="lg-marks">' +
+      '<div class="m1">' + logoMoeHTML() + '</div>' +
+      '<div style="flex:1;font-size:9pt;color:#555;line-height:1.7">' + h(sc.ministryAr) +
+        '<span class="en" style="display:block">' + h(sc.ministryEn) + '</span></div>' +
+      '<div class="m2">' + logoCharterHTML() + '</div>' +
+    '</div>' +
+    '<div class="lg-sch">' + h(sc.nameAr) + '<span class="en">' + h(sc.nameEn) + '</span></div>' +
+    '<div class="lg-rule"></div>' +
+    '<div class="big">سجل الزيارات الصفية وملاحظات الحصة' +
+      '<span class="en">Classroom Visit &amp; Lesson Observation Log</span></div>' +
+    '<div class="cyc">' + h(sc.cycle) + '<span class="en">' + h(sc.cycleEn) + '</span></div>' +
+    '<div><span class="yr">العام الدراسي · <span class="en">Academic Year</span> ' + h(s.academicYear) + '</span></div>' +
+    '<div class="lg-owner">' +
+      row('اسم نائب المدير الأكاديمي', 'Academic Vice Principal', s.observer) +
+      row('الفصل الدراسي', 'Term', Model.activeTerm().name) +
+      row('الفترة', 'Period', fmtDate(s.windowStart) + ' – ' + fmtDate(s.windowEnd)) +
+      row('عدد المعلمات', 'Number of Teachers', opts.teachers.length) +
+      row('رقم السجل', 'Log Reference', opts.ref) +
+    '</div>' +
+    '<div class="lg-src">' +
+      'يستند هذا السجل إلى وثيقة <b>توقعات الحصة الدرسية للحلقة الأولى والثانية</b> للعام الدراسي ' + h(s.academicYear) +
+      ' — سبعة مجالات و<b>' + LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + '</b> مؤشرًا للملاحظة الصفية.' +
+      '<div class="en" style="margin-top:2px">Based on the Cycle 1 &amp; 2 Lesson Expectations document — seven domains, ' +
+      LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + ' observation indicators.</div>' +
+    '</div>' +
+  '</div></div>';
+}
+
+function paperLogIndex(teachers){
+  const rows = teachers.map((t, i) =>
+    '<tr><td class="no">' + (i+1) + '</td>' +
+    '<td>' + h(t.name) + '</td>' +
+    '<td class="en">' + h(t.nameEn || '') + '</td>' +
+    '<td>' + h(t.subject || '—') + '</td>' +
+    '<td class="mono" style="text-align:center">' + ((t.grades||[]).join(' · ') || '—') + '</td>' +
+    '<td></td><td></td></tr>').join('');
+  return '<div class="pr-sheet">' +
+    printHeader('فهرس المعلمات', 'Index of Teachers', [
+      '<span class="en">Teachers:</span> <b>' + teachers.length + '</b>',
+      '<span class="en">Term:</span> <b>' + h(Model.activeTerm().name) + '</b>']) +
+    '<table class="pr-tbl"><thead><tr>' +
+      '<th style="width:8%">م<br><span class="en">No.</span></th>' +
+      '<th style="width:24%">اسم المعلمة<br><span class="en">Teacher Name</span></th>' +
+      '<th style="width:20%">الاسم بالإنجليزية<br><span class="en">Name (EN)</span></th>' +
+      '<th style="width:15%">المادة<br><span class="en">Subject</span></th>' +
+      '<th style="width:11%">الصفوف<br><span class="en">Grades</span></th>' +
+      '<th style="width:11%">تاريخ الزيارة<br><span class="en">Visit Date</span></th>' +
+      '<th style="width:11%">ملاحظة<br><span class="en">Note</span></th>' +
+    '</tr></thead><tbody>' + (rows ||
+      '<tr><td colspan="7" style="text-align:center;padding:14px">لا توجد معلمات مسجلة — No teachers registered</td></tr>') +
+    '</tbody></table>' +
+    printFooter('Index of Teachers — فهرس المعلمات') + '</div>';
+}
+
+/* the observation checklist, split across the two sides of one sheet */
+function lgChecklist(domains, startIndex){
+  let n = startIndex;
+  let out = '<table class="lg"><thead><tr>' +
+    '<th style="width:6%">م<br><span class="en">No.</span></th>' +
+    '<th>المؤشر · <span class="en">Indicator</span></th>' +
+    EXPECT_SCALE.map(x => '<th style="width:10%">' + h(x[0]) + '<br><span class="en">' + h(x[1]) + '</span></th>').join('') +
+  '</tr></thead><tbody>';
+  domains.forEach(d => {
+    out += '<tr class="dm"><td colspan="5">' + h(d.ar) + ' <span class="en">· ' + h(d.en) + '</span></td></tr>';
+    d.items.forEach(it => {
+      n++;
+      out += '<tr><td class="no">' + n + '</td>' +
+        '<td>' + h(it[0]) + '<br><span class="en" style="color:#666;font-size:6.1pt">' + h(it[1]) + '</span></td>' +
+        '<td class="bx"><i></i></td><td class="bx"><i></i></td><td class="bx"><i></i></td></tr>';
+    });
+  });
+  return out + '</tbody></table>';
+}
+
+function lgTeacherBanner(t, n, total){
+  return '<div class="lg-teacher">' +
+    '<div class="nm">' + h(t.name) + (t.nameEn ? '<span class="en">' + h(t.nameEn) + '</span>' : '') + '</div>' +
+    '<div class="sh">' + h(t.subject || '—') + ' · <span class="en">Observer:</span> ' + h(S().observer) +
+      ' · <span class="en">Sheet</span> <b>' + n + '/' + total + '</b></div>' +
+  '</div>';
+}
+
+/* front side: lesson data, objectives, success criteria, domains 1–3 */
+function paperLogFront(t, n, total){
+  const fld = (ar, en, w) => '<div' + (w ? ' class="' + w + '"' : '') + '><span class="k">' + h(ar) +
+    ' <span class="en">' + h(en) + '</span></span><span class="v"></span></div>';
+  return '<div class="pr-sheet pr-form">' +
+    lgHeader('ورقة ملاحظة الحصة', 'Lesson Observation Sheet') +
+    lgTeacherBanner(t, n, total) +
+    '<div class="lg-fields">' +
+      fld('اليوم', 'Day') + fld('التاريخ', 'Date') + fld('الحصة', 'Period') + fld('الوقت', 'Time') +
+      fld('المادة', 'Subject') + fld('الصف والشعبة', 'Grade / Class') +
+      fld('عدد الطالبات', 'No. of Students') + fld('أصحاب الهمم', 'Students of Determination') +
+      fld('عنوان الدرس', 'Lesson Title', 'w50') + fld('نوع الزيارة', 'Visit Type', 'w50') +
+    '</div>' +
+    '<div class="pr-sec lg-split">' +
+      '<div><h4>أهداف الدرس · <span class="en">Lesson Objectives</span></h4>' + lgLines('h22') + '</div>' +
+      '<div><h4>معايير النجاح · <span class="en">Success Criteria</span></h4>' + lgLines('h22') + '</div>' +
+    '</div>' +
+    '<div class="pr-sec"><h4>مؤشرات الملاحظة · <span class="en">Observation Indicators — Domains 1–4</span></h4>' +
+      lgChecklist(LESSON_EXPECTATIONS.slice(0, 4), 0) + '</div>' +
+    printFooter('Lesson Observation Sheet — ' + t.name + ' — (1/2)') +
+  '</div>';
+}
+
+/* back side: domains 4–7, then strengths and areas for improvement */
+function paperLogBack(t, n, total){
+  const skip = LESSON_EXPECTATIONS.slice(0, 4).reduce((x, d) => x + d.items.length, 0);
+  return '<div class="pr-sheet pr-form">' +
+    lgHeader('ورقة ملاحظة الحصة — تابع', 'Lesson Observation Sheet (continued)') +
+    lgTeacherBanner(t, n, total) +
+    '<div class="pr-sec"><h4>مؤشرات الملاحظة · <span class="en">Observation Indicators — Domains 5–7</span></h4>' +
+      lgChecklist(LESSON_EXPECTATIONS.slice(4), skip) + '</div>' +
+    '<div class="pr-sec lg-split">' +
+      '<div><h4>نقاط القوة · <span class="en">Strengths</span></h4>' + lgLines('h48') + '</div>' +
+      '<div><h4>نقاط التحسين · <span class="en">Areas for Improvement</span></h4>' + lgLines('h48') + '</div>' +
+    '</div>' +
+    '<div class="pr-sec"><h4>الخطوة التالية المتفق عليها · <span class="en">Agreed Next Step</span></h4>' +
+      '<div class="pr-cbs c5">' + cbList(FORM_NEXT_STEPS.map(x => x[0]), [])
+        .replace('<div class="pr-cbs">','').replace(/<\/div>$/,'') + '</div></div>' +
+    '<div class="pr-sign">' +
+      '<div>توقيع الملاحظ · <span class="en">Observer</span></div>' +
+      '<div>توقيع المعلمة · <span class="en">Teacher</span></div>' +
+      '<div>التاريخ · <span class="en">Date</span></div>' +
+    '</div>' +
+    printFooter('Lesson Observation Sheet — ' + t.name + ' — (2/2)') +
+  '</div>';
+}
+
+function buildPaperLog(opts){
+  const sheets = [];
+  if(opts.cover) sheets.push(paperLogCover(opts));
+  if(opts.index) sheets.push(paperLogIndex(opts.teachers));
+  opts.teachers.forEach(t => {
+    for(let i = 1; i <= opts.perTeacher; i++){
+      sheets.push(paperLogFront(t, i, opts.perTeacher));
+      sheets.push(paperLogBack(t, i, opts.perTeacher));
+    }
+  });
+  return sheets.join('');
+}
+
+function openPaperLog(){
+  const teachers = Model.activeTeachers();
+  if(!teachers.length) return toast('أضيفي المعلمات أولًا من صفحة المعلمات', 'err');
+  const list = teachers.map(t =>
+    '<label class="slot" style="cursor:pointer">' +
+      '<input type="checkbox" class="cb plT" value="' + h(t.id) + '" checked>' +
+      '<span class="info"><b>' + h(t.name) + '</b><i>' + h(t.subject || '—') + '</i></span></label>').join('');
+  openModal({
+    title:'إنشاء السجل الورقي', sub:'Paper Log — A4 booklet carried into lessons', size:'wide',
+    body:'<div class="note" style="margin-bottom:12px">' + ICON.info +
+      ' سجل اسمي بقياس <b>A4</b>: غلاف، فهرس المعلمات، ثم <b>ورقتان لكل زيارة</b> (وجه وظهر) مبنيتان على ' +
+      'المجالات السبعة لوثيقة توقعات الحصة، وتتضمنان خانتَي <b>نقاط القوة</b> و<b>نقاط التحسين</b>.</div>' +
+      '<div class="form-grid">' +
+        '<div class="field"><label>عدد أوراق الملاحظة لكل معلمة<span class="en"> Sheets per Teacher</span></label>' +
+          '<select id="plPer">' + optionList([['1','ورقة واحدة (صفحتان)'],['2','ورقتان (4 صفحات)'],['3','ثلاث أوراق (6 صفحات)'],['4','أربع أوراق (8 صفحات)']], '2') + '</select></div>' +
+        '<div class="field"><label>محتويات السجل<span class="en"> Booklet Contents</span></label>' +
+          '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:5px">' +
+            '<label class="switch"><input type="checkbox" id="plCover" checked><span class="track"></span><span class="lb">الغلاف</span></label>' +
+            '<label class="switch"><input type="checkbox" id="plIndex" checked><span class="track"></span><span class="lb">فهرس المعلمات</span></label>' +
+          '</div></div>' +
+      '</div>' +
+      '<div class="section-title" style="margin-top:16px">' + ICON.users + ' المعلمات المشمولات <span class="en">· Teachers Included</span></div>' +
+      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
+        '<button type="button" class="btn sm" id="plAll">تحديد الكل</button>' +
+        '<button type="button" class="btn sm" id="plNone">إلغاء التحديد</button>' +
+        '<div style="flex:1"></div><span id="plCount" style="font-size:11.5px;color:var(--ink-3)"></span>' +
+      '</div>' +
+      '<div class="slots" style="max-height:230px">' + list + '</div>',
+    foot:'<span id="plPages" style="font-size:11px;color:var(--ink-3)"></span><div class="spacer"></div>' +
+      '<button class="btn" data-close="1">إلغاء</button>' +
+      '<button class="btn primary" id="plGo">' + ICON.print + ' معاينة وطباعة السجل</button>',
+    onMount(r){
+      const refresh = () => {
+        const n = $$('.plT:checked', r).length;
+        const per = Number($('#plPer', r).value);
+        const pages = (($('#plCover', r).checked ? 1 : 0) + ($('#plIndex', r).checked ? 1 : 0)) + n*per*2;
+        $('#plCount', r).textContent = 'المحددات: ' + n + ' من ' + teachers.length;
+        $('#plPages', r).textContent = 'إجمالي الصفحات: ' + pages + ' صفحة A4';
+      };
+      $$('.plT', r).forEach(c => c.onchange = refresh);
+      $('#plPer', r).onchange = refresh;
+      $('#plCover', r).onchange = refresh;
+      $('#plIndex', r).onchange = refresh;
+      $('#plAll', r).onclick = () => { $$('.plT', r).forEach(c => c.checked = true); refresh(); };
+      $('#plNone', r).onclick = () => { $$('.plT', r).forEach(c => c.checked = false); refresh(); };
+      refresh();
+      $('#plGo', r).onclick = () => {
+        const ids = $$('.plT:checked', r).map(c => c.value);
+        if(!ids.length) return toast('حددي معلمة واحدة على الأقل', 'err');
+        const opts = {
+          teachers: ids.map(id => Model.teacher(id)).filter(Boolean),
+          perTeacher: Number($('#plPer', r).value) || 1,
+          cover: $('#plCover', r).checked,
+          index: $('#plIndex', r).checked,
+          ref: 'CVL-' + S().academicYear.replace('/', '-'),
+        };
+        closeModal();
+        doPrint('portrait', buildPaperLog(opts));
+        toast('تم إنشاء السجل الورقي — اختاري "طباعة الخلفيات" لطباعة الغلاف بألوانه', 'ok');
+      };
+    }
+  });
 }
 
 /* ── entry points ── */
@@ -3544,7 +3942,8 @@ VIEWS.reports = function(){
     '<div class="page-actions">' +
       '<button class="btn" id="rpCsvVisits">' + ICON.download + ' تصدير الزيارات CSV</button>' +
       '<button class="btn" id="rpCsvCoverage">' + ICON.download + ' تصدير التغطية CSV</button>' +
-      '<button class="btn primary" id="rpPrint">' + ICON.print + ' طباعة الخطة الأسبوعية</button>' +
+      '<button class="btn" id="rpPrint">' + ICON.print + ' طباعة الخطة الأسبوعية</button>' +
+      '<button class="btn primary" id="rpLog">' + ICON.book + ' إنشاء السجل الورقي</button>' +
     '</div></div>' +
 
   '<div class="coverage" style="margin-bottom:14px">' +
@@ -3596,6 +3995,7 @@ VIEWS.reports = function(){
 };
 VIEWS.after_reports = function(){
   $('#rpPrint').onclick = printWeeklyPlan;
+  $('#rpLog').onclick = openPaperLog;
   $('#rpCsvVisits').onclick = exportVisitsCSV;
   $('#rpCsvCoverage').onclick = exportWeeklyCSV;
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
@@ -3679,7 +4079,15 @@ VIEWS.settings = function(){
     '<div class="page-actions"><button class="btn primary" id="stSave">' + ICON.check + ' حفظ الإعدادات</button></div></div>' +
 
   accSection('st_general','1','البيانات العامة','General & Identity',
-    '<div class="form-grid">' +
+    '<div class="form-grid two">' +
+      '<div class="field"><label>اسم المدرسة بالعربية<span class="en"> School Name (AR)</span></label><input type="text" id="stSchoolAr" value="' + h(s.schoolNameAr) + '"></div>' +
+      '<div class="field"><label>اسم المدرسة بالإنجليزية<span class="en"> School Name (EN)</span></label><input type="text" id="stSchoolEn" value="' + h(s.schoolNameEn) + '"></div>' +
+      '<div class="field"><label>الحلقة<span class="en"> Cycle (AR)</span></label><input type="text" id="stCycleAr" value="' + h(s.cycleAr) + '"></div>' +
+      '<div class="field"><label>الحلقة بالإنجليزية<span class="en"> Cycle (EN)</span></label><input type="text" id="stCycleEn" value="' + h(s.cycleEn) + '"></div>' +
+      '<div class="field"><label>رقم المدرسة<span class="en"> School Code</span></label><input type="text" id="stSchoolCode" value="' + h(s.schoolCode) + '"></div>' +
+      '<div class="field"><label>مديرة المدرسة<span class="en"> Principal</span></label><input type="text" id="stPrincipal" value="' + h(s.principal) + '"></div>' +
+    '</div>' +
+    '<div class="form-grid" style="margin-top:12px">' +
       '<div class="field"><label>العام الدراسي<span class="en"> Academic Year</span></label><input type="text" id="stYear" value="' + h(s.academicYear) + '"></div>' +
       '<div class="field"><label>اسم الملاحظ<span class="en"> Observer</span></label><input type="text" id="stObserver" value="' + h(s.observer) + '"></div>' +
       '<div class="field"><label>المسمى بالإنجليزية<span class="en"> Observer Title (EN)</span></label><input type="text" id="stObserverEn" value="' + h(s.observerEn) + '"></div>' +
@@ -3784,6 +4192,12 @@ VIEWS.after_settings = function(){
 
   $('#stSave').onclick = () => {
     s.academicYear = $('#stYear').value.trim() || s.academicYear;
+    s.schoolNameAr = $('#stSchoolAr').value.trim() || s.schoolNameAr;
+    s.schoolNameEn = $('#stSchoolEn').value.trim() || s.schoolNameEn;
+    s.cycleAr = $('#stCycleAr').value.trim();
+    s.cycleEn = $('#stCycleEn').value.trim();
+    s.schoolCode = $('#stSchoolCode').value.trim();
+    s.principal = $('#stPrincipal').value.trim();
     s.observer = $('#stObserver').value.trim();
     s.observerEn = $('#stObserverEn').value.trim();
     s.defaultDuration = Number($('#stDuration').value) || 20;
