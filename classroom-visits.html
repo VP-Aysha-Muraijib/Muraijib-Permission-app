@@ -520,125 +520,112 @@ table.pr-tbl tr{page-break-inside:avoid}
 .pr-note{font-size:8pt;color:#555;margin-top:4px}
 .pg-break{page-break-before:always}
 
-/* ── paper log (سجل ورقي) ──
-   Visual language taken from the school's "جسور التعلّم" operational plan:
-   warm neutrals, hairline rules instead of boxed grids, beige group bands,
-   a gold accent, and an editorial running header/footer.            */
-.lg{
-  --ink:#3B312B; --body:#45372F; --mute:#666562; --faint:#9A948C;
-  --gold:#B2935A; --gold-d:#80683D; --line:#E2DCD1; --line-d:#45372F;
-  --panel:#F7F5F0; --panel2:#EDE7DC; --sage:#668174; --sage-d:#4C6457; --sage-l:#EEF2EF;
-  color:var(--body);
+/* ── observation notebook (مذكرة الملاحظة الصفية) ──
+   Hairline rules, one very light tint, no decorative colour: the card has to
+   photocopy cleanly in black and white and be written on with a pen.      */
+.nb{
+  --ink:#2F2A25; --body:#45372F; --mute:#666562; --faint:#8E8880;
+  --gold:#B2935A; --line:#CFC9BE; --hair:#E2DCD1; --panel:#F6F4EF;
+  color:var(--body);font-size:9pt;display:flex;flex-direction:column;min-height:270mm;
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-.lg .en{font-family:var(--ff-en)}
+.nb .en{font-family:var(--ff-en)}
 
-/* ---------- cover ---------- */
-.lg-cover{display:flex;flex-direction:column;min-height:262mm;background:#fff}
-.lg-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10mm;margin-bottom:12mm}
-.lg-top .side{display:flex;flex-direction:column;gap:2.5mm;max-width:76mm}
-.lg-top .side.l{align-items:flex-start;text-align:start}
-.lg-top .side.r{align-items:flex-end;text-align:end}
-.lg-top .mk{width:30mm;color:var(--ink)}
-.lg-top .mk.sm{width:20mm}
-.lg-top .mk svg,.lg-top .mk img{display:block;width:100%;height:auto;max-height:17mm;object-fit:contain}
-.lg-top .nm{font-size:9pt;font-weight:700;color:var(--ink);line-height:1.5}
-.lg-top .nm.sub{font-size:8pt;font-weight:400;color:var(--mute)}
-.lg-mid{display:flex;gap:10mm;flex:1;align-items:stretch}
-.lg-art{width:72mm;flex-shrink:0;position:relative;overflow:hidden;border-radius:2px}
-.lg-art svg{position:absolute;inset:0;width:100%;height:100%}
-.lg-art .ph{position:absolute;inset-inline:0;bottom:0;height:58%;width:100%;object-fit:cover;object-position:left center}
-.lg-say{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:end;padding-bottom:6mm}
-.lg-say .lbl{font-size:10.5pt;color:var(--mute);margin-bottom:5mm}
-.lg-say .ttl{font-size:34pt;font-weight:800;color:var(--ink);line-height:1.22;letter-spacing:-.6px}
-.lg-say .hr{height:1px;background:var(--line);margin:7mm 0 6mm}
-.lg-say .sub{font-size:12.5pt;font-weight:600;color:var(--body);line-height:1.75}
-.lg-say .subEn{font-size:9pt;color:var(--mute);line-height:1.7;margin-top:4mm}
-.lg-say .yr{font-size:12pt;font-weight:800;color:var(--ink);margin-top:8mm;letter-spacing:.5px}
-.lg-say .cyc{font-size:10.5pt;color:var(--body);margin-top:2mm}
-.lg-quote{border-top:1px solid var(--gold);margin-top:9mm;padding-top:5mm;text-align:center}
-.lg-quote img{display:block;height:8mm;width:auto;margin:0 auto;opacity:.92}
-.lg-cfoot{display:flex;justify-content:space-between;gap:10mm;margin-top:8mm;font-size:8.5pt;color:var(--mute)}
+/* header */
+.nb-head{display:flex;align-items:center;gap:4mm;border-bottom:1.8px solid var(--ink);padding-bottom:1mm}
+.nb-head .mk{width:17mm;flex-shrink:0}
+.nb-head .mk.c{width:19mm}
+.nb-head .mk img{display:block;width:100%;height:auto;max-height:7.4mm;object-fit:contain}
+.nb-head .t{flex:1;text-align:center;min-width:0}
+.nb-head .sch{font-size:8pt;color:var(--mute);line-height:1.4}
+.nb-head .ttl{font-size:10pt;font-weight:700;color:var(--ink);line-height:1.25}
+.nb-head .ttl span{display:block;font-size:6.8pt;font-weight:400;color:var(--faint);letter-spacing:.2px}
+.nb-id{display:flex;justify-content:space-between;gap:6mm;font-size:7pt;color:var(--mute);
+  padding:.7mm 0 0;border-bottom:1px solid var(--hair);margin-bottom:1.1mm}
+.nb-id b{color:var(--ink)}
 
-/* ---------- running header / footer ---------- */
-.lg-rh{display:flex;justify-content:space-between;gap:8mm;font-size:8pt;color:var(--mute);
-  border-bottom:1px solid var(--line);padding-bottom:2mm;margin-bottom:4.5mm}
-.lg-rf{display:flex;justify-content:space-between;align-items:center;gap:8mm;font-size:8pt;color:var(--mute);
-  border-top:1px solid var(--line);padding-top:2mm;margin-top:5mm}
-.lg-rf b{font-size:9pt;color:var(--ink);font-weight:800;direction:ltr;unicode-bidi:isolate}
-.lg-lbl{display:flex;align-items:center;gap:3mm;justify-content:flex-start;font-size:8pt;color:var(--mute)}
-.lg-lbl i{width:16mm;height:1px;background:var(--gold);display:block}
-.lg-h1{display:flex;align-items:baseline;justify-content:space-between;gap:8mm;
-  font-size:13.5pt;font-weight:800;color:var(--ink);line-height:1.3;margin-top:.6mm;text-align:start}
-.lg-h1 span{font-size:8.5pt;font-weight:400;color:var(--mute);white-space:nowrap}
-
-/* ---------- panels ---------- */
-.lg-pull{
-  border-inline-start:2.5px solid var(--gold);background:var(--panel);
-  padding:3mm 5mm;margin:5mm 0;font-size:10.5pt;color:var(--ink);line-height:1.8;
-}
-.lg-ident{display:flex;justify-content:space-between;align-items:baseline;gap:6mm;flex-wrap:wrap;
-  border-bottom:1.6px solid var(--line-d);padding-bottom:1.1mm;margin-bottom:2mm}
-.lg-ident .nm{font-size:10.5pt;font-weight:800;color:var(--ink);line-height:1.25}
-.lg-ident .nm span{font-size:9pt;font-weight:400;color:var(--mute);margin-inline-start:5mm}
-.lg-ident .meta{font-size:8.5pt;color:var(--mute);text-align:end;line-height:1.7}
-.lg-ident .meta b{color:var(--ink);font-weight:700}
-
-/* ---------- field rows ---------- */
-.lg-fields{display:flex;flex-wrap:wrap;border-top:1px solid var(--line);margin-bottom:4mm}
-.lg-fields > div{width:25%;box-sizing:border-box;padding:.6mm 3mm;border-bottom:1px solid var(--line);
-  display:flex;flex-direction:column;gap:.4mm}
-.lg-fields > div.w50{width:50%}
-.lg-fields .k{font-size:6.5pt;color:var(--faint);line-height:1.2}
-.lg-fields .v{border-bottom:1px dotted var(--line);min-height:3.2mm}
-
-/* ---------- checklist ---------- */
-table.lg-t{width:100%;border-collapse:collapse;font-size:6.5pt;table-layout:fixed}
-table.lg-t th{
-  font-size:6.5pt;font-weight:700;color:var(--mute);text-align:start;padding:.9mm 2mm;
-  border-bottom:1.6px solid var(--line-d);line-height:1.3;
-}
-table.lg-t th.c{text-align:center}
-table.lg-t td{padding:.3mm 2mm;border-bottom:1px solid var(--line);vertical-align:middle;
-  color:var(--body);line-height:1.2}
-table.lg-t tr{page-break-inside:avoid}
-table.lg-t td.no{text-align:center;color:var(--faint);font-size:6.8pt}
-table.lg-t td.bx{text-align:center}
-table.lg-t td.bx i{display:inline-block;width:3.1mm;height:3.1mm;border:1px solid var(--faint);border-radius:.6mm}
-table.lg-t td .en{display:block;color:var(--faint);font-size:5.6pt;line-height:1.15}
-table.lg-t tr.grp td{
-  background:var(--panel);font-weight:800;color:var(--ink);font-size:7.2pt;padding:.9mm 2mm;
-  border-bottom:1px solid var(--line);
+/* sections */
+.nb-sec{margin-bottom:1.1mm}
+.nb-sec.grow{flex:1;display:flex;flex-direction:column}
+.nb-sec.grow .nb-rule{flex:1}
+.nb-sec > h3{
+  display:flex;align-items:center;gap:2.5mm;font-size:8pt;font-weight:700;color:var(--ink);
+  background:var(--panel);border-inline-start:2.2px solid var(--ink);
+  padding:.6mm 2.5mm;margin-bottom:1mm;
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-table.lg-t tr.grp td span{font-weight:400;color:var(--mute);font-size:7pt}
-table.lg-t tr.grp td b{color:var(--gold-d);font-weight:800}
+.nb-sec > h3 > i{
+  font-style:normal;width:4.2mm;height:4.2mm;border:1px solid var(--ink);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:6.6pt;font-weight:700;flex-shrink:0;
+}
+.nb-sec > h3 > span{margin-inline-start:auto;font-size:6.8pt;font-weight:400;color:var(--faint)}
 
-/* ---------- writing blocks ---------- */
-.lg-wr{border-top:1.6px solid var(--line-d);padding-top:1.3mm;margin-top:2.6mm}
-.lg-wr > h5{font-size:8.5pt;font-weight:800;color:var(--ink);margin-bottom:1.2mm;line-height:1.3}
-.lg-wr > h5 span{font-weight:400;color:var(--mute);font-size:8pt}
-.lg-wr.acc{border-top-color:var(--gold)}
-.lg-wr.acc2{border-top-color:var(--sage)}
-.lg-rule{background:repeating-linear-gradient(to bottom,transparent,transparent 7.6mm,var(--line) 7.6mm,var(--line) calc(7.6mm + 1px))}
-.lg-rule.h12{height:12mm}.lg-rule.h14{height:14mm}.lg-rule.h16{height:16mm}.lg-rule.h20{height:20mm}.lg-rule.h24{height:24mm}.lg-rule.h32{height:32mm}
-.lg-rule.h18{height:18mm}.lg-rule.h40{height:40mm}.lg-rule.h46{height:46mm}
-.lg-cols{display:flex;gap:7mm}
-.lg-cols > div{flex:1;min-width:0}
-.lg-chips{display:flex;flex-wrap:wrap;gap:1mm 0}
-.lg-chip{width:16.66%;box-sizing:border-box;padding-inline-end:2mm;font-size:6pt;color:var(--body);
-  display:flex;align-items:flex-start;gap:1.2mm;line-height:1.35}
-.lg-chip i{display:inline-block;width:2.7mm;height:2.7mm;border:1px solid var(--faint);border-radius:.5mm;flex-shrink:0;margin-top:.6mm}
-.lg-sign{display:flex;gap:10mm;margin-top:3mm}
-.lg-sign > div{flex:1;border-top:1px solid var(--faint);padding-top:1.4mm;font-size:7.6pt;color:var(--mute);text-align:center}
+/* labelled blanks */
+.nb-grid{display:flex;flex-wrap:wrap}
+.nb-f{box-sizing:border-box;padding:0 2.5mm .8mm 0;display:flex;align-items:baseline;gap:1.4mm}
+.nb-f .k{font-size:6.8pt;color:var(--faint);line-height:1.2;white-space:nowrap}
+.nb-f .v{flex:1;border-bottom:1px solid var(--line);height:3.8mm;min-width:8mm}
+.nb-lab{font-size:7.6pt;font-weight:700;color:var(--ink);margin-bottom:.7mm}
+.nb-lab small{font-weight:400;color:var(--faint);font-size:6.8pt}
+.nb-sub{font-size:6.6pt;color:var(--faint);margin-bottom:.7mm}
+.nb-two{display:flex;gap:5mm}
+.nb-two > div{flex:1;min-width:0}
+.nb-rule{border:1px solid var(--line);border-radius:.6mm;
+  background:repeating-linear-gradient(to bottom,transparent,transparent 7.4mm,var(--hair) 7.4mm,var(--hair) calc(7.4mm + 1px))}
+.nb-hint{font-size:6.2pt;color:var(--faint);line-height:1.45;margin-top:.7mm}
 
-/* ---------- index ---------- */
-table.lg-idx{width:100%;border-collapse:collapse;font-size:8.5pt}
-table.lg-idx th{font-size:7.6pt;font-weight:700;color:var(--mute);text-align:start;
-  padding:2mm;border-bottom:1.6px solid var(--line-d)}
-table.lg-idx td{padding:2.2mm;border-bottom:1px solid var(--line);color:var(--body)}
-table.lg-idx td.no{color:var(--faint);text-align:center}
-table.lg-idx tr:nth-child(even) td{background:#FBFAF7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* indicator table */
+table.nb-t{width:100%;border-collapse:collapse;font-size:7pt;table-layout:fixed}
+table.nb-t th{font-size:6.4pt;font-weight:700;color:var(--mute);text-align:start;
+  padding:.7mm 1.2mm;border-bottom:1.4px solid var(--ink);line-height:1.2}
+table.nb-t th.c{text-align:center}
+table.nb-t td{padding:.3mm 1.6mm;border-bottom:1px solid var(--hair);color:var(--body);line-height:1.2}
+table.nb-t tr{page-break-inside:avoid}
+table.nb-t td.no{text-align:center;color:var(--faint);font-size:6.8pt}
+table.nb-t td.bx{text-align:center}
+table.nb-t td.bx i{display:inline-block;width:2.8mm;height:2.8mm;border:1px solid var(--faint);border-radius:.5mm}
+table.nb-t tr.grp td{background:var(--panel);font-weight:700;color:var(--ink);font-size:7.2pt;padding:.7mm 1.6mm;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.nb-t td.k{font-weight:700;color:var(--ink);width:26%}
+table.nb-t td em{font-style:normal;color:var(--faint);font-size:6.2pt;margin-inline-start:2mm;white-space:nowrap}
+
+/* signatures + page footer */
+.nb-foot{display:flex;gap:8mm;margin-top:1.5mm}
+.nb-foot > div{flex:1;border-top:1px solid var(--line);padding-top:1.2mm;font-size:7.2pt;color:var(--mute);text-align:center}
+.nb-pfoot{display:flex;justify-content:space-between;align-items:center;gap:6mm;font-size:7.2pt;color:var(--faint);
+  border-top:1px solid var(--hair);padding-top:1.4mm;margin-top:2.5mm}
+.nb-pfoot b{color:var(--ink)}
+
+/* guidance page */
+.nb-lead{font-size:9.5pt;color:var(--ink);line-height:1.8;border-inline-start:2.2px solid var(--gold);
+  background:var(--panel);padding:2.5mm 3.5mm;margin-bottom:3mm;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.g-grid{display:flex;gap:3mm}
+.g-item{flex:1;border:1px solid var(--hair);border-top:2px solid var(--ink);border-radius:.8mm;padding:2mm 2.5mm}
+.g-item b{display:block;font-size:8.6pt;color:var(--ink);margin-bottom:.8mm}
+.g-item span{font-size:7.4pt;color:var(--mute);line-height:1.6}
+.g-t td{padding:1.2mm 2mm}
+.g-ul{margin:1mm 4mm 0;padding:0;font-size:8pt;color:var(--body);line-height:1.75}
+.g-ul li{margin-bottom:1.2mm}
+.nb-idx td{height:6.6mm}
+
+/* cover */
+.nb-cover{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:262mm;padding-top:6mm}
+.nb-cmarks{display:flex;align-items:center;gap:6mm;width:100%;margin-bottom:8mm}
+.nb-cmarks .m{width:26mm}.nb-cmarks .m.c{width:30mm}
+.nb-cmarks .m img{display:block;width:100%;height:auto;max-height:17mm;object-fit:contain}
+.nb-cmarks .s{flex:1;font-size:10.5pt;font-weight:700;color:var(--ink);line-height:1.5}
+.nb-cmarks .s span{display:block;font-size:7.6pt;font-weight:400;color:var(--mute)}
+.nb-crule{width:100%;height:1.6px;background:var(--ink);margin-bottom:14mm}
+.nb-ctitle{font-size:26pt;font-weight:700;color:var(--ink);line-height:1.5}
+.nb-ctitle span{display:block;font-size:10.5pt;font-weight:400;color:var(--mute);line-height:1.6;margin-top:5mm}
+.nb-cmeta{width:118mm;margin:16mm auto 0;text-align:start;font-size:9pt}
+.nb-cmeta .r{display:flex;gap:4mm;padding:2mm 0;border-bottom:1px solid var(--hair)}
+.nb-cmeta .r > i{font-style:normal;color:var(--mute);font-size:7.8pt;width:52mm;flex-shrink:0}
+.nb-cmeta .r > b{flex:1;color:var(--ink);font-weight:700}
+.nb-cnote{max-width:140mm;margin:12mm auto 0;font-size:8.4pt;color:var(--mute);line-height:1.8}
+.nb-cslogan{margin-top:auto;padding-top:8mm;border-top:1px solid var(--gold);width:100%}
+.nb-cslogan img{display:block;height:7mm;width:auto;margin:0 auto;opacity:.9}
 
 @media print{
   html,body{background:#fff !important}
@@ -1029,64 +1016,35 @@ const DOMAINS = [
 ];
 
 /* ──────────────────────────────────────────────────────────────────────
-   Lesson Expectations — Cycle 1 & 2, 2026/2027
-   The seven domains of the school's "توقعات الحصة الدرسية" document, used
-   as the observation checklist in the printed paper log.
+   Observation indicators — twelve observable statements covering the six
+   domains of the leadership framework (planning, teaching, learning and
+   engagement, differentiation and inclusion, assessment and impact).
+   Deliberately short: they are ticked by hand during a lesson.
    ────────────────────────────────────────────────────────────────────── */
-const LESSON_EXPECTATIONS = [
-  {ar:'روتين الحصة', en:'Lesson Routine', items:[
-    ['تسجيل حضور الطالبات عبر المنهل أو منصة التعلّم الذكي','Recording attendance via AlManhal or LMS'],
-    ['مشاركة قوانين المدرسة وإرشادات المواطنة الرقمية والتأكيد على التاءات الأربع','Sharing school rules and digital citizenship guidelines'],
-    ['تذكير الطالبات برؤية المدرسة ورسالتها مع الربط بالهوية الوطنية','Reminding students of the vision and mission, linked to national identity'],
-    ['تطبيق روتين المادة من خلال أنشطة تمهيدية مرتبطة بالدروس السابقة','Implementing the subject routine through introductory activities'],
+const OBS_INDICATORS = [
+  {d:'التخطيط ووضوح التعلم', items:[
+    'نواتج التعلم محددة وقابلة للملاحظة ومُعلَنة للطالبات.',
+    'معايير النجاح واضحة وتُستخدم مرجعًا أثناء التعلم.',
+    'الأنشطة متسقة مع النواتج ومستوى التحدي مناسب.',
   ]},
-  {ar:'المخرجات التعليمية ومعايير النجاح', en:'Outcomes & Success Criteria', items:[
-    ['كتابة عنوان الدرس والأهداف التعليمية على السبورة بشكل واضح','Writing the lesson title and objectives clearly on the board'],
-    ['مشاركة مخرجات وأهداف الدرس مع الطالبات بصورة محددة وواضحة','Sharing clear learning outcomes with students'],
-    ['توضيح معايير النجاح المتوقعة للدرس','Presenting the success criteria for the lesson'],
-    ['عرض المفردات والمصطلحات الأساسية المرتبطة بالدرس','Introducing key vocabulary and terminology'],
-    ['نمذجة المخرج التعليمي أمام الطالبات لضمان وضوح التوقعات','Modeling the learning outcome for students'],
-    ['وضع علامة ✔ أمام كل مخرج تعليمي مكتوب على السبورة بعد تحقيقه','Placing a check mark next to each outcome once achieved'],
+  {d:'جودة التدريس', items:[
+    'الشرح والنمذجة دقيقان علميًا وواضحان للطالبات.',
+    'الأسئلة متدرجة وتدفع إلى التفسير والتفكير الناقد.',
   ]},
-  {ar:'الأنشطة', en:'Activities', items:[
-    ['ارتباط جميع الأنشطة بالمخرج أو الهدف التعليمي المحدد','Aligning all activities with the learning outcome'],
-    ['تزويد الطالبات بتعليمات وتوقعات واضحة قبل تنفيذ أي نشاط','Providing clear instructions and expectations before each activity'],
-    ['أنشطة تراعي الفروق الفردية بما في ذلك الطالبات أصحاب الهمم','Planning activities that address individual differences, including students of determination'],
-    ['دمج وتفعيل منصات التعلّم الذكي والبرامج المعتمدة أثناء الحصة','Integrating smart learning platforms and approved programs'],
-    ['ضمان الانتقال التدريجي والمنظم بين الأنشطة التعليمية','Ensuring smooth and gradual transitions between activities'],
-    ['توظيف استراتيجيات تدريس متنوعة (فردي – ثنائي – مجموعات)','Using varied teaching strategies (individual, pair, group)'],
-    ['أنشطة تدعم التعلّم النشط وأنشطة ممتدة لتعزيز الفهم','Planning activities that support active learning and extended opportunities'],
-    ['الاستخدام الأمثل للمساحات والأركان التعليمية بما يخدم أهداف الدرس','Optimal use of indoor and outdoor learning spaces'],
+  {d:'التعلم والمشاركة', items:[
+    'الطالبات منخرطات في مهام تعلم فعلية ويعملن باستقلالية.',
+    'وقت التعلم مُستثمر والبيئة الصفية آمنة وداعمة.',
   ]},
-  {ar:'طرح الأسئلة لتطوير التفكير', en:'Questioning to Develop Thinking', items:[
-    ['طرح أسئلة تحفّز مهارات التفكير العليا لدى الطالبات','Asking questions that stimulate higher-order thinking skills'],
-    ['تشجيع الطالبات على طرح أسئلة مفتوحة','Encouraging students to ask open-ended questions'],
-    ['إعطاء الطالبات الوقت الكافي للتفكير في الأسئلة المطروحة','Providing sufficient wait time to reflect on questions'],
+  {d:'التمايز والتعليم الدامج', items:[
+    'الدعم والتحدي يراعيان الفروق بين الطالبات.',
+    'التكييفات مناسبة لأصحاب الهمم وفرص المشاركة عادلة.',
   ]},
-  {ar:'الربط والدمج', en:'Connection and Integration', items:[
-    ['ربط الخبرات الجديدة بالخبرات السابقة للطالبات','Connecting new experiences to prior knowledge'],
-    ['ربط الدرس بواقع الحياة اليومية وثقافة الإمارات والأحداث الجارية','Relating the lesson to daily life, UAE culture and current events'],
-    ['ربط الخبرة التعليمية بالمواد الدراسية الأخرى','Linking the learning experience to other subjects'],
-    ['دمج مهارات القراءة والكتابة والتحدث بوضوح ضمن الدرس','Integrating reading, writing and speaking skills'],
-  ]},
-  {ar:'إشراك الطالبات', en:'Actively Engaging Students', items:[
-    ['تهيئة بيئة صفية محفزة وجاذبة للطالبات','Creating a stimulating and engaging classroom environment'],
-    ['طرح أسئلة للتحقق من فهم الطالبات للمحتوى','Asking questions to check understanding of the content'],
-    ['إعطاء جميع الطالبات فرصًا للمشاركة وتحمّل مسؤولية تعلمهن','Giving all students opportunities to participate and take ownership of their learning'],
-    ['تقليل حديث المعلمة وإتاحة الفرصة الأكبر للطالبات للتحدث','Reducing teacher talk and increasing student talk'],
-    ['التشجيع والتحفيز المستمر للطالبات','Continuously encouraging and motivating students'],
-    ['دمج وتنويع المصادر التعليمية لدعم مشاركة جميع الطالبات','Diversifying learning resources to support all students'],
-    ['توزيع الأدوار وإعطاء الطالبات أدوارًا قيادية داخل الحصة','Assigning roles and giving students leadership roles'],
-  ]},
-  {ar:'التقييم', en:'Assessment', items:[
-    ['تطبيق أنشطة تدعم تحقيق المخرج التعليمي وتقييمه','Implementing activities that support the achievement and assessment of the outcome'],
-    ['تشجيع التقييم الذاتي وتقييم الأقران باستخدام معايير واضحة','Encouraging self- and peer-assessment using clear criteria'],
-    ['تقديم تغذية راجعة بنّاءة مع خطوات لاحقة لتطوير التعلم','Providing constructive feedback with next steps'],
-    ['تشجيع الطالبات على مشاركة أعمالهن للتأمل في تعلمهن','Encouraging students to share and present their work for reflection'],
-    ['تدوين الملاحظات حول أداء الطالبات في سجل ملاحظات المعلمة','Recording observations in the teacher observation log'],
+  {d:'التقويم وأثر التدريس', items:[
+    'التحقق من الفهم مستمر ويُعدَّل التدريس بناءً عليه.',
+    'تظهر أدلة مباشرة على تحقق نواتج التعلم لدى الطالبات.',
   ]},
 ];
-const EXPECT_SCALE = [['مُتحقق','Met'], ['جزئيًا','Partly'], ['لم يُلاحظ','Not seen']];
+const OBS_SCALE = ['متحقق', 'متحقق جزئيًا', 'غير متحقق', 'لم يُرصد'];
 
 /* Visit lifecycle — Planned → Printed → Visited → Admin Notes → Feedback → Follow-up → Closed */
 const STAGES = [
@@ -2670,245 +2628,235 @@ function weeklyPlanSheet(){
    a nominal index of teachers, then two pages per observation built on the
    seven domains of the Lesson Expectations document.
    ══════════════════════════════════════════════════════════════════════ */
-function lgRule(cls){ return '<div class="lg-rule ' + cls + '"></div>'; }
-
-/* decorative column of the cover: layered arcs over a soft panel */
-function lgCoverArt(){
-  return '<svg viewBox="0 0 220 620" preserveAspectRatio="none" aria-hidden="true">' +
-    '<rect x="0" y="0" width="220" height="620" rx="3" fill="#F7F5F0"/>' +
-    '<path d="M-30 236 C 20 104, 118 32, 250 14 L250 0 L-30 0 Z" fill="#EEF2EF"/>' +
-    '<path d="M-30 286 C 26 150, 128 74, 250 56 L250 14 C118 32, 20 104, -30 236 Z" fill="#EDE7DC"/>' +
-    '<path d="M-30 318 C 32 180, 136 102, 250 84" fill="none" stroke="#B2935A" stroke-width="1.6"/>' +
-  '</svg>';
-}
-
-/* the identity block that opens every sheet */
-function lgRunHead(){
+function nbFoot(label){
   const sc = SCH();
-  return '<div class="lg-rh">' +
-    '<span class="en">Classroom Visit Log · ' + h(sc.nameEn) + '</span>' +
-    '<span>سجل الزيارات الصفية · ' + h(sc.cycle) + '</span>' +
-  '</div>';
+  return '<div class="nb-pfoot"><span class="en">' + h(S().academicYear) + '</span>' +
+    '<b class="en">' + h(label) + '</b><span>' + h(sc.nameAr) + '</span></div>';
 }
-function lgRunFoot(label){
-  const sc = SCH();
-  return '<div class="lg-rf">' +
-    '<span class="en">' + h(S().academicYear) + '</span>' +
-    '<b>' + h(label) + '</b>' +
-    '<span>' + h(sc.nameAr) + '</span>' +
-  '</div>';
-}
-function lgTitle(lbl, ar, en){
-  return '<div class="lg-lbl"><i></i>' + h(lbl) + '</div>' +
-    '<div class="lg-h1">' + h(ar) + '<span class="en">' + h(en) + '</span></div>';
-}
+function nbLines(mm){ return '<div class="nb-rule" style="height:' + mm + 'mm"></div>'; }
+function nbBox(mm){ return '<div class="nb-box" style="height:' + mm + 'mm"></div>'; }
 
-function paperLogCover(opts){
+function nbHead(cardNo){
   const sc = SCH(), s = S();
-  return '<div class="pr-sheet lg"><div class="lg-cover">' +
-    '<div class="lg-top">' +
-      '<div class="side r">' +
-        '<div class="mk">' + logoMoeHTML() + '</div>' +
-        '<div class="nm">' + h(sc.nameAr) + '</div>' +
-      '</div>' +
-      '<div class="side l">' +
-        '<div class="mk sm">' + logoCharterHTML() + '</div>' +
-        '<div class="nm sub en">' + h(sc.nameEn) + '</div>' +
-      '</div>' +
+  return '<div class="nb-head">' +
+    '<div class="mk">' + logoMoeHTML() + '</div>' +
+    '<div class="t">' +
+      '<div class="sch">' + h(sc.nameAr) + '</div>' +
+      '<div class="ttl">مذكرة الملاحظة الصفية والمتابعة الأكاديمية' +
+        '<span class="en">Academic Classroom Observation &amp; Improvement Notebook</span></div>' +
     '</div>' +
-    '<div class="lg-mid">' +
-      '<div class="lg-say">' +
-        '<div class="lbl">سجل متابعة ميداني</div>' +
-        '<div class="ttl">الزيارات الصفية<br>وملاحظات الحصة</div>' +
-        '<div class="hr"></div>' +
-        '<div class="sub">توثيق الزيارة الصفية ومؤشرات توقعات الحصة،<br>ورصد نقاط القوة ونقاط التحسين لكل معلمة.</div>' +
-        '<div class="subEn en">Classroom Visit &amp; Lesson Observation Log<br>' +
-          'Documenting lesson expectations, strengths and areas for improvement.</div>' +
-        '<div class="yr en">' + h(s.academicYear) + '</div>' +
-        '<div class="cyc">' + h(sc.cycle) + ' · ' + h(Model.activeTerm().name) + '</div>' +
-        '<div class="cyc">' + h(s.observer) + ' · نائب المدير الأكاديمي</div>' +
-      '</div>' +
-      '<div class="lg-art">' + lgCoverArt() +
-        '<img class="ph" src="' + ASSET_FLAG + '" alt=""></div>' +
+    '<div class="mk c">' + logoCharterHTML() + '</div>' +
+  '</div>' +
+  '<div class="nb-id">' +
+    '<span>' + h(s.observer) + ' · نائب مدير المدرسة للشؤون الأكاديمية</span>' +
+    '<span>' + (cardNo === null ? '' : 'بطاقة رقم <b>' + (cardNo ? h(cardNo) : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;') + '</b> &nbsp;·&nbsp; ') +
+      'العام الدراسي <b class="en">' + h(s.academicYear) + '</b></span>' +
+  '</div>';
+}
+function nbSec(no, ar, en, inner, cls){
+  return '<section class="nb-sec ' + (cls||'') + '">' +
+    '<h3>' + (no ? '<i class="en">' + no + '</i>' : '') + h(ar) +
+      (en ? '<span class="en">' + h(en) + '</span>' : '') + '</h3>' + inner + '</section>';
+}
+/* a labelled blank the observer writes into */
+function nbF(label, w){
+  return '<div class="nb-f" style="width:' + w + '%"><span class="k">' + h(label) + '</span><span class="v"></span></div>';
+}
+
+function obsCard(cardNo){
+  /* 1 — visit data */
+  const visit = '<div class="nb-grid">' +
+    nbF('اسم المعلمة', 34) + nbF('المادة', 21) + nbF('الصف والشعبة', 18) + nbF('الحصة', 11) + nbF('اليوم', 16) +
+    nbF('التاريخ', 17) + nbF('من', 11) + nbF('إلى', 11) + nbF('نوع الزيارة', 24) + nbF('عنوان الدرس', 37) +
+  '</div>';
+
+  /* 2 — class profile, counts only; no diagnostic detail */
+  const students = '<div class="nb-grid">' +
+    nbF('إجمالي الطالبات', 25) + nbF('الحاضرات', 25) + nbF('الغائبات', 25) + nbF('من أصحاب الهمم', 25) +
+  '</div>' +
+  '<div class="nb-sub">ملاحظات موجزة بشأن التكييفات أو احتياجات الدعم — دون تفاصيل تشخيصية</div>' +
+  nbLines(8);
+
+  /* 3 — planning: three separate fields, never merged */
+  const planning =
+    '<div class="nb-lab">الهدف الرئيسي للحصة</div>' + nbLines(9) +
+    '<div class="nb-two" style="margin-top:1.2mm">' +
+      '<div><div class="nb-lab">نواتج التعلم المتوقعة</div>' + nbLines(11) + '</div>' +
+      '<div><div class="nb-lab">معايير النجاح</div>' + nbLines(11) + '</div>' +
+    '</div>';
+
+  /* 4 — twelve indicators, four evidence-based judgements */
+  let n = 0, rows = '';
+  OBS_INDICATORS.forEach(g => {
+    g.items.forEach(it => {
+      n++;
+      rows += '<tr><td class="no en">' + n + '</td>' +
+        '<td>' + h(it) + '</td>' +
+        OBS_SCALE.map(() => '<td class="bx"><i></i></td>').join('') + '</tr>';
+    });
+  });
+  const indicators = '<table class="nb-t"><thead><tr>' +
+      '<th class="c" style="width:4.5%">م</th><th>المؤشر</th>' +
+      OBS_SCALE.map(x => '<th class="c" style="width:8.5%">' + h(x) + '</th>').join('') +
+    '</tr></thead><tbody>' + rows + '</tbody></table>' +
+    '<div class="nb-hint">كل تقدير مُسنَد إلى دليل مُشاهَد · «غير متحقق»: أُتيحت الفرصة ولم يتحقق · «لم يُرصد»: لم تتح ملاحظته في هذه الزيارة.</div>';
+
+  /* 5 — the evidence field: the largest block on the page */
+  const evidence = nbLines(36);
+
+  /* 6 — feedback */
+  const feedback = '<div class="nb-two">' +
+    '<div><div class="nb-lab">نقاط القوة <small>— الممارسة والدليل والأثر</small></div>' + nbLines(13) + '</div>' +
+    '<div><div class="nb-lab">فرص التحسين <small>— ذات الأولوية</small></div>' + nbLines(13) + '</div>' +
+  '</div>';
+
+  /* 7 — action and follow-up */
+  const action =
+    '<div class="nb-grid">' + nbF('إجراء مقترح أثناء الزيارة', 100) + '</div>' +
+    '<div class="nb-grid">' + nbF('إجراء متفق عليه مع المعلمة', 100) + '</div>' +
+    '<div class="nb-grid">' + nbF('المسؤول عن التنفيذ', 30) + nbF('موعد المتابعة', 25) + nbF('دليل التحقق من التحسن', 45) + '</div>';
+
+  return '<div class="pr-sheet nb">' + nbHead(cardNo) +
+    nbSec('1', 'بيانات الزيارة', 'Visit data', visit) +
+    nbSec('2', 'بيانات الطالبات', 'Class profile', students) +
+    nbSec('3', 'التخطيط التعليمي', 'Planning for learning', planning) +
+    nbSec('4', 'مؤشرات جودة التعليم والتعلم', 'Quality indicators', indicators) +
+    nbSec('5', 'أدلة التعلم والملاحظات الصفية', 'Evidence of learning', evidence, 'grow') +
+    nbSec('6', 'التغذية الراجعة', 'Feedback', feedback) +
+    nbSec('7', 'الإجراء التطويري والمتابعة', 'Action and follow-up', action) +
+    '<div class="nb-foot">' +
+      '<div>توقيع الملاحِظة</div><div>توقيع المعلمة</div><div>تاريخ التغذية الراجعة</div>' +
     '</div>' +
-    '<div class="lg-quote">' + sloganHTML() + '</div>' +
-    '<div class="lg-cfoot">' +
-      '<span class="en">Log Reference · ' + h(opts.ref) + ' · ' + opts.teachers.length + ' teachers</span>' +
-      '<span>' + fmtDate(s.windowStart) + ' – ' + fmtDate(s.windowEnd) + '</span>' +
+  '</div>';
+}
+
+/* ---------- front matter ---------- */
+function nbCover(opts){
+  const sc = SCH(), s = S();
+  const row = (k, v) => '<div class="r"><i>' + h(k) + '</i><b>' + h(v || '') + '</b></div>';
+  return '<div class="pr-sheet nb"><div class="nb-cover">' +
+    '<div class="nb-cmarks">' +
+      '<div class="m">' + logoMoeHTML() + '</div>' +
+      '<div class="s">' + h(sc.nameAr) + '<span class="en">' + h(sc.nameEn) + '</span></div>' +
+      '<div class="m c">' + logoCharterHTML() + '</div>' +
     '</div>' +
+    '<div class="nb-crule"></div>' +
+    '<div class="nb-ctitle">مذكرة الملاحظة الصفية<br>والمتابعة الأكاديمية' +
+      '<span class="en">Academic Classroom Observation<br>&amp; Improvement Notebook</span></div>' +
+    '<div class="nb-cmeta">' +
+      row('نائب مدير المدرسة للشؤون الأكاديمية', s.observer) +
+      row('الحلقة والصفوف', sc.cycle + ' · الصفوف من الخامس إلى الثامن') +
+      row('العام الدراسي', s.academicYear) +
+      row('عدد بطاقات الملاحظة', opts.cards + ' بطاقة') +
+      row('رقم المذكرة', opts.ref) +
+    '</div>' +
+    '<div class="nb-cnote">أداة ورقية للملاحظة القيادية أثناء الحصة: تُدوَّن فيها الممارسة والدليل والأثر،' +
+      ' وتُترجم إلى إجراء تطويري مُتابَع. زيارة واحدة = بطاقة واحدة.</div>' +
+    '<div class="nb-cslogan">' + sloganHTML() + '</div>' +
   '</div></div>';
 }
 
-function paperLogIndex(teachers){
-  const rows = teachers.map((t, i) =>
-    '<tr><td class="no en">' + (i+1) + '</td>' +
-    '<td style="font-weight:700">' + h(t.name) + '</td>' +
-    '<td class="en" style="color:#666562">' + h(t.nameEn || '—') + '</td>' +
-    '<td>' + h(t.subject || '—') + '</td>' +
-    '<td class="en">' + ((t.grades||[]).join(' · ') || '—') + '</td>' +
-    '<td></td><td></td></tr>').join('');
-  return '<div class="pr-sheet lg">' + lgRunHead() +
-    lgTitle('فهرس السجل', 'فهرس المعلمات', 'Index of teachers') +
-    '<div class="lg-pull">يخصَّص لكل معلمة ورقة ملاحظة مستقلة باسمها؛ تُستكمل أثناء الحصة وتُرحَّل بعدها إلى النظام الإلكتروني.</div>' +
-    '<table class="lg-idx"><thead><tr>' +
-      '<th style="width:7%;text-align:center">م</th>' +
-      '<th style="width:26%">اسم المعلمة</th>' +
-      '<th style="width:21%">Teacher name</th>' +
-      '<th style="width:16%">المادة</th>' +
-      '<th style="width:10%">الصفوف</th>' +
-      '<th style="width:10%">تاريخ الزيارة</th>' +
-      '<th style="width:10%">ملاحظة</th>' +
-    '</tr></thead><tbody>' + (rows ||
-      '<tr><td colspan="7" style="text-align:center;padding:6mm">لا توجد معلمات مسجلة</td></tr>') +
-    '</tbody></table>' + lgRunFoot('2') + '</div>';
+function nbGuide(){
+  const li = (t, d) => '<div class="g-item"><b>' + h(t) + '</b><span>' + h(d) + '</span></div>';
+  return '<div class="pr-sheet nb">' + nbHead(null) +
+    nbSec('', 'كيف تُستخدم المذكرة', 'How to use this notebook',
+      '<div class="nb-lead">جودة الحصة لا تُقاس بما تفعله المعلمة فقط، بل بما تتعلمه الطالبات فعليًا نتيجة الممارسات التعليمية.</div>' +
+      '<div class="g-grid">' +
+        li('الممارسة', 'ما قامت به المعلمة أو الطالبات داخل الحصة.') +
+        li('الدليل', 'ما شاهدته أو سمعته أو تحققت منه في أعمال الطالبات.') +
+        li('الأثر', 'ما تغيّر أو تحقق في تعلم الطالبات نتيجة تلك الممارسة.') +
+        li('التوصية', 'إجراء محدد قابل للتنفيذ يُتوقع أن يحسّن التعلم لاحقًا.') +
+      '</div>' +
+      '<div class="nb-lab" style="margin-top:4mm">صياغة التقدير</div>' +
+      '<table class="nb-t g-t"><tbody>' +
+        '<tr><td class="k">متحقق</td><td>يوجد دليل مباشر وواضح على تحقق المؤشر لدى الطالبات.</td></tr>' +
+        '<tr><td class="k">متحقق جزئيًا</td><td>يوجد دليل، لكنه غير متسق عبر الطالبات أو غير مكتمل.</td></tr>' +
+        '<tr><td class="k">غير متحقق</td><td>أُتيحت الفرصة لظهور المؤشر ولم يتحقق.</td></tr>' +
+        '<tr><td class="k">لم يُرصد</td><td>لم تتح طبيعة الحصة أو مدة الزيارة ملاحظة المؤشر. ليست حكمًا سلبيًا.</td></tr>' +
+      '</tbody></table>' +
+      '<div class="nb-lab" style="margin-top:4mm">ضوابط مهنية</div>' +
+      '<ul class="g-ul">' +
+        '<li>اكتب الحكم مقرونًا بدليله: «طرحت أسئلة متدرجة، وفسّرت ثلاث طالبات المفهوم في مثال جديد» بدل «المعلمة ممتازة».</li>' +
+        '<li>لا يُستنتج مستوى تحصيل الطالبات العام ولا مقدار تقدمهن على المدى الطويل من زيارة واحدة قصيرة.</li>' +
+        '<li>تُدوَّن أعداد الطالبات وأصحاب الهمم دون أي تفاصيل تشخيصية، حفاظًا على الخصوصية.</li>' +
+        '<li>ميّز بين الإجراء المقترح أثناء الزيارة والإجراء المتفق عليه مع المعلمة بعد التغذية الراجعة.</li>' +
+        '<li>في الزيارة القصيرة (10 دقائق) تُعبّأ الأقسام 1 و2 و5 و6 ثم ما أمكن رصده من المؤشرات؛ ويُستكمل الباقي بعد الحصة.</li>' +
+      '</ul>') +
+    nbFoot('2') + '</div>';
 }
 
-/* checklist rendered as hairline rows with beige domain bands */
-function lgChecklist(domains, startIndex, domainOffset){
-  let n = startIndex;
-  let out = '<table class="lg-t"><thead><tr>' +
-    '<th class="c" style="width:6%">م</th><th>المؤشر · <span class="en">Indicator</span></th>' +
-    EXPECT_SCALE.map(x => '<th class="c" style="width:10%">' + h(x[0]) + '</th>').join('') +
-  '</tr></thead><tbody>';
-  domains.forEach((d, k) => {
-    out += '<tr class="grp"><td colspan="5"><b>' + ((domainOffset||0) + k + 1) + '</b> &nbsp;' + h(d.ar) +
-      ' <span class="en">· ' + h(d.en) + '</span></td></tr>';
-    d.items.forEach(it => {
-      n++;
-      out += '<tr><td class="no en">' + n + '</td>' +
-        '<td>' + h(it[0]) + '<span class="en">' + h(it[1]) + '</span></td>' +
-        '<td class="bx"><i></i></td><td class="bx"><i></i></td><td class="bx"><i></i></td></tr>';
-    });
-  });
-  return out + '</tbody></table>';
-}
-
-function lgIdent(t, n, total){
-  return '<div class="lg-ident">' +
-    '<div class="nm">' + h(t.name) + (t.nameEn ? '<span class="en">· ' + h(t.nameEn) + '</span>' : '') + '</div>' +
-    '<div class="meta">' + h(t.subject || '—') +
-      ' · <span class="en">Observer</span> <b>' + h(S().observer) + '</b>' +
-      '<br><span class="en">Sheet ' + n + ' / ' + total + '</span></div>' +
-  '</div>';
-}
-
-function paperLogFront(t, n, total){
-  const fld = (ar, en, w) => '<div' + (w ? ' class="' + w + '"' : '') + '>' +
-    '<span class="k">' + h(ar) + ' · <span class="en">' + h(en) + '</span></span><span class="v"></span></div>';
-  return '<div class="pr-sheet lg">' + lgRunHead() +
-    lgTitle('ورقة ملاحظة الحصة · 1 من 2', 'بيانات الحصة ومؤشرات الملاحظة', 'Lesson data and observation indicators') +
-    lgIdent(t, n, total) +
-    '<div class="lg-fields">' +
-      fld('اليوم', 'Day') + fld('التاريخ', 'Date') + fld('الحصة', 'Period') + fld('الوقت', 'Time') +
-      fld('المادة', 'Subject') + fld('الصف والشعبة', 'Grade / Class') +
-      fld('عدد الطالبات', 'Students') + fld('أصحاب الهمم', 'Determination') +
-      fld('عنوان الدرس', 'Lesson title', 'w50') + fld('نوع الزيارة', 'Visit type', 'w50') +
-    '</div>' +
-    '<div class="lg-cols">' +
-      '<div class="lg-wr acc"><h5>أهداف الدرس <span class="en">· Lesson objectives</span></h5>' + lgRule('h12') + '</div>' +
-      '<div class="lg-wr acc"><h5>معايير النجاح <span class="en">· Success criteria</span></h5>' + lgRule('h12') + '</div>' +
-    '</div>' +
-    '<div class="lg-wr"><h5>مؤشرات الملاحظة <span class="en">· Observation indicators — domains 1–4</span></h5>' +
-      lgChecklist(LESSON_EXPECTATIONS.slice(0, 4), 0, 0) + '</div>' +
-    lgRunFoot('1 / 2') +
-  '</div>';
-}
-
-function paperLogBack(t, n, total){
-  const skip = LESSON_EXPECTATIONS.slice(0, 4).reduce((x, d) => x + d.items.length, 0);
-  const chips = FORM_NEXT_STEPS.map(x =>
-    '<span class="lg-chip"><i></i><span class="en">' + h(x[0]) + '</span></span>').join('');
-  return '<div class="pr-sheet lg">' + lgRunHead() +
-    lgTitle('ورقة ملاحظة الحصة · 2 من 2', 'نقاط القوة ونقاط التحسين', 'Strengths and areas for improvement') +
-    lgIdent(t, n, total) +
-    '<div class="lg-wr"><h5>مؤشرات الملاحظة <span class="en">· Observation indicators — domains 5–7</span></h5>' +
-      lgChecklist(LESSON_EXPECTATIONS.slice(4), skip, 4) + '</div>' +
-    '<div class="lg-cols">' +
-      '<div class="lg-wr acc2"><h5>نقاط القوة <span class="en">· Strengths</span></h5>' + lgRule('h40') + '</div>' +
-      '<div class="lg-wr acc"><h5>نقاط التحسين <span class="en">· Areas for improvement</span></h5>' + lgRule('h40') + '</div>' +
-    '</div>' +
-    '<div class="lg-wr"><h5>الخطوة التالية المتفق عليها <span class="en">· Agreed next step</span></h5>' +
-      '<div class="lg-chips">' + chips + '</div></div>' +
-    '<div class="lg-sign"><div>توقيع الملاحظ · <span class="en">Observer</span></div>' +
-      '<div>توقيع المعلمة · <span class="en">Teacher</span></div>' +
-      '<div>التاريخ · <span class="en">Date</span></div></div>' +
-    lgRunFoot('2 / 2') +
-  '</div>';
+function nbIndex(rowCount){
+  let rows = '';
+  for(let i = 1; i <= rowCount; i++){
+    rows += '<tr><td class="no en">' + i + '</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+  }
+  return '<div class="pr-sheet nb">' + nbHead(null) +
+    nbSec('', 'سجل الزيارات الصفية', 'Visit log',
+      '<div class="nb-sub">يُستكمل هذا السجل بعد كل زيارة ليُقرأ أثر المتابعة عبر الفصل الدراسي.</div>' +
+      '<table class="nb-t nb-idx"><thead><tr>' +
+        '<th class="c" style="width:5%">م</th>' +
+        '<th style="width:9%">التاريخ</th>' +
+        '<th style="width:20%">اسم المعلمة</th>' +
+        '<th style="width:13%">المادة</th>' +
+        '<th style="width:10%">الصف والشعبة</th>' +
+        '<th style="width:13%">نوع الزيارة</th>' +
+        '<th style="width:15%">أولوية التحسين</th>' +
+        '<th style="width:15%">موعد المتابعة</th>' +
+      '</tr></thead><tbody>' + rows + '</tbody></table>') +
+    nbFoot('3') + '</div>';
 }
 
 function buildPaperLog(opts){
   const sheets = [];
-  if(opts.cover) sheets.push(paperLogCover(opts));
-  if(opts.index) sheets.push(paperLogIndex(opts.teachers));
-  opts.teachers.forEach(t => {
-    for(let i = 1; i <= opts.perTeacher; i++){
-      sheets.push(paperLogFront(t, i, opts.perTeacher));
-      sheets.push(paperLogBack(t, i, opts.perTeacher));
-    }
-  });
+  if(opts.cover) sheets.push(nbCover({cards: opts.cards, ref: opts.ref}));
+  if(opts.guide) sheets.push(nbGuide());
+  if(opts.index) sheets.push(nbIndex(22));
+  for(let i = 1; i <= opts.cards; i++) sheets.push(obsCard(i));
   return sheets.join('');
 }
 
 function openPaperLog(){
-  const teachers = Model.activeTeachers();
-  if(!teachers.length) return toast('أضيفي المعلمات أولًا من صفحة المعلمات', 'err');
-  const list = teachers.map(t =>
-    '<label class="slot" style="cursor:pointer">' +
-      '<input type="checkbox" class="cb plT" value="' + h(t.id) + '" checked>' +
-      '<span class="info"><b>' + h(t.name) + '</b><i>' + h(t.subject || '—') + '</i></span></label>').join('');
+  const s = S();
   openModal({
-    title:'إنشاء السجل الورقي', sub:'Paper Log — A4 booklet carried into lessons', size:'wide',
+    title:'إنشاء مذكرة الملاحظة الصفية', sub:'Academic Classroom Observation & Improvement Notebook — A4',
     body:'<div class="note" style="margin-bottom:12px">' + ICON.info +
-      ' سجل اسمي بقياس <b>A4</b>: غلاف، فهرس المعلمات، ثم <b>ورقتان لكل زيارة</b> (وجه وظهر) مبنيتان على ' +
-      'المجالات السبعة لوثيقة توقعات الحصة، وتتضمنان خانتَي <b>نقاط القوة</b> و<b>نقاط التحسين</b>.</div>' +
+      ' كتيّب للكتابة اليدوية أثناء الحصة: غلاف، صفحة إرشادية، سجل زيارات، ثم بطاقات ملاحظة فارغة متطابقة.' +
+      ' <b>زيارة واحدة = وجه A4 واحد.</b></div>' +
       '<div class="form-grid">' +
-        '<div class="field"><label>عدد أوراق الملاحظة لكل معلمة<span class="en"> Sheets per Teacher</span></label>' +
-          '<select id="plPer">' + optionList([['1','ورقة واحدة (صفحتان)'],['2','ورقتان (4 صفحات)'],['3','ثلاث أوراق (6 صفحات)'],['4','أربع أوراق (8 صفحات)']], '2') + '</select></div>' +
-        '<div class="field"><label>محتويات السجل<span class="en"> Booklet Contents</span></label>' +
-          '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:5px">' +
-            '<label class="switch"><input type="checkbox" id="plCover" checked><span class="track"></span><span class="lb">الغلاف</span></label>' +
-            '<label class="switch"><input type="checkbox" id="plIndex" checked><span class="track"></span><span class="lb">فهرس المعلمات</span></label>' +
+        '<div class="field"><label>عدد بطاقات الملاحظة<span class="en"> Observation cards</span></label>' +
+          '<select id="nbCards">' + optionList(['10','20','30','40'].map(x => [x, x + ' بطاقة']), '20') + '</select></div>' +
+        '<div class="field"><label>محتويات الكتيّب<span class="en"> Front matter</span></label>' +
+          '<div style="display:flex;gap:12px;flex-wrap:wrap;padding-top:5px">' +
+            '<label class="switch"><input type="checkbox" id="nbCover" checked><span class="track"></span><span class="lb">الغلاف</span></label>' +
+            '<label class="switch"><input type="checkbox" id="nbGuide" checked><span class="track"></span><span class="lb">الصفحة الإرشادية</span></label>' +
+            '<label class="switch"><input type="checkbox" id="nbIdx" checked><span class="track"></span><span class="lb">سجل الزيارات</span></label>' +
           '</div></div>' +
       '</div>' +
-      '<div class="section-title" style="margin-top:16px">' + ICON.users + ' المعلمات المشمولات <span class="en">· Teachers Included</span></div>' +
-      '<div style="display:flex;gap:8px;margin-bottom:8px">' +
-        '<button type="button" class="btn sm" id="plAll">تحديد الكل</button>' +
-        '<button type="button" class="btn sm" id="plNone">إلغاء التحديد</button>' +
-        '<div style="flex:1"></div><span id="plCount" style="font-size:11.5px;color:var(--ink-3)"></span>' +
-      '</div>' +
-      '<div class="slots" style="max-height:230px">' + list + '</div>',
-    foot:'<span id="plPages" style="font-size:11px;color:var(--ink-3)"></span><div class="spacer"></div>' +
+      '<div class="note" style="margin-top:12px">' + ICON.print +
+      ' لطباعة بطاقة واحدة فقط لإعادة التصوير، أوقفي محتويات الكتيّب واختاري <b>10 بطاقات</b> ثم اطبعي الصفحة الأولى.</div>',
+    foot:'<span id="nbPages" style="font-size:11px;color:var(--ink-3)"></span><div class="spacer"></div>' +
       '<button class="btn" data-close="1">إلغاء</button>' +
-      '<button class="btn primary" id="plGo">' + ICON.print + ' معاينة وطباعة السجل</button>',
+      '<button class="btn" id="nbOne">' + ICON.file + ' بطاقة واحدة</button>' +
+      '<button class="btn primary" id="nbGo">' + ICON.print + ' طباعة المذكرة</button>',
     onMount(r){
       const refresh = () => {
-        const n = $$('.plT:checked', r).length;
-        const per = Number($('#plPer', r).value);
-        const pages = (($('#plCover', r).checked ? 1 : 0) + ($('#plIndex', r).checked ? 1 : 0)) + n*per*2;
-        $('#plCount', r).textContent = 'المحددات: ' + n + ' من ' + teachers.length;
-        $('#plPages', r).textContent = 'إجمالي الصفحات: ' + pages + ' صفحة A4';
+        const n = Number($('#nbCards', r).value);
+        const front = ($('#nbCover', r).checked?1:0) + ($('#nbGuide', r).checked?1:0) + ($('#nbIdx', r).checked?1:0);
+        $('#nbPages', r).textContent = 'إجمالي الصفحات: ' + (n + front) + ' صفحة A4';
       };
-      $$('.plT', r).forEach(c => c.onchange = refresh);
-      $('#plPer', r).onchange = refresh;
-      $('#plCover', r).onchange = refresh;
-      $('#plIndex', r).onchange = refresh;
-      $('#plAll', r).onclick = () => { $$('.plT', r).forEach(c => c.checked = true); refresh(); };
-      $('#plNone', r).onclick = () => { $$('.plT', r).forEach(c => c.checked = false); refresh(); };
+      ['nbCards','nbCover','nbGuide','nbIdx'].forEach(id => $('#' + id, r).onchange = refresh);
       refresh();
-      $('#plGo', r).onclick = () => {
-        const ids = $$('.plT:checked', r).map(c => c.value);
-        if(!ids.length) return toast('حددي معلمة واحدة على الأقل', 'err');
+      $('#nbGo', r).onclick = () => {
         const opts = {
-          teachers: ids.map(id => Model.teacher(id)).filter(Boolean),
-          perTeacher: Number($('#plPer', r).value) || 1,
-          cover: $('#plCover', r).checked,
-          index: $('#plIndex', r).checked,
-          ref: 'CVL-' + S().academicYear.replace('/', '-'),
+          cards: Number($('#nbCards', r).value) || 20,
+          cover: $('#nbCover', r).checked, guide: $('#nbGuide', r).checked, index: $('#nbIdx', r).checked,
+          ref: 'OBS-' + s.academicYear.replace('/', '-'),
         };
         closeModal();
         doPrint('portrait', buildPaperLog(opts));
-        toast('تم إنشاء السجل الورقي — اختاري "طباعة الخلفيات" لطباعة الغلاف بألوانه', 'ok');
+        toast('تم إنشاء المذكرة — فعّلي "طباعة الخلفيات" لطباعة الغلاف بألوانه', 'ok');
       };
+      $('#nbOne', r).onclick = () => { closeModal(); doPrint('portrait', obsCard('')); };
     }
   });
 }
