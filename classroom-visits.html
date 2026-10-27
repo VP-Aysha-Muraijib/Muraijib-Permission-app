@@ -518,48 +518,69 @@ table.pr-tbl tr{page-break-inside:avoid}
 /* ── paper log (سجل ورقي) ── */
 .lg-cover{
   position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;
-  min-height:262mm;border:1.6px solid #4F6B45;border-radius:4px;padding:0 12mm 10mm;
-  background:#FCFBF7;overflow:hidden;
+  min-height:256mm;padding:0;overflow:hidden;background:#FDFCF8;
+  border:2.2px solid #4F6B45;border-radius:3px;
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-.lg-cover::before,.lg-cover::after{content:"";position:absolute;width:86mm;height:86mm;border-radius:50%;z-index:0}
-.lg-cover::before{top:-34mm;inset-inline-start:-30mm;background:radial-gradient(circle,rgba(201,168,76,.26),transparent 70%)}
-.lg-cover::after{bottom:-32mm;inset-inline-end:-28mm;background:radial-gradient(circle,rgba(79,107,69,.22),transparent 70%)}
+/* soft warm wash + corner ornaments, echoing the earlier Muraijib platforms */
+.lg-cover::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(60mm 46mm at 12% 8%,rgba(201,168,76,.20),transparent 70%),
+    radial-gradient(66mm 52mm at 92% 86%,rgba(79,107,69,.17),transparent 70%),
+    linear-gradient(170deg,#FFFFFF 0%,#FBF9F2 45%,#F4F2E8 100%);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+/* large emblem watermark behind the content */
+.lg-cover::after{
+  content:"";position:absolute;z-index:0;top:92mm;inset-inline-start:50%;
+  width:108mm;height:108mm;transform:translateX(50%);opacity:.055;
+  background:var(--wm) center/contain no-repeat;
+}
 .lg-cover > *{position:relative;z-index:1;width:100%}
-.lg-band{
-  /* the centred flex column would otherwise collapse an empty band to zero width */
-  align-self:stretch;height:4.5mm;margin:0 -12mm 8mm;width:auto !important;
-  background:linear-gradient(90deg,#4F6B45,#C9A84C,#F0DFA8,#C9A84C,#4F6B45);
+.lg-inner{padding:0 14mm;display:flex;flex-direction:column;align-items:center;flex:1}
+.lg-band{align-self:stretch;height:5mm;width:auto !important;
+  background:linear-gradient(90deg,#4F6B45,#6E8A62,#C9A84C,#F0DFA8,#C9A84C,#6E8A62,#4F6B45);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.lg-band.foot{height:3.5mm;margin-top:auto}
+.lg-marks{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:5mm 0 0}
+.lg-marks .m1{width:30mm;color:#1A1A1A}
+.lg-marks .m2{width:34mm;color:#1A1A1A}
+.lg-marks svg,.lg-marks img{display:block;width:100%;height:auto;max-height:30mm;object-fit:contain}
+.lg-marks .mid{flex:1;font-size:9.5pt;color:#4A4A4A;line-height:1.75;padding:0 4mm}
+.lg-marks .mid b{display:block;font-size:10.5pt;color:#2F4429;font-weight:700}
+.lg-div{display:flex;align-items:center;gap:6px;justify-content:center;margin:5mm 0 0;width:70%}
+.lg-div i{flex:1;height:1px;background:linear-gradient(90deg,transparent,#C9A84C,transparent)}
+.lg-div b{width:4.4mm;height:4.4mm;background:#C9A84C;transform:rotate(45deg);
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.lg-sch{margin-top:4mm;font-size:15pt;font-weight:800;color:#2F4429;line-height:1.55}
+.lg-sch span{display:block;font-size:10pt;font-weight:600;color:#5E6B57;letter-spacing:.4px;margin-top:1.5mm}
+.lg-titlecard{
+  margin-top:6mm;background:#fff;border:1px solid #E0DCC9;border-block:2.4px solid #4F6B45;
+  padding:7mm 8mm;box-shadow:0 2px 0 rgba(79,107,69,.06);
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-.lg-marks{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6mm}
-.lg-marks .m1{width:26mm;color:#111}
-.lg-marks .m2{width:30mm;color:#111}
-.lg-marks svg,.lg-marks img{display:block;width:100%;height:auto;max-height:26mm;object-fit:contain}
-.lg-sch{font-size:12.5pt;font-weight:800;color:#3B5233;line-height:1.6}
-.lg-sch span{display:block;font-size:9.5pt;font-weight:500;color:#555;letter-spacing:.3px}
-.lg-rule{height:1px;background:#D8D5C8;margin:6mm 14mm}
-.lg-cover .big{
-  font-size:22pt;font-weight:800;color:#2F4429;line-height:1.55;margin-top:4mm;
-  padding:7mm 6mm;border-block:1.4px solid #C9A84C;background:#fff;
+.lg-titlecard .t1{font-size:25pt;font-weight:800;color:#24341F;line-height:1.5;letter-spacing:-.3px}
+.lg-titlecard .t2{font-size:13pt;font-weight:600;color:#4F6B45;margin-top:3.5mm;letter-spacing:.6px}
+.lg-pills{display:flex;justify-content:center;gap:6mm;margin-top:6mm;flex-wrap:wrap}
+.lg-pill{
+  border:1.3px solid #4F6B45;border-radius:22px;padding:2mm 8mm;background:#F4F8F1;
+  font-size:11pt;font-weight:800;color:#2F4429;line-height:1.45;
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-.lg-cover .big span{display:block;font-size:12.5pt;font-weight:600;color:#4F6B45;margin-top:3mm;letter-spacing:.4px}
-.lg-cover .cyc{font-size:12pt;color:#111;margin-top:7mm;font-weight:700}
-.lg-cover .cyc span{display:block;font-size:9.5pt;font-weight:500;color:#555;margin-top:1mm}
-.lg-cover .yr{
-  display:inline-block;font-size:12pt;color:#3B5233;margin-top:4mm;font-weight:800;
-  border:1.3px solid #4F6B45;border-radius:20px;padding:1.5mm 9mm;background:#F6F9F3;width:auto !important;
-  -webkit-print-color-adjust:exact;print-color-adjust:exact;
-}
+.lg-pill span{display:block;font-size:8.5pt;font-weight:500;color:#5E6B57}
 .lg-owner{
-  border:1.5px solid #3B5233;border-radius:5px;padding:8px 14px;margin:14mm auto 0;
-  max-width:120mm;text-align:start;font-size:10pt;line-height:2.1;
+  margin:6mm 0 0;border:1px solid #D9D6C6;border-radius:4px;background:#fff;
+  padding:4mm 7mm;text-align:start;font-size:10pt;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
 }
-.lg-owner .r{display:flex;gap:8px;align-items:baseline}
-.lg-owner .r > i{font-style:normal;color:#555;font-size:9pt;min-width:48mm}
-.lg-owner .r > b{flex:1;border-bottom:1px dotted #999;color:#111}
-.lg-src{margin-top:auto;font-size:8.5pt;color:#555;border-top:1px solid #CCC;padding-top:5px;line-height:1.8}
+.lg-owner .r{display:flex;gap:7px;align-items:baseline;padding:1.6mm 0}
+.lg-owner .r + .r{border-top:1px dotted #DEDBCB}
+.lg-owner .r > i{font-style:normal;color:#5E6B57;font-size:8.6pt;min-width:52mm}
+.lg-owner .r > b{flex:1;color:#1A1A1A;font-weight:700}
+.lg-src{margin-top:5mm;font-size:8.4pt;color:#5A5A5A;line-height:1.75;padding:0 6mm}
+.lg-vision{margin-top:4mm;font-size:9pt;color:#4F6B45;font-weight:700;line-height:1.7}
+.lg-vision span{display:block;font-size:8pt;font-weight:500;color:#6B7465}
 .lg-head{display:flex;align-items:center;gap:8px;border-bottom:1.6px solid #4F6B45;padding-bottom:3px;margin-bottom:4px}
 .lg-head .m1{width:13mm;color:#111;flex-shrink:0}
 .lg-head .m2{width:16mm;color:#111;flex-shrink:0}
@@ -2710,33 +2731,43 @@ function paperLogCover(opts){
   const sc = SCH(), s = S();
   const row = (ar, en, val) => '<div class="r"><i>' + h(ar) + ' · <span class="en">' + h(en) + '</span></i>' +
     '<b>' + h(val || '') + '</b></div>';
-  return '<div class="pr-sheet"><div class="lg-cover">' +
+  /* the emblem doubles as a faint watermark behind the cover */
+  const wm = "url('data:image/svg+xml;utf8," + encodeURIComponent(moeEmblemSVG().replace(/currentColor/g, '#2F4429')) + "')";
+  return '<div class="pr-sheet"><div class="lg-cover" style="--wm:' + wm + '">' +
     '<div class="lg-band"></div>' +
-    '<div class="lg-marks">' +
-      '<div class="m1">' + logoMoeHTML() + '</div>' +
-      '<div style="flex:1;font-size:9pt;color:#555;line-height:1.7">' + h(sc.ministryAr) +
-        '<span class="en" style="display:block">' + h(sc.ministryEn) + '</span></div>' +
-      '<div class="m2">' + logoCharterHTML() + '</div>' +
+    '<div class="lg-inner">' +
+      '<div class="lg-marks">' +
+        '<div class="m1">' + logoMoeHTML() + '</div>' +
+        '<div class="mid"><b>' + h(sc.ministryAr) + '</b><span class="en">' + h(sc.ministryEn) + '</span></div>' +
+        '<div class="m2">' + logoCharterHTML() + '</div>' +
+      '</div>' +
+      '<div class="lg-div"><i></i><b></b><i></i></div>' +
+      '<div class="lg-sch">' + h(sc.nameAr) + '<span class="en">' + h(sc.nameEn) + '</span></div>' +
+      '<div class="lg-titlecard">' +
+        '<div class="t1">سجل الزيارات الصفية<br>وملاحظات الحصة</div>' +
+        '<div class="t2 en">Classroom Visit &amp; Lesson Observation Log</div>' +
+      '</div>' +
+      '<div class="lg-pills">' +
+        '<span class="lg-pill">' + h(sc.cycle) + '<span class="en">' + h(sc.cycleEn) + '</span></span>' +
+        '<span class="lg-pill">' + h(s.academicYear) + '<span>العام الدراسي · <span class="en">Academic Year</span></span></span>' +
+      '</div>' +
+      '<div class="lg-owner">' +
+        row('نائب المدير الأكاديمي', 'Academic Vice Principal', s.observer) +
+        row('الفصل الدراسي', 'Term', Model.activeTerm().name) +
+        row('الفترة', 'Period', fmtDate(s.windowStart) + ' – ' + fmtDate(s.windowEnd)) +
+        row('عدد المعلمات', 'Number of Teachers', opts.teachers.length) +
+        row('رقم السجل', 'Log Reference', opts.ref) +
+      '</div>' +
+      '<div class="lg-src">' +
+        'يستند هذا السجل إلى وثيقة <b>توقعات الحصة الدرسية</b> للعام الدراسي ' + h(s.academicYear) +
+        ' — سبعة مجالات و<b>' + LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + '</b> مؤشرًا للملاحظة الصفية.' +
+        '<div class="en" style="margin-top:1mm">Based on the Lesson Expectations document — seven domains, ' +
+        LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + ' observation indicators.</div>' +
+      '</div>' +
+      '<div class="lg-vision">رؤيتنا: تقديم التعليم الأفضل لمبتكري المستقبل' +
+        '<span class="en">Our vision: Providing better education opportunities for tomorrow\'s innovators</span></div>' +
     '</div>' +
-    '<div class="lg-sch">' + h(sc.nameAr) + '<span class="en">' + h(sc.nameEn) + '</span></div>' +
-    '<div class="lg-rule"></div>' +
-    '<div class="big">سجل الزيارات الصفية وملاحظات الحصة' +
-      '<span class="en">Classroom Visit &amp; Lesson Observation Log</span></div>' +
-    '<div class="cyc">' + h(sc.cycle) + '<span class="en">' + h(sc.cycleEn) + '</span></div>' +
-    '<div><span class="yr">العام الدراسي · <span class="en">Academic Year</span> ' + h(s.academicYear) + '</span></div>' +
-    '<div class="lg-owner">' +
-      row('اسم نائب المدير الأكاديمي', 'Academic Vice Principal', s.observer) +
-      row('الفصل الدراسي', 'Term', Model.activeTerm().name) +
-      row('الفترة', 'Period', fmtDate(s.windowStart) + ' – ' + fmtDate(s.windowEnd)) +
-      row('عدد المعلمات', 'Number of Teachers', opts.teachers.length) +
-      row('رقم السجل', 'Log Reference', opts.ref) +
-    '</div>' +
-    '<div class="lg-src">' +
-      'يستند هذا السجل إلى وثيقة <b>توقعات الحصة الدرسية للحلقة الأولى والثانية</b> للعام الدراسي ' + h(s.academicYear) +
-      ' — سبعة مجالات و<b>' + LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + '</b> مؤشرًا للملاحظة الصفية.' +
-      '<div class="en" style="margin-top:2px">Based on the Cycle 1 &amp; 2 Lesson Expectations document — seven domains, ' +
-      LESSON_EXPECTATIONS.reduce((n,d)=>n+d.items.length,0) + ' observation indicators.</div>' +
-    '</div>' +
+    '<div class="lg-band foot"></div>' +
   '</div></div>';
 }
 
