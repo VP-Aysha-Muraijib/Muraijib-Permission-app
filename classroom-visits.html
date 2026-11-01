@@ -523,6 +523,85 @@ table.pr-tbl tr{page-break-inside:avoid}
 .pr-note{font-size:8pt;color:#555;margin-top:4px}
 .pg-break{page-break-before:always}
 
+/* ── بطاقة ملاحظة وتقويم الحصة (adopted review card) ── */
+.rv{
+  --nv:#16324F; --nv2:#1D3D6B; --sl:#5F6A7A; --ln:#C9D1DB; --ln2:#E4E9EF;
+  --gd:#B8902A; --gd2:#A8853F; --or:#C25F2C; --gr:#0F5A46; --ink:#1C2532; --pan:#F4F7FA;
+  color:var(--ink);font-size:7pt;line-height:1.45;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.rv .en{font-family:var(--ff-en)}
+.rv .ph{color:#9AA4B0}
+.rv-head{display:flex;align-items:center;gap:3mm;border-bottom:1.6px solid var(--nv);padding-bottom:1.2mm;margin-bottom:1.4mm}
+.rv-head .t{min-width:36mm}
+.rv-head .t b{display:block;font-size:8.6pt;font-weight:700;color:var(--nv)}
+.rv-head .t span{font-size:6.6pt;color:var(--sl)}
+.rv-head .ttl{flex:1;text-align:center}
+.rv-head .ttl{font-size:12pt;font-weight:700;color:var(--nv)}
+.rv-head .ttl span{display:block;font-size:6.6pt;font-weight:400;color:var(--sl);margin-top:.3mm}
+.rv-head .mk{width:15mm;flex-shrink:0}.rv-head .mk.c{width:17mm}
+.rv-head .mk img{display:block;width:100%;height:auto;max-height:8mm;object-fit:contain}
+.rv-focus{background:var(--pan);border-inline-start:2px solid var(--nv2);padding:.8mm 2mm;font-size:6pt;
+  line-height:1.45;color:var(--sl);margin-bottom:1.1mm}
+.rv-row{display:flex;flex-wrap:wrap;border:1px solid var(--ln);border-radius:.6mm;margin-bottom:1.2mm;background:#fff}
+.rv-f{box-sizing:border-box;padding:.7mm 1.6mm;display:flex;align-items:baseline;gap:1.4mm;border-inline-start:1px solid var(--ln2)}
+.rv-f:first-child{border-inline-start:none}
+.rv-f .k{font-size:6pt;color:var(--sl);white-space:nowrap}
+.rv-f .v{flex:1;font-size:7pt;color:var(--ink);min-width:0}
+.rv-f .v.s{font-weight:700}
+.rv-pick{display:flex;gap:1.4mm;flex-wrap:wrap;align-items:center}
+.rv-pick span{display:inline-flex;align-items:center;gap:.7mm;font-size:5.8pt;color:var(--sl);white-space:nowrap}
+.rv-pick span i{width:1.9mm;height:1.9mm;border:.5px solid var(--sl);border-radius:50%;display:inline-block}
+.rv-pick span b{font-weight:400;color:#93A0AE;font-size:5pt;margin-inline-start:.4mm}
+.rv-pick span.on{color:var(--nv);font-weight:700}
+.rv-pick span.on i{background:var(--nv);border-color:var(--nv)}
+.rv-pick.l span,.rv-pick.g span{font-size:6pt}
+.rv-pick.g{gap:2.2mm;margin:1mm 0}
+.rv-pick.g span{font-size:7pt}
+.rv-pick.g span i{width:2.4mm;height:2.4mm}
+.rv-grid{display:flex;gap:1.6mm;margin-bottom:1.2mm}
+.rv-grid .cl{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.1mm}
+.rv-cell{border:1px solid var(--ln);border-radius:.8mm;overflow:hidden;background:#fff;page-break-inside:avoid}
+.rv-ch{background:var(--nv);color:#fff;padding:.6mm 1.6mm;font-size:7.2pt;font-weight:700;display:flex;align-items:center;gap:1.2mm}
+.rv-ch b{font-weight:800}
+.rv-ch .en{font-weight:400;font-size:5.8pt;opacity:.8}
+.rv-ch i{margin-inline-start:auto;font-style:normal;font-size:5.6pt;font-weight:400;opacity:.85}
+.rv-lens{padding:.6mm 1.6mm 0}
+.rv-lens b{font-size:6.4pt;color:var(--nv2);font-weight:700}
+.rv-lens .q{font-size:5.9pt;color:var(--ink);margin:.2mm 0 0;line-height:1.4}
+.rv-lens .e{font-size:5.6pt;color:var(--sl);margin:.2mm 0 0;line-height:1.4}
+.rv-note{margin:.8mm 1.6mm;border:1px solid var(--ln2);border-inline-start:1.6px solid var(--gd);
+  background:#FCFCFA;padding:.7mm 1.4mm;font-size:5.9pt;line-height:1.45;min-height:5mm}
+.rv-bands{display:flex;align-items:center;gap:1.2mm;padding:.35mm 1.6mm;border-top:1px solid var(--ln2)}
+.rv-bands .lb{font-size:5.6pt;color:var(--sl);white-space:nowrap;min-width:13mm}
+.rv-strip{display:flex;border:1px solid var(--ln);border-radius:.6mm;overflow:hidden;margin-bottom:1.2mm}
+.rv-strip .c{flex:1;text-align:center;padding:.8mm .6mm;border-inline-start:1px solid var(--ln2)}
+.rv-strip .c:first-child{border:none}
+.rv-strip .c .n{display:block;font-size:5.4pt;color:var(--sl);line-height:1.3}
+.rv-strip .c b{font-size:6.8pt;color:var(--nv);font-weight:700}
+.rv-strip .c.tot{background:var(--nv);}
+.rv-strip .c.tot .n{color:#C9D1DB}.rv-strip .c.tot b{color:#fff}
+.rv-bottom{display:flex;gap:1.6mm;margin-bottom:1.2mm}
+.rv-bottom .sum{flex:1.9;min-width:0}
+.rv-bottom .ov{flex:1;border:1px solid var(--ln);border-radius:.8mm;padding:1.2mm 1.6mm;background:var(--pan)}
+.rv-bottom b{font-size:6.8pt;color:var(--nv);font-weight:700;display:block}
+.rv-bottom .q{font-size:5.8pt;color:var(--sl);display:block;margin-bottom:.6mm}
+.rv-bottom .bx{border:1px solid var(--ln2);border-radius:.6mm;padding:.7mm 1.4mm;font-size:6pt;
+  line-height:1.45;min-height:7mm;background:#fff}
+.rv-bottom .bx.sm{min-height:5mm}
+.rv-bottom .two{display:flex;gap:1.6mm;margin:.8mm 0}
+.rv-bottom .two > div{flex:1;min-width:0}
+.rv-bottom .ov p{font-size:5.6pt;color:var(--sl);line-height:1.45;margin:.6mm 0 0}
+.rv-foot{display:flex;justify-content:space-between;gap:3mm;font-size:5.4pt;color:var(--sl);
+  border-top:1px solid var(--ln2);padding-top:.8mm}
+.rv-foot .cr{color:#93A0AE}
+.rv-sign{display:flex;gap:6mm;margin-top:1.2mm}
+.rv-sign > div{flex:1;border-top:1px solid var(--sl);padding-top:1mm;font-size:6.2pt;color:var(--sl);text-align:center}
+.rv-detail{margin-bottom:2mm;page-break-inside:avoid}
+.rv-detail b{display:block;font-size:8pt;color:var(--nv);font-weight:700;margin-bottom:.8mm}
+.rv-detail .bx{border:1px solid var(--ln2);border-inline-start:1.6px solid var(--gd);border-radius:.6mm;
+  padding:1.4mm 2mm;font-size:7.4pt;line-height:1.7;background:#FCFCFA}
+
 /* ── observation notebook (مذكرة الملاحظة الصفية) ──
    Hairline rules, one very light tint, no decorative colour: the card has to
    photocopy cleanly in black and white and be written on with a pen.      */
@@ -1069,6 +1148,57 @@ const OBS_INDICATORS = [
 ];
 const OBS_SCALE = ['متحقق', 'متحقق جزئيًا', 'غير متحقق', 'لم يُرصد'];
 
+/* ──────────────────────────────────────────────────────────────────────
+   بطاقة ملاحظة وتقويم الحصة — the card the school has adopted, built on
+   the Irtiqa inspection standards. Reproduced from the school's own
+   document, after «عناصر الحصة الرئيسة في إطار ارتقاء» by Ms Iman Ali Jaffal.
+   ────────────────────────────────────────────────────────────────────── */
+const REVIEW_STD = [
+  {id:'s31', code:'3.1', ar:'التدريس من أجل تعلم فعال', en:'Teaching for effective learning', std:'المعيار 3', col:0, lenses:[
+    {t:'أثر التدريس في تعلم الطالبات',
+     q:'هل تتضح نواتج التعلم؟ وهل أدت الاستراتيجيات والموارد والحوار إلى فهم أعمق ومشاركة فاعلة؟',
+     e:'الدليل: نشاط مرتبط بالناتج، تعلم فعلي، واستجابة المعلمة لصعوبات الفهم.'},
+    {t:'الأسئلة ومستوى التحدي الفكري',
+     q:'هل تتجاوز الأسئلة التذكر إلى التفسير والتحليل والتبرير؟ وهل تحصل المتفوقات على تحدٍ معرفي مناسب؟',
+     e:'الدليل: أسئلة متدرجة، إجابات مبررة، فرص للبحث والتفكير العميق.'}]},
+  {id:'s13', code:'1.3', ar:'مهارات التعلم', en:'Learning skills', std:'المعيار 1', col:1, lenses:[
+    {t:'الاستقلالية والتفكير والتعاون',
+     q:'هل تعمل الطالبات باستقلالية ويتعاون بفاعلية؟ وهل يطرحن الأسئلة ويفكرن ويحللن ويقيّمن عملهن؟',
+     e:'الدليل: المبادرة الذاتية، حوار هادف، أسئلة الطالبات، التقييم الذاتي، توظيف التقنية للتعلم.'}]},
+  {id:'s11', code:'1.1', ar:'التحصيل', en:'Attainment', std:'المعيار 1', col:0, lenses:[
+    {t:'المعرفة والفهم والمهارات',
+     q:'ماذا تعرف الطالبات الآن؟ وما الذي يستطعن تطبيقه؟ وهل تتفق إجاباتهن وأعمالهن مع توقعات المنهاج؟',
+     e:'الدليل: إجابات شفوية، مهام وأعمال فعلية بمستويات أداء متفاوتة.'}]},
+  {id:'s12', code:'1.2', ar:'التقدم', en:'Progress', std:'المعيار 1', col:1, lenses:[
+    {t:'التقدم خلال الحصة',
+     q:'ما الذي أصبحت الطالبات قادرات على فعله مقارنة ببداية الحصة؟ وهل يظهر التقدم لدى الفئات المختلفة؟',
+     e:'الدليل: مقارنة البداية بالنهاية، مهمة ختامية تقيس الناتج، تقدم الفئات المختلفة.'}]},
+  {id:'s32', code:'3.2', ar:'التقييم', en:'Assessment', std:'المعيار 3', col:0, lenses:[
+    {t:'التحقق من التعلم وتعديل التدريس',
+     q:'كيف تتحقق المعلمة من فهم كل طالبة أثناء الحصة؟ وهل تعدّل تدريسها بناءً على ما تكشفه الاستجابات؟',
+     e:'الدليل: تحقق يشمل جميع الطالبات، وإعادة شرح أو تعديل المهمة عند الحاجة.'},
+    {t:'التغذية الراجعة وأعمال الطالبات',
+     q:'هل تخبر التغذية الراجعة كل طالبة بما أنجزته وبخطوتها التالية؟ وهل يُوظَّف التقييم الذاتي وتقييم الأقران بمعايير واضحة؟',
+     e:'الدليل: تغذية راجعة محددة شفهية أو مكتوبة، وتطبيق الطالبات لها، ومعايير نجاح معروفة.'}]},
+  {id:'s42', code:'4.2', ar:'مواءمة المنهاج', en:'Curriculum adaptation', std:'المعيار 4', col:1, lenses:[
+    {t:'التمايز والدعم والتحدي',
+     q:'هل تختلف المهام أو الموارد أو المساندة والمخرجات حسب الاحتياجات مع الحفاظ على أهداف تعلم طموحة؟',
+     e:'الدليل: تكييفات مناسبة، مهام متفاوتة، فرص منصفة لإظهار التعلم.'}]},
+  {id:'s52', code:'5.2', ar:'الرعاية والدعم', en:'Care and support', std:'المعيار 5', col:1, lenses:[
+    {t:'مشاركة الفئات المختلفة',
+     q:'هل تشارك الطالبات منخفضات التحصيل والمتفوقات وأصحاب الهمم؟ ومن يحتاج إلى تدخل إضافي؟',
+     e:'الدليل: مشاركة منصفة لجميع الفئات، ودعم موجّه أثناء المهام، وتحديد من يحتاج متابعة.'}]},
+];
+/* Irtiqa quantitative terms, as proportions of the students present */
+const REVIEW_BANDS = [['الجميع تقريبًا','>90%'], ['معظم','75–90%'], ['أغلبية كبيرة','61–74%'],
+  ['أغلبية','50–60%'], ['أقلية كبيرة','31–49%'], ['أقلية','16–30%'], ['قليل','≤15%']];
+const REVIEW_LEVELS = ['ممتاز', 'جيد جدًا', 'جيد', 'مقبول', 'ضعيف', 'ضعيف جدًا'];
+const REVIEW_REASONS = ['تقييمية', 'تطويرية', 'متابعة', 'مشتركة'];
+const REVIEW_FOCUS = 'التركيز في الحكم: ماذا تعلّمت الطالبات؟ وما الدليل على أثر التدريس والتقييم؟ — الحكم يستند إلى شواهد تعلم فعلية، ولا يكفي تنفيذ النشاط أو مجرد مشاركة الطالبات؛ وقياس الاتجاهات عبر الزمن يحتاج أيضًا إلى مراجعة الأعمال ونتائج التقييم خارج الحصة.';
+const REVIEW_RULE = 'أفضل انطباق لا متوسط حسابي · «جيد» هو المستوى المتوقع و«مقبول» هو الحد الأدنى · التقدير العام لا يتجاوز تقدير التقدم.';
+const REVIEW_BANDNOTE = 'النسب بمصطلحات ارتقاء الكمية (من الطالبات الحاضرات)، ثم يُختار التقدير بأفضل انطباق على أوصاف الإطار.';
+const REVIEW_CREDIT = 'مقتبسة عن «عناصر الحصة الرئيسة في إطار ارتقاء» — الأستاذة إيمان علي جفال.';
+
 /* Visit lifecycle — Planned → Printed → Visited → Admin Notes → Feedback → Follow-up → Closed */
 const STAGES = [
   {id:'planned',  en:'Planned',            ar:'مخططة',            icon:'calendar'},
@@ -1148,7 +1278,11 @@ const KEY = 'muraijib.cvms.v1';
 
 const DEFAULT_SETTINGS = {
   observer: 'عائشة النعيمي',
-  observers: ['عائشة النعيمي', 'نورة الكعبي'],
+  observers: [
+    {n:'عائشة النعيمي', r:'نائب مدير المدرسة للشؤون الأكاديمية'},
+    {n:'نورة الكعبي',   r:'نائب مدير المدرسة للشؤون الأكاديمية'},
+    {n:'د. اليازية الظاهري', r:'مديرة المدرسة'},
+  ],
   observerEn: 'Academic Vice Principal',
   academicYear: '2026/2027',
   logo: '',
@@ -1199,6 +1333,9 @@ const Store = {
     /* replace the old placeholder observer with the configured name, once */
     if(this.db.settings.observer === 'نائبة مدير المدرسة للشؤون الأكاديمية')
       this.db.settings.observer = DEFAULT_SETTINGS.observer;
+    /* observers were plain names before roles were added */
+    this.db.settings.observers = (this.db.settings.observers || []).map(o =>
+      typeof o === 'string' ? {n:o, r:'نائب مدير المدرسة للشؤون الأكاديمية'} : o);
     return this.db;
   },
   save(){
@@ -1270,6 +1407,8 @@ const Model = {
     if(v){  /* records created before the card fields existed */
       if(!v.students) v.students = {total:'', present:'', absent:'', sen:'', adaptations:''};
       if(!v.indicators) v.indicators = {};
+      if(!v.review) v.review = {reason:'', rows:{}, overall:'', summary:'', distinction:'', priority:'', followUpAction:''};
+      if(!v.review.rows) v.review.rows = {};
       ['objective','outcomes','criteria','actionProposed','actionAgreed','verifyEvidence']
         .forEach(k => { if(v[k] == null) v[k] = ''; });
     }
@@ -1310,6 +1449,8 @@ const Model = {
       students: {total:'', present:'', absent:'', sen:'', adaptations:''},
       indicators: {},
       actionProposed:'', actionAgreed:'', verifyEvidence:'',
+      /* بطاقة ملاحظة وتقويم الحصة — filled when the review card is used */
+      review: {reason:'', rows:{}, overall:'', summary:'', distinction:'', priority:'', followUpAction:''},
       status:'Planned', stage:'planned', feedbackStatus:'Feedback Pending', followUp:'No Follow-up',
       /* post-visit record — kept deliberately separate from evaluation */
       evidence:'', strengths:'', development:'', feedbackNotes:'', nextSteps:[],
@@ -2338,6 +2479,40 @@ function openVisitRecord(id, focusSection){
       v.focus.map(f => '<span class="tag en">' + h(f) + '</span> ').join('') + '</div>' : '') +
     (v.purpose ? '<div style="margin-top:10px"><div class="k" style="font-size:10.5px;color:var(--ink-3)">Purpose</div><div style="font-size:12px">' + nl2br(v.purpose) + '</div></div>' : '');
 
+  const rvw = (() => {
+    const R = v.review || {rows:{}};
+    const rows = REVIEW_STD.map(std => {
+      const rec = (R.rows || {})[std.id] || {};
+      return '<fieldset class="fs" style="margin-top:10px"><legend>' + h(std.code) + ' ' + h(std.ar) + '</legend>' +
+        '<div class="field"><label>ملاحظات الملاحِظة<span class="en"> Observer notes</span></label>' +
+          '<textarea data-rv="' + std.id + '|note" style="min-height:78px">' + h(rec.note || '') + '</textarea></div>' +
+        '<div class="form-grid" style="margin-top:10px">' +
+          '<div class="field"><label>نسبة الطالبات</label><select data-rv="' + std.id + '|band">' +
+            optionList(REVIEW_BANDS.map(b => [b[0], b[0] + ' · ' + b[1]]), rec.band, '—') + '</select></div>' +
+          '<div class="field"><label>التقدير</label><select data-rv="' + std.id + '|level">' +
+            optionList(REVIEW_LEVELS, rec.level, '—') + '</select></div>' +
+        '</div></fieldset>';
+    }).join('');
+    return '<div class="note" style="margin-bottom:12px">' + ICON.info +
+      ' البطاقة المعتمدة المبنية على معايير ارتقاء. النص الطويل يُطبع ملخصًا في البطاقة وكاملًا في صفحة الملاحظات التفصيلية.</div>' +
+      '<div class="form-grid">' +
+        '<div class="field"><label>سبب الزيارة</label><select id="rvReason">' +
+          optionList(REVIEW_REASONS, R.reason, '—') + '</select></div>' +
+        '<div class="field"><label>التقدير العام للحصة</label><select id="rvOverall">' +
+          optionList(REVIEW_LEVELS, R.overall, '—') + '</select></div>' +
+      '</div>' + rows +
+      '<fieldset class="fs" style="margin-top:10px"><legend>الخلاصة</legend>' +
+        '<div class="field"><label>ماذا تعلّمت الطالبات، وبأي نسبة، وما الذي صنع ذلك أو حال دونه؟</label>' +
+          '<textarea id="rvSummary" style="min-height:76px">' + h(R.summary || '') + '</textarea></div>' +
+        '<div class="form-grid two" style="margin-top:10px">' +
+          '<div class="field"><label>نقطة التميز</label><textarea id="rvDist" style="min-height:62px">' + h(R.distinction || '') + '</textarea></div>' +
+          '<div class="field"><label>الأولوية التطويرية</label><textarea id="rvPrio" style="min-height:62px">' + h(R.priority || '') + '</textarea></div>' +
+        '</div>' +
+        '<div class="field" style="margin-top:10px"><label>إجراء المتابعة</label>' +
+          '<textarea id="rvFollow" style="min-height:62px">' + h(R.followUpAction || '') + '</textarea></div>' +
+      '</fieldset>';
+  })();
+
   /* the printed card's own fields, so paper and system hold the same record */
   const card =
     '<div class="form-grid two">' +
@@ -2442,14 +2617,16 @@ function openVisitRecord(id, focusSection){
       stepper(v) +
     '</div></div>' +
     accSection('r_details','1','بيانات الزيارة','Visit Information', details, focusSection === 'details') +
-    accSection('r_card','2','بطاقة الملاحظة الصفية','Observation card — planning, class profile, indicators', card, focusSection === 'card') +
-    accSection('r_obs','3','ملاحظات الزيارة والأدلة','Classroom Observation Evidence', observation, focusSection === 'observation' || !focusSection) +
-    accSection('r_admin','4','ملاحظات الإدارة والإجراء','Administration Notes & Action', admin, focusSection === 'admin') +
-    accSection('r_follow','5','الحالة والمتابعة','Status & Follow-up', followBlock, focusSection === 'follow');
+    accSection('r_rvw','2','بطاقة ملاحظة وتقويم الحصة','Lesson observation & evaluation — adopted card', rvw, focusSection === 'review') +
+    accSection('r_card','3','بطاقة الملاحظة الصفية','Observation card — planning, class profile, indicators', card, focusSection === 'card') +
+    accSection('r_obs','4','ملاحظات الزيارة والأدلة','Classroom Observation Evidence', observation, focusSection === 'observation' || !focusSection) +
+    accSection('r_admin','5','ملاحظات الإدارة والإجراء','Administration Notes & Action', admin, focusSection === 'admin') +
+    accSection('r_follow','6','الحالة والمتابعة','Status & Follow-up', followBlock, focusSection === 'follow');
 
   const foot =
     '<button class="btn sm" id="rPrintForm">' + ICON.print + ' نموذج الزيارة</button>' +
     '<button class="btn sm" id="rPrintRec">' + ICON.pdf + ' طباعة السجل</button>' +
+    '<button class="btn sm" id="rReviewCard">' + ICON.clipboard + ' بطاقة تقويم الحصة</button>' +
     '<button class="btn sm primary" id="rTeacherRep">' + ICON.file + ' تقرير المعلمة</button>' +
     '<button class="btn sm" id="rEval">' + ICON.clipboard + ' ' + (ev ? 'فتح التقييم' : 'تقييم الزيارة') + '</button>' +
     '<div class="spacer"></div>' +
@@ -2468,6 +2645,19 @@ function openVisitRecord(id, focusSection){
         pt.innerHTML = l.classList.contains('hidden') ? ICON.eye + ' عرض' : ICON.x + ' إخفاء'; };
 
       const collect = () => {
+        const R = v.review || (v.review = {rows:{}});
+        R.reason = $('#rvReason', r).value;
+        R.overall = $('#rvOverall', r).value;
+        R.summary = $('#rvSummary', r).value.trim();
+        R.distinction = $('#rvDist', r).value.trim();
+        R.priority = $('#rvPrio', r).value.trim();
+        R.followUpAction = $('#rvFollow', r).value.trim();
+        R.rows = R.rows || {};
+        $$('[data-rv]', r).forEach(el => {
+          const [sid, field] = el.dataset.rv.split('|');
+          R.rows[sid] = R.rows[sid] || {};
+          R.rows[sid][field] = el.value.trim();
+        });
         v.objective = $('#cObjective', r).value.trim();
         v.outcomes  = $('#cOutcomes', r).value.trim();
         v.criteria  = $('#cCriteria', r).value.trim();
@@ -2519,6 +2709,7 @@ function openVisitRecord(id, focusSection){
       $('#rPrintForm', r).onclick = () => { save('تم الحفظ'); closeModal(); previewVisitForms([v.id]); };
       $('#rPrintRec', r).onclick = () => { save('تم الحفظ'); closeModal(); printVisitRecord(v.id); };
       $('#rTeacherRep', r).onclick = () => { save('تم الحفظ'); closeModal(); printTeacherReport(v.id); };
+      $('#rReviewCard', r).onclick = () => { save('تم الحفظ'); closeModal(); printReviewCard(v.id); };
       $('#rEval', r).onclick = () => { save('تم الحفظ'); closeModal(); go('evaluate', v.id); };
     }
   });
@@ -2836,6 +3027,115 @@ function obsCard(cardNo){
       '<div>توقيع الملاحِظة</div><div>توقيع المعلمة</div><div>تاريخ التغذية الراجعة</div>' +
     '</div>' +
   '</div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   بطاقة ملاحظة وتقويم الحصة — the adopted review card, printed filled
+   from the record. Long observer notes spill onto an appendix page so
+   nothing the observer wrote is lost to the one-page layout.
+   ══════════════════════════════════════════════════════════════════════ */
+function rvPick(list, chosen, cls){
+  return '<div class="rv-pick ' + (cls||'') + '">' + list.map(x => {
+    const lab = Array.isArray(x) ? x[0] : x, sub = Array.isArray(x) ? x[1] : '';
+    const on = chosen && String(chosen) === String(lab);
+    return '<span class="' + (on ? 'on' : '') + '"><i></i>' + h(lab) +
+      (sub ? '<b class="en">' + h(sub) + '</b>' : '') + '</span>';
+  }).join('') + '</div>';
+}
+function rvField(label, value, w, strong){
+  return '<div class="rv-f" style="width:' + w + '%"><span class="k">' + h(label) + '</span>' +
+    '<span class="v' + (strong ? ' s' : '') + '">' + h(value || '—') + '</span></div>';
+}
+function rvCell(std, rec){
+  const note = (rec && rec.note) || '';
+  const short = note.length > 190 ? note.slice(0, 190).replace(/\s+\S*$/, '') + ' …' : note;
+  return '<div class="rv-cell">' +
+    '<div class="rv-ch"><b>' + h(std.code) + '</b> ' + h(std.ar) +
+      '<span class="en">' + h(std.en) + '</span><i>' + h(std.std) + '</i></div>' +
+    std.lenses.map(l =>
+      '<div class="rv-lens"><b>' + h(l.t) + '</b>' +
+        '<p class="q">' + h(l.q) + '</p><p class="e">' + h(l.e) + '</p></div>').join('') +
+    '<div class="rv-note">' + (short ? h(short) : '<span class="ph">—</span>') + '</div>' +
+    '<div class="rv-bands"><span class="lb">نسبة الطالبات</span>' + rvPick(REVIEW_BANDS, rec && rec.band, 'b') + '</div>' +
+    '<div class="rv-bands"><span class="lb">التقدير</span>' + rvPick(REVIEW_LEVELS, rec && rec.level, 'l') + '</div>' +
+  '</div>';
+}
+function reviewCardSheet(v){
+  const t = Model.teacher(v.teacherId), r = v.review || {rows:{}}, st = v.students || {};
+  const sc = SCH();
+  const obsRole = ((S().observers || []).find(o => o.n === v.observer) || {}).r || S().observerEn;
+  const col = i => REVIEW_STD.filter(x => x.col === i).map(x => rvCell(x, (r.rows || {})[x.id])).join('');
+
+  const strip = '<div class="rv-strip">' + REVIEW_STD.map(x =>
+      '<div class="c"><span class="n">' + h(x.code) + ' ' + h(x.ar) + '</span>' +
+      '<b>' + h(((r.rows || {})[x.id] || {}).level || '—') + '</b></div>').join('') +
+    '<div class="c tot"><span class="n">التقدير العام</span><b>' + h(r.overall || '—') + '</b></div></div>';
+
+  return '<div class="pr-sheet rv">' +
+    '<div class="rv-head">' +
+      '<div class="t"><b>' + h(sc.nameAr) + '</b><span>' + h(sc.cycle) + ' · العين</span></div>' +
+      '<div class="ttl">ملاحظة وتقويم الحصة الدرسية<span>عناصر الحصة الرئيسة في إطار ارتقاء · ' + h(S().academicYear) + '</span></div>' +
+      '<div class="mk">' + logoMoeHTML() + '</div><div class="mk c">' + logoCharterHTML() + '</div>' +
+    '</div>' +
+    '<div class="rv-focus">' + h(REVIEW_FOCUS) + '</div>' +
+    '<div class="rv-row">' +
+      rvField('اسم الملاحِظة', v.observer || S().observer, 30, true) +
+      rvField('الوظيفة', obsRole, 28) +
+      '<div class="rv-f" style="width:42%"><span class="k">سبب الزيارة</span>' +
+        rvPick(REVIEW_REASONS, r.reason, 'r') + '</div>' +
+    '</div>' +
+    '<div class="rv-row">' +
+      rvField('اسم المعلمة', t ? t.name : '', 26, true) + rvField('المادة', v.subject, 17) +
+      rvField('الصف والشعبة', v.grade ? v.grade + '/' + v.cls : '', 14) +
+      rvField('اليوم / التاريخ', v.date ? DOW_AR[dowOf(v.date)] + ' ' + fmtDate(v.date) : '', 21) +
+      rvField('الحصة', v.period, 10) +
+      rvField('الحضور / الغياب', (st.present || '—') + ' / ' + (st.absent || '—'), 12) +
+    '</div>' +
+    '<div class="rv-row"><div class="rv-f" style="width:100%"><span class="k">عنوان الدرس والأهداف</span>' +
+      '<span class="v">' + h([v.topic, v.objective].filter(Boolean).join(' — ') || '—') + '</span></div></div>' +
+    '<div class="rv-grid"><div class="cl">' + col(0) + '</div><div class="cl">' + col(1) + '</div></div>' +
+    strip +
+    '<div class="rv-bottom">' +
+      '<div class="sum"><b>الخلاصة</b><span class="q">ماذا تعلّمت الطالبات، وبأي نسبة، وما الذي في التدريس والتقييم صنع ذلك أو حال دونه؟</span>' +
+        '<div class="bx">' + (r.summary ? nl2br(r.summary) : '<span class="ph">—</span>') + '</div>' +
+        '<div class="two">' +
+          '<div><b>نقطة التميز</b><div class="bx sm">' + (r.distinction ? nl2br(r.distinction) : '<span class="ph">—</span>') + '</div></div>' +
+          '<div><b>الأولوية التطويرية</b><div class="bx sm">' + (r.priority ? nl2br(r.priority) : '<span class="ph">—</span>') + '</div></div>' +
+        '</div>' +
+        '<div><b>إجراء المتابعة</b><div class="bx sm">' + (r.followUpAction ? nl2br(r.followUpAction) : '<span class="ph">—</span>') + '</div></div>' +
+      '</div>' +
+      '<div class="ov"><b>التقدير العام للحصة</b>' + rvPick(REVIEW_LEVELS, r.overall, 'g') +
+        '<p>' + h(REVIEW_RULE) + '</p></div>' +
+    '</div>' +
+    '<div class="rv-foot">' +
+      '<span>' + h(REVIEW_BANDNOTE) + '</span>' +
+      '<span class="cr">' + h(REVIEW_CREDIT) + '</span>' +
+    '</div>' +
+    '<div class="rv-sign"><div>الملاحِظة: الاسم والتوقيع</div><div>المعلمة: اطّلعت</div></div>' +
+  '</div>';
+}
+/* appendix: the observer's full wording for any standard whose note was cut */
+function reviewDetailSheet(v){
+  const r = v.review || {rows:{}};
+  const long = REVIEW_STD.filter(x => (((r.rows||{})[x.id]||{}).note || '').length > 190);
+  if(!long.length) return '';
+  const t = Model.teacher(v.teacherId);
+  return '<div class="pr-sheet rv">' +
+    '<div class="rv-head">' +
+      '<div class="t"><b>' + h(SCH().nameAr) + '</b><span>' + h(SCH().cycle) + ' · العين</span></div>' +
+      '<div class="ttl">ملاحظات الملاحِظة التفصيلية<span>ملحق بطاقة ملاحظة وتقويم الحصة · ' +
+        h(t ? t.name : '') + ' · ' + fmtDate(v.date) + '</span></div>' +
+      '<div class="mk">' + logoMoeHTML() + '</div><div class="mk c">' + logoCharterHTML() + '</div>' +
+    '</div>' +
+    long.map(x => '<div class="rv-detail"><b>' + h(x.code) + ' ' + h(x.ar) + '</b>' +
+      '<div class="bx">' + nl2br(((r.rows||{})[x.id]||{}).note) + '</div></div>').join('') +
+    '<div class="rv-foot"><span>' + h(REVIEW_CREDIT) + '</span></div>' +
+  '</div>';
+}
+function printReviewCard(visitId){
+  const v = Model.visit(visitId);
+  if(!v) return toast('الزيارة غير موجودة', 'err');
+  doPrint('portrait', reviewCardSheet(v) + reviewDetailSheet(v));
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -3736,6 +4036,7 @@ VIEWS.evaluations = function(){
       '<td>' + stageBadge(v) + '</td>' +
       '<td class="nowrap"><div class="actions">' +
         '<button class="btn sm primary" data-eval="' + h(v.id) + '">' + ICON.clipboard + ' ' + (e ? 'فتح التقييم' : 'تقييم الزيارة') + '</button>' +
+        '<button class="iconbtn" data-rvcard="' + h(v.id) + '" title="بطاقة تقويم الحصة">' + ICON.clipboard + '</button>' +
         '<button class="iconbtn" data-treport="' + h(v.id) + '" title="تقرير المعلمة">' + ICON.file + '</button>' +
         (e ? '<button class="iconbtn" data-evalprint="' + h(e.id) + '" title="طباعة التقييم">' + ICON.print + '</button>' : '') +
       '</div></td></tr>';
@@ -3777,6 +4078,7 @@ VIEWS.after_evaluations = function(){
   $$('#view [data-eval]').forEach(b => b.onclick = () => go('evaluate', b.dataset.eval));
   $$('#view [data-evalprint]').forEach(b => b.onclick = () => printEvaluation(b.dataset.evalprint));
   $$('#view [data-treport]').forEach(b => b.onclick = () => printTeacherReport(b.dataset.treport));
+  $$('#view [data-rvcard]').forEach(b => b.onclick = () => printReviewCard(b.dataset.rvcard));
 };
 
 /* ═══════════════════════════════════════════════════════════════
