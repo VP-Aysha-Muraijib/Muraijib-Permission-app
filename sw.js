@@ -3,7 +3,11 @@
 // v3 — full offline + cache-first strategy
 // ═══════════════════════════════════════════════════
 
-const CACHE_NAME = 'muraijib-perm-v3';
+const CACHE_NAME = 'muraijib-perm-v4';
+
+// Pages behind the edge login are never cached: a cached copy would be
+// served without the browser ever re-authenticating.
+const NEVER_CACHE = ['/classroom-visits.html', '/admin-dashboard.html'];
 const OFFLINE_URL = './index.html';
 
 // All assets to pre-cache on install
@@ -16,7 +20,7 @@ const PRECACHE_ASSETS = [
 
 // ── INSTALL: pre-cache all assets ──
 self.addEventListener('install', event => {
-  console.log('[SW] Installing v3...');
+  console.log('[SW] Installing v4...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(PRECACHE_ASSETS))
@@ -27,7 +31,7 @@ self.addEventListener('install', event => {
 
 // ── ACTIVATE: clean old caches ──
 self.addEventListener('activate', event => {
-  console.log('[SW] Activating v3...');
+  console.log('[SW] Activating v4...');
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
@@ -47,6 +51,13 @@ self.addEventListener('fetch', event => {
   // Skip non-GET and non-http(s)
   if (event.request.method !== 'GET') return;
   if (!event.request.url.startsWith('http')) return;
+
+  // Never cache the protected pages — always go to the network, which asks
+  // the edge function for credentials.
+  if (NEVER_CACHE.some(path => new URL(event.request.url).pathname.endsWith(path))) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
 
   // Skip Google Fonts (always fetch live)
   if (event.request.url.includes('fonts.googleapis.com') ||
