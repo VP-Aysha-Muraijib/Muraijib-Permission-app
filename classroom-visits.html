@@ -107,6 +107,9 @@ a{color:var(--olive-d);text-decoration:none}
   display:flex;align-items:center;gap:6px;white-space:nowrap;
 }
 .mast-chip b{color:var(--olive-d);font-weight:700}
+.obs-pick{border:none;background:transparent;color:var(--olive-d);font-weight:700;font-size:11.5px;
+  padding:0 18px 0 0;width:auto;min-width:92px;background-position:left 0 center}
+.obs-pick:focus{box-shadow:none}
 .mast-chip.acc{background:var(--olive-tint);border-color:var(--olive-pale)}
 
 /* ════════ NAV ════════ */
@@ -572,6 +575,26 @@ table.pr-tbl tr{page-break-inside:avoid}
 .nb-two > div{flex:1;min-width:0}
 .nb-rule{border:1px solid var(--line);border-radius:.6mm;
   background:repeating-linear-gradient(to bottom,transparent,transparent 7.4mm,var(--hair) 7.4mm,var(--hair) calc(7.4mm + 1px))}
+.nb-f .v.filled{border-bottom:1px solid var(--line);color:var(--ink);font-weight:600;font-size:7.6pt;
+  height:auto;min-height:4.2mm;line-height:1.4;padding-bottom:.4mm}
+.nb-fill{border:1px solid var(--line);border-radius:.6mm;padding:1.2mm 2mm;font-size:8pt;line-height:1.65;
+  color:var(--ink);background:#FEFEFC;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.nb-fill .ph{color:var(--faint)}
+.nb-rep{display:flex;justify-content:space-between;align-items:center;gap:6mm;font-size:8.6pt;font-weight:700;
+  color:var(--ink);background:var(--panel);border-inline-start:2.2px solid var(--gold);
+  padding:1.2mm 2.5mm;margin-bottom:1.6mm;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.nb-t td.bx i.on{background:var(--ink);border-color:var(--ink);position:relative;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.nb-t td.bx i.on::after{content:"";position:absolute;inset-inline-start:.85mm;top:.15mm;
+  width:.8mm;height:1.7mm;border:solid #fff;border-width:0 .35mm .35mm 0;transform:rotate(45deg)}
+.ind-list{display:flex;flex-direction:column;gap:4px}
+.ind-grp{font-size:11.5px;font-weight:700;color:var(--olive-d);margin-top:6px}
+.ind-row{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;
+  padding:5px 8px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--ivory)}
+.ind-row .t{flex:1;min-width:210px;font-size:12px;color:var(--ink-2);display:flex;gap:7px}
+.ind-row .t b{color:var(--ink-3);font-weight:600}
+.ind-row .rating label{padding:3px 8px;font-size:11px}
 .nb-hint{font-size:6.2pt;color:var(--faint);line-height:1.45;margin-top:.7mm}
 
 /* indicator table */
@@ -830,7 +853,7 @@ table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);tex
     <div class="mast-meta">
       <div class="mast-chip acc">العام الدراسي <b class="en" id="mastYear">2026/2027</b></div>
       <div class="mast-chip" id="mastTerm">الفصل الأول</div>
-      <div class="mast-chip">الملاحظ <b id="mastObserver">—</b></div>
+      <div class="mast-chip">الملاحِظة <select id="mastObserver" class="obs-pick"></select></div>
     </div>
   </div>
 </header>
@@ -1125,6 +1148,7 @@ const KEY = 'muraijib.cvms.v1';
 
 const DEFAULT_SETTINGS = {
   observer: 'عائشة النعيمي',
+  observers: ['عائشة النعيمي', 'نورة الكعبي'],
   observerEn: 'Academic Vice Principal',
   academicYear: '2026/2027',
   logo: '',
@@ -1241,7 +1265,16 @@ const Model = {
 
   /* ── Visits ── */
   visits(){ return DB().visits.slice(); },
-  visit(id){ return DB().visits.find(v => v.id === id) || null; },
+  visit(id){
+    const v = DB().visits.find(x => x.id === id) || null;
+    if(v){  /* records created before the card fields existed */
+      if(!v.students) v.students = {total:'', present:'', absent:'', sen:'', adaptations:''};
+      if(!v.indicators) v.indicators = {};
+      ['objective','outcomes','criteria','actionProposed','actionAgreed','verifyEvidence']
+        .forEach(k => { if(v[k] == null) v[k] = ''; });
+    }
+    return v;
+  },
   visitByCode(code){
     const q = String(code||'').trim().toUpperCase();
     return DB().visits.find(v => (v.code||'').toUpperCase() === q) || null;
@@ -1272,6 +1305,11 @@ const Model = {
       id: uid('v'), code:'', date, teacherId:'', subject:'', grade:'', cls:'', period:'', observer: S().observer,
       topic:'', type:'Short Visit', startTime:'', duration: S().defaultDuration,
       purpose:'', focus:[], notes:'',
+      /* the fields of the printed observation card, so the record mirrors it */
+      objective:'', outcomes:'', criteria:'',
+      students: {total:'', present:'', absent:'', sen:'', adaptations:''},
+      indicators: {},
+      actionProposed:'', actionAgreed:'', verifyEvidence:'',
       status:'Planned', stage:'planned', feedbackStatus:'Feedback Pending', followUp:'No Follow-up',
       /* post-visit record — kept deliberately separate from evaluation */
       evidence:'', strengths:'', development:'', feedbackNotes:'', nextSteps:[],
@@ -1592,7 +1630,12 @@ function render(){
   if(after) after();
   $('#mastYear').textContent = S().academicYear;
   $('#mastTerm').textContent = Model.activeTerm().name;
-  $('#mastObserver').textContent = S().observer;
+  (function(){
+    const sel = $('#mastObserver'), s2 = S();
+    const list = uniq((s2.observers || []).concat([s2.observer]).filter(Boolean));
+    sel.innerHTML = optionList(list, s2.observer);
+    sel.onchange = () => { S().observer = sel.value; Store.save(); toast('تم تبديل الملاحِظة إلى ' + sel.value, 'ok'); render(); };
+  })();
   $('#mastSchool').textContent = SCH().nameAr;
   $('#mastEmblem').innerHTML = logoMoeHTML();
   $('#mastCharter').innerHTML = logoCharterHTML();
@@ -2293,6 +2336,42 @@ function openVisitRecord(id, focusSection){
       v.focus.map(f => '<span class="tag en">' + h(f) + '</span> ').join('') + '</div>' : '') +
     (v.purpose ? '<div style="margin-top:10px"><div class="k" style="font-size:10.5px;color:var(--ink-3)">Purpose</div><div style="font-size:12px">' + nl2br(v.purpose) + '</div></div>' : '');
 
+  /* the printed card's own fields, so paper and system hold the same record */
+  const card =
+    '<div class="form-grid two">' +
+      '<div class="field span2"><label>الهدف الرئيسي للحصة<span class="en"> Lesson objective</span></label>' +
+        '<input type="text" id="cObjective" value="' + h(v.objective) + '"></div>' +
+      '<div class="field"><label>نواتج التعلم المتوقعة<span class="en"> Learning outcomes</span></label>' +
+        '<textarea id="cOutcomes" style="min-height:62px">' + h(v.outcomes) + '</textarea></div>' +
+      '<div class="field"><label>معايير النجاح<span class="en"> Success criteria</span></label>' +
+        '<textarea id="cCriteria" style="min-height:62px">' + h(v.criteria) + '</textarea></div>' +
+    '</div>' +
+    '<fieldset class="fs" style="margin-top:12px"><legend>بيانات الطالبات — Class profile</legend>' +
+      '<div class="form-grid">' +
+        '<div class="field"><label>إجمالي الطالبات</label><input type="number" min="0" id="cTotal" value="' + h(v.students.total) + '"></div>' +
+        '<div class="field"><label>الحاضرات</label><input type="number" min="0" id="cPresent" value="' + h(v.students.present) + '"></div>' +
+        '<div class="field"><label>الغائبات</label><input type="number" min="0" id="cAbsent" value="' + h(v.students.absent) + '"></div>' +
+        '<div class="field"><label>من أصحاب الهمم</label><input type="number" min="0" id="cSen" value="' + h(v.students.sen) + '"></div>' +
+        '<div class="field span2"><label>ملاحظات التكييفات واحتياجات الدعم<span class="en"> — دون تفاصيل تشخيصية</span></label>' +
+          '<input type="text" id="cAdapt" value="' + h(v.students.adaptations) + '"></div>' +
+      '</div></fieldset>' +
+    '<div class="section-title" style="margin-top:14px">' + ICON.clipboard + ' مؤشرات جودة التعليم والتعلم</div>' +
+    '<div class="ind-list">' + (() => {
+      let n = 0, out = '';
+      OBS_INDICATORS.forEach(g => {
+        out += '<div class="ind-grp">' + h(g.d) + '</div>';
+        g.items.forEach(it => {
+          const key = 'i' + (++n);
+          const cur = v.indicators[key] || '';
+          out += '<div class="ind-row"><span class="t"><b class="mono">' + n + '</b>' + h(it) + '</span>' +
+            '<span class="rating" data-ind="' + key + '">' + OBS_SCALE.map(x =>
+              '<label class="' + (cur === x ? 'on' : '') + '"><input type="radio" name="' + key + '" value="' + h(x) + '"' +
+              (cur === x ? ' checked' : '') + '>' + h(x) + '</label>').join('') + '</span></div>';
+        });
+      });
+      return out;
+    })() + '</div>';
+
   const observation =
     '<div class="note" style="margin-bottom:12px">' + ICON.info + ' هذا القسم مخصص لتوثيق <b>الأدلة الملاحَظة</b> أثناء الحصة — منفصل عن ملاحظات الإدارة وعن نموذج التقييم.</div>' +
     '<div class="field"><label>الأدلة الملاحظة أثناء الحصة<span class="en"> Evidence Observed During the Lesson</span></label>' +
@@ -2318,6 +2397,12 @@ function openVisitRecord(id, focusSection){
       '<div class="field"><label>الملاحظة الإدارية الحالية<span class="en"> Current Observation Note</span></label>' +
         '<textarea id="aCurrent" style="min-height:110px" placeholder="توجيه إداري، نقطة نوقشت سابقًا، ملاحظة تتعلق بالتخطيط أو العرض التقديمي أو الإدارة الصفية…">' + h(v.admin.current) + '</textarea></div>' +
       '<div class="form-grid" style="margin-top:12px">' +
+        '<div class="field span2"><label>إجراء مقترح أثناء الزيارة<span class="en"> Proposed during the visit</span></label>' +
+          '<input type="text" id="aProposed" value="' + h(v.actionProposed) + '"></div>' +
+        '<div class="field span2"><label>إجراء متفق عليه مع المعلمة<span class="en"> Agreed with the teacher</span></label>' +
+          '<input type="text" id="aAgreed" value="' + h(v.actionAgreed) + '"></div>' +
+        '<div class="field span2"><label>دليل التحقق من التحسن<span class="en"> Evidence that will verify it</span></label>' +
+          '<input type="text" id="aVerify" value="' + h(v.verifyEvidence) + '"></div>' +
         '<div class="field span2"><label>الإجراء المطلوب<span class="en"> Required Action</span></label>' +
           '<input type="text" id="aAction" value="' + h(v.admin.action) + '" placeholder="مثال: مراجعة الخطة الدرسية مع رئيسة القسم"></div>' +
         '<div class="field"><label>المسؤول<span class="en"> Responsible Person</span></label>' +
@@ -2355,13 +2440,15 @@ function openVisitRecord(id, focusSection){
       stepper(v) +
     '</div></div>' +
     accSection('r_details','1','بيانات الزيارة','Visit Information', details, focusSection === 'details') +
-    accSection('r_obs','2','ملاحظات الزيارة والأدلة','Classroom Observation Evidence', observation, focusSection === 'observation' || !focusSection) +
-    accSection('r_admin','3','ملاحظات الإدارة','Administration Notes', admin, focusSection === 'admin') +
-    accSection('r_follow','4','الحالة والمتابعة','Status & Follow-up', followBlock, focusSection === 'follow');
+    accSection('r_card','2','بطاقة الملاحظة الصفية','Observation card — planning, class profile, indicators', card, focusSection === 'card') +
+    accSection('r_obs','3','ملاحظات الزيارة والأدلة','Classroom Observation Evidence', observation, focusSection === 'observation' || !focusSection) +
+    accSection('r_admin','4','ملاحظات الإدارة والإجراء','Administration Notes & Action', admin, focusSection === 'admin') +
+    accSection('r_follow','5','الحالة والمتابعة','Status & Follow-up', followBlock, focusSection === 'follow');
 
   const foot =
     '<button class="btn sm" id="rPrintForm">' + ICON.print + ' نموذج الزيارة</button>' +
     '<button class="btn sm" id="rPrintRec">' + ICON.pdf + ' طباعة السجل</button>' +
+    '<button class="btn sm primary" id="rTeacherRep">' + ICON.file + ' تقرير المعلمة</button>' +
     '<button class="btn sm" id="rEval">' + ICON.clipboard + ' ' + (ev ? 'فتح التقييم' : 'تقييم الزيارة') + '</button>' +
     '<div class="spacer"></div>' +
     '<button class="btn" data-close="1">إغلاق</button>' +
@@ -2372,11 +2459,29 @@ function openVisitRecord(id, focusSection){
     title:'سجل الزيارة الصفية', sub:'Visit Record · ' + v.code, size:'wide', body, foot,
     onMount(r){
       bindAcc(r); bindChips(r);
+      $$('[data-ind]', r).forEach(g => $$('label', g).forEach(lb =>
+        lb.onclick = () => { $$('label', g).forEach(x => x.classList.remove('on')); lb.classList.add('on'); }));
       const pt = $('#rPrevToggle', r);
       if(pt) pt.onclick = () => { const l = $('#rPrevList', r); l.classList.toggle('hidden');
         pt.innerHTML = l.classList.contains('hidden') ? ICON.eye + ' عرض' : ICON.x + ' إخفاء'; };
 
       const collect = () => {
+        v.objective = $('#cObjective', r).value.trim();
+        v.outcomes  = $('#cOutcomes', r).value.trim();
+        v.criteria  = $('#cCriteria', r).value.trim();
+        v.students = {
+          total: $('#cTotal', r).value, present: $('#cPresent', r).value,
+          absent: $('#cAbsent', r).value, sen: $('#cSen', r).value,
+          adaptations: $('#cAdapt', r).value.trim(),
+        };
+        v.indicators = {};
+        $$('[data-ind]', r).forEach(g => {
+          const sel = $('input:checked', g);
+          if(sel) v.indicators[g.dataset.ind] = sel.value;
+        });
+        v.actionProposed = $('#aProposed', r).value.trim();
+        v.actionAgreed = $('#aAgreed', r).value.trim();
+        v.verifyEvidence = $('#aVerify', r).value.trim();
         v.evidence = $('#rEvidence', r).value.trim();
         v.strengths = $('#rStrengths', r).value.trim();
         v.development = $('#rDevelopment', r).value.trim();
@@ -2411,6 +2516,7 @@ function openVisitRecord(id, focusSection){
       };
       $('#rPrintForm', r).onclick = () => { save('تم الحفظ'); closeModal(); previewVisitForms([v.id]); };
       $('#rPrintRec', r).onclick = () => { save('تم الحفظ'); closeModal(); printVisitRecord(v.id); };
+      $('#rTeacherRep', r).onclick = () => { save('تم الحفظ'); closeModal(); printTeacherReport(v.id); };
       $('#rEval', r).onclick = () => { save('تم الحفظ'); closeModal(); go('evaluate', v.id); };
     }
   });
@@ -2728,6 +2834,93 @@ function obsCard(cardNo){
       '<div>توقيع الملاحِظة</div><div>توقيع المعلمة</div><div>تاريخ التغذية الراجعة</div>' +
     '</div>' +
   '</div>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TEACHER REPORT — the observation card, filled from the electronic record
+   and shared with the teacher. Same layout as the blank card so the two
+   are read as one document.
+   ══════════════════════════════════════════════════════════════════════ */
+function nbFv(label, value, w){
+  return '<div class="nb-f" style="width:' + w + '%"><span class="k">' + h(label) +
+    '</span><span class="v filled">' + h(value || '—') + '</span></div>';
+}
+function nbFilled(mm, text){
+  return '<div class="nb-fill" style="min-height:' + mm + 'mm">' + (text ? nl2br(text) : '<span class="ph">—</span>') + '</div>';
+}
+function teacherReportSheet(v){
+  const t = Model.teacher(v.teacherId);
+  const st = v.students || {};
+  const time = v.startTime || S().periodTimes[v.period] || '';
+  const ev = Model.evalOfVisit(v.id);
+
+  const visit = '<div class="nb-grid">' +
+    nbFv('اسم المعلمة', t ? t.name : '', 34) + nbFv('المادة', v.subject, 21) +
+    nbFv('الصف والشعبة', v.grade ? v.grade + '/' + v.cls : '', 18) + nbFv('الحصة', v.period, 11) +
+    nbFv('اليوم', DOW_AR[dowOf(v.date)], 16) +
+    nbFv('التاريخ', fmtDate(v.date), 17) + nbFv('من', time ? fmtTime(time) : '', 11) +
+    nbFv('إلى', time ? fmtTime(addMinutes(time, v.duration)) : '', 11) +
+    nbFv('نوع الزيارة', v.type, 24) + nbFv('عنوان الدرس', v.topic, 37) +
+  '</div>';
+
+  const students = '<div class="nb-grid">' +
+    nbFv('إجمالي الطالبات', st.total, 25) + nbFv('الحاضرات', st.present, 25) +
+    nbFv('الغائبات', st.absent, 25) + nbFv('من أصحاب الهمم', st.sen, 25) +
+  '</div>' + (st.adaptations ? '<div class="nb-sub">التكييفات واحتياجات الدعم</div>' + nbFilled(7, st.adaptations) : '');
+
+  const planning =
+    '<div class="nb-lab">الهدف الرئيسي للحصة</div>' + nbFilled(8, v.objective) +
+    '<div class="nb-two" style="margin-top:1.2mm">' +
+      '<div><div class="nb-lab">نواتج التعلم المتوقعة</div>' + nbFilled(11, v.outcomes) + '</div>' +
+      '<div><div class="nb-lab">معايير النجاح</div>' + nbFilled(11, v.criteria) + '</div>' +
+    '</div>';
+
+  let n = 0, rows = '';
+  OBS_INDICATORS.forEach(g => g.items.forEach(it => {
+    n++;
+    const cur = (v.indicators || {})['i' + n] || '';
+    rows += '<tr><td class="no en">' + n + '</td><td>' + h(it) + '</td>' +
+      OBS_SCALE.map(x => '<td class="bx"><i' + (cur === x ? ' class="on"' : '') + '></i></td>').join('') + '</tr>';
+  }));
+  const indicators = '<table class="nb-t"><thead><tr>' +
+      '<th class="c" style="width:4.5%">م</th><th>المؤشر</th>' +
+      OBS_SCALE.map(x => '<th class="c" style="width:8.5%">' + h(x) + '</th>').join('') +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+  const action = '<div class="nb-grid">' +
+      nbFv('إجراء مقترح أثناء الزيارة', v.actionProposed, 100) +
+    '</div><div class="nb-grid">' +
+      nbFv('إجراء متفق عليه مع المعلمة', v.actionAgreed, 100) +
+    '</div><div class="nb-grid">' +
+      nbFv('المسؤول عن التنفيذ', v.followUpPerson || S().observer, 30) +
+      nbFv('موعد المتابعة', v.followUpDate ? fmtDate(v.followUpDate) : '', 25) +
+      nbFv('دليل التحقق من التحسن', v.verifyEvidence, 45) +
+    '</div>';
+
+  return '<div class="pr-sheet nb">' + nbHead(null) +
+    '<div class="nb-rep">تقرير الزيارة الصفية — نسخة المعلمة <span class="vcode">' + h(v.code) + '</span></div>' +
+    nbSec('1', 'بيانات الزيارة', 'Visit data', visit) +
+    nbSec('2', 'بيانات الطالبات', 'Class profile', students) +
+    nbSec('3', 'التخطيط التعليمي', 'Planning for learning', planning) +
+    nbSec('4', 'مؤشرات جودة التعليم والتعلم', 'Quality indicators', indicators) +
+    nbSec('5', 'أدلة التعلم والملاحظات الصفية', 'Evidence of learning', nbFilled(22, v.evidence), 'grow') +
+    nbSec('6', 'التغذية الراجعة', 'Feedback',
+      '<div class="nb-two">' +
+        '<div><div class="nb-lab">نقاط القوة</div>' + nbFilled(16, v.strengths) + '</div>' +
+        '<div><div class="nb-lab">فرص التحسين</div>' + nbFilled(16, v.development) + '</div>' +
+      '</div>') +
+    nbSec('7', 'الإجراء التطويري والمتابعة', 'Action and follow-up', action) +
+    (ev && ev.observerComments ? nbSec('8', 'تعليق الملاحِظة', 'Observer comment', nbFilled(10, ev.observerComments)) : '') +
+    '<div class="nb-foot">' +
+      '<div>توقيع الملاحِظة · ' + h(v.observer || S().observer) + '</div>' +
+      '<div>توقيع المعلمة</div><div>تاريخ التغذية الراجعة</div>' +
+    '</div>' +
+  '</div>';
+}
+function printTeacherReport(visitId){
+  const v = Model.visit(visitId);
+  if(!v) return toast('الزيارة غير موجودة', 'err');
+  doPrint('portrait', teacherReportSheet(v));
 }
 
 /* ---------- front matter ---------- */
@@ -3379,6 +3572,7 @@ VIEWS.evaluations = function(){
       '<td>' + stageBadge(v) + '</td>' +
       '<td class="nowrap"><div class="actions">' +
         '<button class="btn sm primary" data-eval="' + h(v.id) + '">' + ICON.clipboard + ' ' + (e ? 'فتح التقييم' : 'تقييم الزيارة') + '</button>' +
+        '<button class="iconbtn" data-treport="' + h(v.id) + '" title="تقرير المعلمة">' + ICON.file + '</button>' +
         (e ? '<button class="iconbtn" data-evalprint="' + h(e.id) + '" title="طباعة التقييم">' + ICON.print + '</button>' : '') +
       '</div></td></tr>';
   }).join('');
@@ -3404,8 +3598,10 @@ VIEWS.evaluations = function(){
         '<th>التقييم<span class="en">Evaluation</span></th><th>التغذية الراجعة<span class="en">Feedback</span></th>' +
         '<th>الخطوة التالية<span class="en">Next Step</span></th><th>تاريخ المتابعة<span class="en">Follow-up Date</span></th>' +
         '<th>الحالة<span class="en">Status</span></th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>'
-      : emptyState('clipboard','لا توجد زيارات منفذة بعد','بعد تنفيذ الزيارة وتسجيلها يمكن فتح نموذج التقييم الصفي التطويري الخاص بها.',
-          '<button class="btn primary" data-nav="daily">' + ICON.calendar + ' الزيارات اليومية</button>')) +
+      : emptyState('clipboard','لا توجد زيارات منفذة بعد',
+          'التقييم يُفتح من زيارة منفذة. إن كانت هذه أول مرة تفتحين فيها النظام على هذا الجهاز فالبيانات تبدأ فارغة: استوردي نسخة احتياطية من الإعدادات، أو أضيفي المعلمات ثم أنشئي زيارة.',
+          '<button class="btn primary" data-nav="daily">' + ICON.calendar + ' الزيارات اليومية</button> ' +
+          '<button class="btn" data-nav="settings">' + ICON.upload + ' استعادة نسخة احتياطية</button>')) +
     '</div></div>';
 };
 VIEWS.after_evaluations = function(){
@@ -3416,6 +3612,7 @@ VIEWS.after_evaluations = function(){
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
   $$('#view [data-eval]').forEach(b => b.onclick = () => go('evaluate', b.dataset.eval));
   $$('#view [data-evalprint]').forEach(b => b.onclick = () => printEvaluation(b.dataset.evalprint));
+  $$('#view [data-treport]').forEach(b => b.onclick = () => printTeacherReport(b.dataset.treport));
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -4035,7 +4232,10 @@ VIEWS.settings = function(){
     '</div>' +
     '<div class="form-grid" style="margin-top:12px">' +
       '<div class="field"><label>العام الدراسي<span class="en"> Academic Year</span></label><input type="text" id="stYear" value="' + h(s.academicYear) + '"></div>' +
-      '<div class="field"><label>اسم الملاحظ<span class="en"> Observer</span></label><input type="text" id="stObserver" value="' + h(s.observer) + '"></div>' +
+      '<div class="field"><label>الملاحِظة النشطة<span class="en"> Active observer</span></label>' +
+        '<select id="stObserver">' + optionList(uniq((s.observers||[]).concat([s.observer]).filter(Boolean)), s.observer) + '</select></div>' +
+      '<div class="field"><label>نواب المدير الأكاديمي<span class="en"> Observers — one per line</span></label>' +
+        '<textarea id="stObservers" style="min-height:62px">' + h((s.observers||[]).join('\n')) + '</textarea></div>' +
       '<div class="field"><label>المسمى بالإنجليزية<span class="en"> Observer Title (EN)</span></label><input type="text" id="stObserverEn" value="' + h(s.observerEn) + '"></div>' +
       '<div class="field"><label>المدة الافتراضية للزيارة (دقيقة)<span class="en"> Default Duration</span></label><input type="number" id="stDuration" min="5" max="60" value="' + h(s.defaultDuration) + '"></div>' +
     '</div>' +
@@ -4144,7 +4344,9 @@ VIEWS.after_settings = function(){
     s.cycleEn = $('#stCycleEn').value.trim();
     s.schoolCode = $('#stSchoolCode').value.trim();
     s.principal = $('#stPrincipal').value.trim();
-    s.observer = $('#stObserver').value.trim();
+    s.observers = $('#stObservers').value.split('\n').map(x => x.trim()).filter(Boolean);
+    s.observer = $('#stObserver').value.trim() || s.observers[0] || s.observer;
+    if(!s.observers.includes(s.observer)) s.observers.unshift(s.observer);
     s.observerEn = $('#stObserverEn').value.trim();
     s.defaultDuration = Number($('#stDuration').value) || 20;
     s.windowStart = $('#stWinStart').value || s.windowStart;
