@@ -143,20 +143,50 @@ a{color:var(--olive-d);text-decoration:none}
 .page-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.4}
 .page-title .sub{display:block;font-size:12px;font-weight:400;color:var(--ink-3);margin-top:1px}
 .page-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* ── recorded-visit data on the home page ── */
+.dash-data{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+@media (max-width:860px){.dash-data{grid-template-columns:1fr}}
+.dist{display:grid;gap:7px}
+.dist-row{display:grid;grid-template-columns:minmax(92px,auto) 1fr 58px;gap:10px;align-items:center;font-size:12px}
+.dist-row .lb{color:var(--ink-2)}
+.dist-row .n{text-align:start;color:var(--ink-3);font-size:11.5px;font-variant-numeric:tabular-nums;
+  direction:ltr;unicode-bidi:isolate}
+.dist-row .n b{color:var(--ink);font-weight:700}
+.dist .bar > i{background:var(--olive-m)}
+.dist .bar > i.l1{background:#2F6B45}
+.dist .bar > i.l2{background:var(--ok)}
+.dist .bar > i.l3{background:var(--olive-m)}
+.dist .bar > i.l4{background:var(--warn)}
+.dist .bar > i.l5{background:var(--alert)}
+.dist .bar > i.l6{background:#6E342D}
+.std-tab{width:100%;border-collapse:collapse;font-size:11.5px}
+.std-tab th,.std-tab td{padding:6px 7px;border-bottom:1px solid var(--line-2);text-align:center;
+  font-variant-numeric:tabular-nums}
+.std-tab th{font-size:10.5px;font-weight:700;color:var(--ink-3);background:var(--ivory-2);white-space:nowrap}
+.std-tab td:first-child,.std-tab th:first-child{text-align:start;white-space:nowrap}
+.std-tab td.z{color:var(--line)}
+.std-tab td.pk{font-weight:800;color:var(--ink);background:var(--olive-pale);border-radius:4px}
+.std-tab .code{font-size:10.5px;font-weight:700;color:var(--olive);direction:ltr;unicode-bidi:isolate}
+.mini{display:grid;gap:5px;font-size:12px}
+.mini .r{display:flex;align-items:center;gap:9px}
+.mini .r .k{flex:0 0 118px;color:var(--ink-2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .r .v{font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.mini .r .t{flex:1}
+
 /* ── quick visit · the 3-minute entry screen ── */
 .qv-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;background:var(--ivory-2);
   border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:12px}
 .qv-bar .t{font-size:12px;color:var(--ink-2)}
 .qv-clock{margin-inline-start:auto;font-size:12.5px;font-weight:700;color:var(--olive);
   direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
-.qv-clock.over{color:var(--rust)}
+.qv-clock.over{color:var(--alert)}
 .pickrow{display:flex;flex-wrap:wrap;gap:5px}
 .pickrow button{padding:6px 11px;font-size:12px;border:1px solid var(--line);border-radius:999px;
   background:var(--white);color:var(--ink-2);line-height:1.5}
 .pickrow button:hover{border-color:var(--olive-3);background:var(--ivory-2)}
 .pickrow button.on{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:700}
 .pickrow button.lv1.on{background:#2f6b45;border-color:#2f6b45}
-.pickrow button.lv5.on,.pickrow button.lv6.on{background:var(--rust);border-color:var(--rust)}
+.pickrow button.lv5.on,.pickrow button.lv6.on{background:var(--rust);border-color:var(--alert)}
 .qv-std{border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;margin-bottom:9px;background:var(--white)}
 .qv-std > .hd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
 .qv-std > .hd b{font-size:12.5px;color:var(--ink)}
@@ -222,7 +252,9 @@ a{color:var(--olive-d);text-decoration:none}
 .iconbtn .ic{width:15px;height:15px}
 
 /* ════════ STAT TILES ════════ */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:1080px){.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.stat-grid{grid-template-columns:1fr}}
 .stat{
   background:var(--white);border:1px solid var(--line);border-radius:var(--r);
   padding:14px 15px;box-shadow:var(--sh);position:relative;overflow:hidden;
@@ -1770,6 +1802,36 @@ const Model = {
     if(v && Array.isArray(v.dataGaps) && v.dataGaps.indexOf('observer') >= 0) return v.observer || '—';
     return (v && v.observer) || S().observer || '—';
   },
+  /* The recorded visits, counted as data for the home page */
+  visitStats(scope){
+    const visits = this.scopeVisits(scope).filter(v => v.status !== 'Cancelled');
+    const tally = key => {
+      const m = {};
+      visits.forEach(v => { const k = key(v); if(k) m[k] = (m[k] || 0) + 1; });
+      return Object.keys(m).map(k => [k, m[k]]).sort((a, b) => b[1] - a[1]);
+    };
+    const blank = () => { const m = {}; REVIEW_LEVELS.forEach(l => m[l] = 0); return m; };
+    const overall = blank();
+    visits.forEach(v => { const x = (v.review || {}).overall; if(x in overall) overall[x]++; });
+    const byStd = {};
+    REVIEW_STD.forEach(st => {
+      byStd[st.id] = blank();
+      visits.forEach(v => {
+        const lv = ((((v.review || {}).rows) || {})[st.id] || {}).level;
+        if(lv in byStd[st.id]) byStd[st.id][lv]++;
+      });
+    });
+    return {
+      total: visits.length,
+      judged: visits.filter(v => (v.review || {}).overall).length,
+      withNotes: visits.filter(v => Object.keys(((v.review || {}).rows) || {}).length).length,
+      overall, byStd,
+      bySubject: tally(v => v.subject),
+      byGrade: tally(v => v.grade),
+      byObserver: tally(v => v.observer),
+      byTeacher: tally(v => { const t = Model.teacher(v.teacherId); return t ? t.name : ''; }),
+    };
+  },
   /* Best fit across the seven, never an average, and never above 1.2 progress */
   suggestOverall(rows){
     const vals = REVIEW_STD.map(st => (rows[st.id] || {}).level).filter(Boolean);
@@ -2027,6 +2089,7 @@ VIEWS.dashboard = function(){
   const dates = Model.activeDates();
   const todayVisits = Model.visitsOn(todayISO());
   const gaps = Model.incompleteVisits();
+  const st = Model.visitStats(state.scope);
   const upcoming = Model.scopeVisits(state.scope)
     .filter(v => v.date >= todayISO() && v.status === 'Planned')
     .sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (Number(a.period)||99)-(Number(b.period)||99))
@@ -2089,6 +2152,56 @@ VIEWS.dashboard = function(){
           '<button class="btn sm" data-fixgap="' + h(v.id) + '">إكمال</button></div>';
       }).join('') + '</div></div></div>'
     : '') +
+
+(st.total ?
+  '<div class="section-title">' + ICON.chart + ' بيانات الزيارات المسجلة <span class="en">· Recorded Visits — ' +
+    h(Model.scopeLabel(state.scope)) + '</span></div>' +
+  '<div class="dash-data">' +
+
+    '<div class="card"><div class="card-head"><h3>التقدير العام للحصص<span class="en">Overall Lesson Judgement</span></h3>' +
+      '<span class="badge mono">' + st.judged + ' / ' + st.total + '</span></div>' +
+      '<div class="card-body">' + (st.judged ?
+        '<div class="dist">' + REVIEW_LEVELS.map((lv, i) => {
+          const n = st.overall[lv], p = pct(n, st.judged);
+          return '<div class="dist-row"><span class="lb">' + h(lv) + '</span>' +
+            '<span class="bar thin"><i class="l' + (i+1) + '" style="width:' + p + '%"></i></span>' +
+            '<span class="n"><b>' + n + '</b> · ' + p + '%</span></div>';
+        }).join('') + '</div>' +
+        (st.judged < st.total ? '<p class="hint" style="margin-top:9px">' + (st.total - st.judged) +
+          ' زيارة بلا تقدير عام بعد.</p>' : '')
+        : '<div class="note">لم يُسجَّل تقدير عام لأي زيارة بعد.</div>') +
+      '</div></div>' +
+
+    '<div class="card"><div class="card-head"><h3>الزيارات حسب المادة والصف<span class="en">By Subject and Grade</span></h3></div>' +
+      '<div class="card-body">' +
+        (st.bySubject.length ? '<div class="mini">' + st.bySubject.map(r =>
+          '<div class="r"><span class="k">' + h(r[0]) + '</span>' +
+          '<span class="bar thin t"><i style="width:' + pct(r[1], st.total) + '%"></i></span>' +
+          '<span class="v">' + r[1] + '</span></div>').join('') + '</div>'
+          : '<div class="note">لم تُسجَّل المادة في أي زيارة.</div>') +
+        (st.byGrade.length ? '<div style="height:11px"></div><div class="chips">' + st.byGrade.map(r =>
+          '<span class="chip" style="cursor:default">صف ' + h(r[0]) + ' · <b class="mono">' + r[1] + '</b></span>').join('') + '</div>' : '') +
+      '</div></div>' +
+
+    '<div class="card" style="grid-column:1/-1"><div class="card-head">' +
+      '<h3>التقديرات حسب المعيار<span class="en">Judgements by Standard — how many visits at each level</span></h3></div>' +
+      '<div class="card-body flush" style="overflow-x:auto">' +
+        '<table class="std-tab"><thead><tr><th>المعيار</th>' +
+          REVIEW_LEVELS.map(l => '<th>' + h(l) + '</th>').join('') + '<th>مُقدَّر</th></tr></thead><tbody>' +
+        REVIEW_STD.map(sd => {
+          const row = st.byStd[sd.id];
+          const tot = REVIEW_LEVELS.reduce((a, l) => a + row[l], 0);
+          const peak = Math.max.apply(null, REVIEW_LEVELS.map(l => row[l]));
+          const sole = REVIEW_LEVELS.filter(l => row[l] === peak).length === 1;
+          return '<tr><td><span class="code">' + h(sd.code) + '</span> ' + h(sd.ar) + '</td>' +
+            REVIEW_LEVELS.map(l => '<td class="' + (!row[l] ? 'z' : (sole && row[l] === peak && peak > 0 ? 'pk' : '')) + '">' +
+              (row[l] || '—') + '</td>').join('') +
+            '<td class="mono">' + tot + '</td></tr>';
+        }).join('') + '</tbody></table>' +
+        '<p class="hint" style="padding:9px 14px 2px">الخانة المظللة هي التقدير الأكثر تكرارًا في المعيار. لا تُظلَّل خانة عند تساوي أكثر من تقدير.</p>' +
+      '</div></div>' +
+
+  '</div>' : '') +
 
   '<div class="section-title">' + ICON.calendar + ' زيارات اليوم <span class="en">· Today — ' + fmtLong(todayISO()) + '</span></div>' +
   '<div class="card"><div class="card-body flush">' +
