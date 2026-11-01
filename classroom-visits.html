@@ -143,6 +143,11 @@ a{color:var(--olive-d);text-decoration:none}
 .page-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.4}
 .page-title .sub{display:block;font-size:12px;font-weight:400;color:var(--ink-3);margin-top:1px}
 .page-actions{display:flex;gap:8px;flex-wrap:wrap}
+.scope-pick{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--white)}
+.scope-pick button{padding:8px 13px;font-size:12.5px;color:var(--ink-2);border-inline-start:1px solid var(--line-2)}
+.scope-pick button:first-child{border-inline-start:none}
+.scope-pick button:hover{background:var(--ivory-2)}
+.scope-pick button.on{background:var(--olive);color:#fff;font-weight:700}
 .section-title{
   font-size:13.5px;font-weight:700;color:var(--olive-d);
   display:flex;align-items:center;gap:8px;margin:22px 0 10px;
@@ -1496,6 +1501,7 @@ const Model = {
       if(!v.review.rows) v.review.rows = {};
       ['objective','outcomes','criteria','actionProposed','actionAgreed','verifyEvidence']
         .forEach(k => { if(v[k] == null) v[k] = ''; });
+      if(!Array.isArray(v.dataGaps)) v.dataGaps = [];
     }
     return v;
   },
@@ -1542,6 +1548,8 @@ const Model = {
       admin: {current:'', action:'', responsible:'', deadline:'', status:'Not Started'},
       followUpDate:'', followUpFocus:'', followUpPerson:'',
       printedAt:'', printCount:0, completedAt:'', closedAt:'',
+      /* fields the source document left blank — recorded rather than invented */
+      dataGaps: [],
       termId: S().activeTermId, createdAt:nowISO(), updatedAt:nowISO(),
     };
   },
@@ -1641,14 +1649,28 @@ const Model = {
   },
   isDisabled(iso){ return S().disabledDates.includes(iso); },
   activeDates(){ return this.windowDates().filter(d => !this.isDisabled(d)); },
-  /* Visits inside the active planning window (dashboards + coverage) */
+  /* Visits inside the active planning window */
   windowVisits(){
     const set = new Set(this.activeDates());
     return DB().visits.filter(v => set.has(v.date));
   },
-  coverage(){
+  /* What the dashboard counts: the whole year, a term, or the planning window */
+  scopeVisits(scope){
+    if(scope === 'window') return this.windowVisits();
+    if(scope === 'term'){
+      const t = this.activeTerm();
+      return DB().visits.filter(v => t.start && t.end && v.date >= t.start && v.date <= t.end);
+    }
+    return DB().visits.slice();
+  },
+  scopeLabel(scope){
+    if(scope === 'window') return 'فترة التخطيط · ' + fmtDate(S().windowStart) + ' – ' + fmtDate(S().windowEnd);
+    if(scope === 'term'){ const t = this.activeTerm(); return t.name + ' · ' + fmtDate(t.start) + ' – ' + fmtDate(t.end); }
+    return 'جميع الزيارات المسجلة';
+  },
+  coverage(scope){
     const teachers = this.activeTeachers();
-    const visits = this.windowVisits();
+    const visits = this.scopeVisits(scope);
     const done = visits.filter(v => STAGE_INDEX[this.computeStage(v)] >= STAGE_INDEX.visited && v.status !== 'Cancelled');
     const visitedIds = uniq(done.map(v => v.teacherId));
     return {
@@ -1664,6 +1686,19 @@ const Model = {
       followUps: visits.filter(v => v.followUp && v.followUp !== 'No Follow-up' && !v.closedAt).length,
       notesPending: visits.filter(v => STAGE_INDEX[this.computeStage(v)] >= STAGE_INDEX.visited && !(v.admin && v.admin.current)).length,
     };
+  },
+  /* Records whose source document left header fields blank — never guessed */
+  incompleteVisits(){
+    return DB().visits.filter(v => v.status !== 'Cancelled' &&
+      ((Array.isArray(v.dataGaps) && v.dataGaps.length) || !v.date || !v.teacherId));
+  },
+  gapLabels(v){
+    const L = {teacher:'اسم المعلمة', observer:'اسم الملاحِظة', date:'اليوم / التاريخ',
+      period:'الحصة', role:'الوظيفة', subject:'المادة', grade:'الصف والشعبة'};
+    const g = (Array.isArray(v.dataGaps) ? v.dataGaps : []).slice();
+    if(!v.date && g.indexOf('date') < 0) g.push('date');
+    if(!v.teacherId && g.indexOf('teacher') < 0) g.push('teacher');
+    return g.map(k => L[k] || k);
   },
   /* Follow-up items = visit-level follow-ups + evaluation agreed actions */
   followUpItems(){
@@ -1703,6 +1738,7 @@ const state = {
   filters: {teacher:'', subject:'', grade:'', type:'', status:'', follow:'', q:''},
   selection: new Set(),
   accOpen: {},
+  scope: 'all',
 };
 
 function badge(map, key){
@@ -1889,11 +1925,12 @@ function sloganHTML(){ return '<img src="' + ASSET_SLOGAN + '" alt="بالميث
    VIEW · DASHBOARD
    ═══════════════════════════════════════════════════════════════ */
 VIEWS.dashboard = function(){
-  const c = Model.coverage();
+  const c = Model.coverage(state.scope);
   const term = Model.activeTerm();
   const dates = Model.activeDates();
   const todayVisits = Model.visitsOn(todayISO());
-  const upcoming = Model.windowVisits()
+  const gaps = Model.incompleteVisits();
+  const upcoming = Model.scopeVisits(state.scope)
     .filter(v => v.date >= todayISO() && v.status === 'Planned')
     .sort((a,b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (Number(a.period)||99)-(Number(b.period)||99))
     .slice(0, 6);
@@ -1904,8 +1941,12 @@ VIEWS.dashboard = function(){
 
   return '' +
   '<div class="page-head"><div class="page-title">اللوحة الرئيسية' +
-    '<span class="sub en">Coverage Dashboard · ' + h(term.name) + ' · ' + fmtDate(S().windowStart) + ' – ' + fmtDate(S().windowEnd) + '</span></div>' +
+    '<span class="sub">نطاق الاحتساب: ' + h(Model.scopeLabel(state.scope)) + '</span></div>' +
     '<div class="page-actions">' +
+      '<div class="scope-pick">' +
+        [['all','جميع الزيارات'],['term','الفصل الدراسي'],['window','فترة التخطيط']].map(x =>
+          '<button class="' + (state.scope === x[0] ? 'on' : '') + '" data-scope="' + x[0] + '">' + h(x[1]) + '</button>').join('') +
+      '</div>' +
       '<button class="btn" data-nav="daily">' + ICON.calendar + ' الزيارات اليومية</button>' +
       '<button class="btn primary" id="dashAdd">' + ICON.plus + ' إضافة زيارة صفية</button>' +
     '</div></div>' +
@@ -1930,9 +1971,26 @@ VIEWS.dashboard = function(){
       '<span>معلمات تمت زيارتهن: <b class="mono">' + c.uniqueVisited + ' / ' + c.totalTeachers + '</b></span>' +
       '<span class="en">Total Visits: <b class="mono">' + c.totalVisits + '</b></span>' +
       '<span class="en">Completed: <b class="mono">' + c.completedVisits + '</b></span>' +
-      '<span>أيام العمل ضمن الفترة: <b class="mono">' + dates.length + '</b></span>' +
+      '<span>أيام العمل ضمن فترة التخطيط: <b class="mono">' + dates.length + '</b></span>' +
     '</div>' +
   '</div>' +
+
+  (gaps.length ?
+    '<div style="height:14px"></div>' +
+    '<div class="card"><div class="card-head"><h3>سجلات بحاجة لإكمال البيانات<span class="en">Records Awaiting Missing Header Data</span></h3>' +
+      '<span class="badge b-warn mono">' + gaps.length + '</span></div>' +
+      '<div class="card-body">' +
+      '<p class="hint" style="margin-bottom:9px">أُدخلت هذه الزيارات من مستندات تركت بعض خانات الترويسة فارغة، ولم تُستكمل بالتخمين. افتحي السجل وأكملي البيانات الناقصة.</p>' +
+      '<div class="list-lines">' + gaps.map(v => {
+        const t = Model.teacher(v.teacherId);
+        return '<div class="line-item"><div class="n mono">' + (v.period || '—') + '</div><div style="flex:1">' +
+          '<div style="font-size:12.5px;font-weight:700">' + h(t ? t.name : 'معلمة غير محددة') +
+            (v.subject ? ' · <span class="en">' + h(v.subject) + '</span>' : '') + '</div>' +
+          '<div style="font-size:11px;color:var(--ink-3)">' + (v.date ? fmtDate(v.date) : 'بلا تاريخ') +
+            ' · ناقص: ' + h(Model.gapLabels(v).join('، ')) + '</div></div>' +
+          '<button class="btn sm" data-fixgap="' + h(v.id) + '">إكمال</button></div>';
+      }).join('') + '</div></div></div>'
+    : '') +
 
   '<div class="section-title">' + ICON.calendar + ' زيارات اليوم <span class="en">· Today — ' + fmtLong(todayISO()) + '</span></div>' +
   '<div class="card"><div class="card-body flush">' +
@@ -1967,6 +2025,8 @@ VIEWS.dashboard = function(){
 };
 
 VIEWS.after_dashboard = function(){
+  $$('#view [data-scope]').forEach(b => b.onclick = () => { state.scope = b.dataset.scope; render(); });
+  $$('#view [data-fixgap]').forEach(b => b.onclick = () => openVisitForm(b.dataset.fixgap));
   const add = $('#dashAdd'); if(add) add.onclick = () => openVisitForm(null, todayISO());
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
   bindMiniTable();
@@ -4611,8 +4671,8 @@ function printFollowUpList(){
    VIEW · REPORTS
    ═══════════════════════════════════════════════════════════════ */
 VIEWS.reports = function(){
-  const c = Model.coverage();
-  const visits = Model.windowVisits().filter(v => v.status !== 'Cancelled');
+  const c = Model.coverage(state.scope);
+  const visits = Model.scopeVisits(state.scope).filter(v => v.status !== 'Cancelled');
   const teachers = Model.activeTeachers();
   const done = v => STAGE_INDEX[Model.computeStage(v)] >= STAGE_INDEX.visited;
 
@@ -4632,8 +4692,12 @@ VIEWS.reports = function(){
 
   return '' +
   '<div class="page-head"><div class="page-title">التقارير والتحليلات' +
-    '<span class="sub en">Reports · ' + fmtDate(S().windowStart) + ' – ' + fmtDate(S().windowEnd) + ' · ' + h(Model.activeTerm().name) + '</span></div>' +
+    '<span class="sub">نطاق الاحتساب: ' + h(Model.scopeLabel(state.scope)) + '</span></div>' +
     '<div class="page-actions">' +
+      '<div class="scope-pick">' +
+        [['all','جميع الزيارات'],['term','الفصل الدراسي'],['window','فترة التخطيط']].map(x =>
+          '<button class="' + (state.scope === x[0] ? 'on' : '') + '" data-scope="' + x[0] + '">' + h(x[1]) + '</button>').join('') +
+      '</div>' +
       '<button class="btn" id="rpCsvVisits">' + ICON.download + ' تصدير الزيارات CSV</button>' +
       '<button class="btn" id="rpCsvCoverage">' + ICON.download + ' تصدير التغطية CSV</button>' +
       '<button class="btn" id="rpPrint">' + ICON.print + ' طباعة الخطة الأسبوعية</button>' +
@@ -4688,6 +4752,7 @@ VIEWS.reports = function(){
   '</div>';
 };
 VIEWS.after_reports = function(){
+  $$('#view [data-scope]').forEach(b => b.onclick = () => { state.scope = b.dataset.scope; render(); });
   $('#rpPrint').onclick = printWeeklyPlan;
   $('#rpLog').onclick = openPaperLog;
   $('#rpCsvVisits').onclick = exportVisitsCSV;
