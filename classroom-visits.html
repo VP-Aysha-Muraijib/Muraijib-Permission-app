@@ -821,6 +821,10 @@ table.tt td input{padding:4px 6px;font-size:11px;border-color:var(--line-2)}
 table.tt .dcell{background:var(--paper);font-weight:700;color:var(--olive-d);text-align:center;white-space:nowrap;font-size:11px}
 
 /* previous-notes alert */
+.merge-rep .r{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dotted var(--line-2)}
+.merge-rep .r > i{font-style:normal;font-size:11.5px;color:var(--ink-3);flex:1}
+.merge-rep .r > b{font-size:14px;font-weight:800;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.merge-rep .r > b.ok{color:var(--olive-d)}
 .logo-slot{border:1px solid var(--line);border-radius:var(--r);padding:12px;background:var(--paper)}
 .logo-slot-h{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:9px;font-size:12px}
 .logo-slot-h b{font-weight:700;color:var(--ink)}
@@ -1257,6 +1261,16 @@ function addMinutes(t, mins){
   return String(Math.floor(total/60)).padStart(2,'0') + ':' + String(total%60).padStart(2,'0');
 }
 function byName(a,b){ return String(a).localeCompare(String(b), 'ar'); }
+/* compare teacher names across honorifics, spacing and alef spellings */
+function normName(x){
+  return String(x || '')
+    .replace(/[\u064B-\u0652\u0670]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    /* the honorific is stripped before ة/ى are folded, or it no longer matches */
+    .replace(/^\s*(الاستاذة|الاستاذ|المعلمة|المعلم|الدكتورة|الدكتور|أ\s*\.|ا\s*\.|د\s*\.)\s*/, '')
+    .replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+    .replace(/\s+/g, ' ').trim();
+}
 function uniq(arr){ return Array.from(new Set(arr)); }
 function pct(part, whole){ return whole > 0 ? Math.round((part/whole)*100) : 0; }
 function nl2br(s){ return h(s).replace(/\n/g,'<br>'); }
@@ -1351,6 +1365,77 @@ const Store = {
     this.db = obj; this.save();
   },
   reset(){ this.db = this.blank(); this.save(); },
+
+  /* Merge a backup into the current data instead of replacing it.
+     Teachers are matched by name, visits by their code or by
+     date + teacher + period, so merging the same file twice adds nothing. */
+  merge(obj, apply){
+    if(!obj || typeof obj !== 'object') throw new Error('ملف غير صالح');
+    const inc = {teachers: obj.teachers || [], visits: obj.visits || [], evaluations: obj.evaluations || []};
+    const db = this.db;
+    const rep = {teachersAdded:0, teachersMatched:0, visitsAdded:0, visitsSkipped:0,
+                 evalsAdded:0, evalsSkipped:0, observersAdded:0};
+    const idMap = {};                       /* incoming teacher id → id used here */
+    const byName = {};
+    db.teachers.forEach(t => byName[normName(t.name)] = t.id);
+    const usedIds = new Set(db.teachers.map(t => t.id)
+      .concat(db.visits.map(v => v.id), db.evaluations.map(e => e.id)));
+
+    inc.teachers.forEach(t => {
+      const key = normName(t.name);
+      if(!key) return;
+      if(byName[key]){ idMap[t.id] = byName[key]; rep.teachersMatched++; return; }
+      const copy = JSON.parse(JSON.stringify(t));
+      if(usedIds.has(copy.id)) copy.id = uid('t');
+      usedIds.add(copy.id); idMap[t.id] = copy.id; byName[key] = copy.id;
+      if(apply) db.teachers.push(copy);
+      rep.teachersAdded++;
+    });
+
+    const codes = new Set(db.visits.map(v => (v.code || '').toUpperCase()).filter(Boolean));
+    const slots = new Set(db.visits.map(v => v.date + '|' + v.teacherId + '|' + v.period));
+    const visitIdMap = {};
+    inc.visits.forEach(v => {
+      const tid = idMap[v.teacherId] || v.teacherId;
+      const code = (v.code || '').toUpperCase();
+      const slot = v.date + '|' + tid + '|' + v.period;
+      if((code && codes.has(code)) || slots.has(slot)){ rep.visitsSkipped++; return; }
+      const copy = JSON.parse(JSON.stringify(v));
+      copy.teacherId = tid;
+      if(usedIds.has(copy.id)) copy.id = uid('v');
+      usedIds.add(copy.id); visitIdMap[v.id] = copy.id;
+      if(code) codes.add(code);
+      slots.add(slot);
+      if(apply) db.visits.push(copy);
+      rep.visitsAdded++;
+    });
+
+    const evalByVisit = new Set(db.evaluations.map(e => e.visitId));
+    inc.evaluations.forEach(e => {
+      const vid = visitIdMap[e.visitId];
+      if(!vid || evalByVisit.has(vid)){ rep.evalsSkipped++; return; }
+      const copy = JSON.parse(JSON.stringify(e));
+      copy.visitId = vid;
+      copy.teacherId = idMap[e.teacherId] || e.teacherId;
+      if(usedIds.has(copy.id)) copy.id = uid('e');
+      usedIds.add(copy.id); evalByVisit.add(vid);
+      if(apply) db.evaluations.push(copy);
+      rep.evalsAdded++;
+    });
+
+    /* settings stay as they are, except that observers are unioned */
+    const incObs = ((obj.settings || {}).observers || []).map(o => typeof o === 'string' ? {n:o, r:''} : o);
+    const have = new Set((db.settings.observers || []).map(o => normName(o.n)));
+    incObs.forEach(o => {
+      if(!o || !o.n || have.has(normName(o.n))) return;
+      have.add(normName(o.n));
+      if(apply) db.settings.observers.push(o);
+      rep.observersAdded++;
+    });
+
+    if(apply) this.save();
+    return rep;
+  },
 };
 /* School identity: constants are the defaults, Settings may override them. */
 function SCH(){
@@ -4748,6 +4833,8 @@ VIEWS.settings = function(){
       ' <span class="en">teachers · visits · evaluations · settings</span>.</div>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
       '<button class="btn" id="stExport">' + ICON.download + ' تصدير نسخة احتياطية (JSON)</button>' +
+      '<button class="btn" id="stMergeBtn">' + ICON.plus + ' دمج نسخة احتياطية</button>' +
+      '<input type="file" id="stMerge" accept="application/json" class="hidden">' +
       '<button class="btn" id="stImportBtn">' + ICON.upload + ' استعادة نسخة احتياطية</button>' +
       '<input type="file" id="stImport" accept="application/json" class="hidden">' +
       '<button class="btn" id="stCsv">' + ICON.download + ' تصدير الزيارات CSV</button>' +
@@ -4844,6 +4931,44 @@ VIEWS.after_settings = function(){
     downloadFile('muraijib-cvms-backup-' + todayISO() + '.json', JSON.stringify(Store.export(), null, 2), 'application/json');
     toast('تم إنشاء النسخة الاحتياطية', 'ok');
   };
+  $('#stMergeBtn').onclick = () => $('#stMerge').click();
+  $('#stMerge').onchange = () => {
+    const file = $('#stMerge').files[0]; if(!file) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      let obj;
+      try{ obj = JSON.parse(fr.result); }catch(e){ return toast('ملف غير صالح', 'err'); }
+      let dry;
+      try{ dry = Store.merge(obj, false); }catch(e){ return toast(e.message, 'err'); }
+      const line = (k, v, cls) => '<div class="r"><i>' + h(k) + '</i><b class="' + (cls||'') + '">' + v + '</b></div>';
+      openModal({
+        title:'دمج نسخة احتياطية', sub:'Merge — nothing already in your system is replaced', size:'narrow',
+        body:'<div class="note" style="margin-bottom:12px">' + ICON.info +
+          ' يُضاف الجديد فقط. المعلمة الموجودة تُطابَق بالاسم، والزيارة الموجودة تُعرف برقمها أو بتاريخها وحصتها فلا تتكرر.</div>' +
+          '<div class="kv merge-rep">' +
+            line('معلمات جديدة', dry.teachersAdded, 'ok') +
+            line('معلمات مطابِقة موجودة', dry.teachersMatched) +
+            line('زيارات جديدة', dry.visitsAdded, 'ok') +
+            line('زيارات مكررة تُتجاهل', dry.visitsSkipped) +
+            line('تقييمات جديدة', dry.evalsAdded, 'ok') +
+            line('ملاحِظات جديدة', dry.observersAdded) +
+          '</div>' +
+          (dry.teachersAdded + dry.visitsAdded + dry.evalsAdded === 0
+            ? '<div class="note warn" style="margin-top:12px">لا يوجد جديد في هذا الملف — بياناتك تحتوي عليه بالفعل.</div>' : ''),
+        foot:'<button class="btn" data-close="1">إلغاء</button>' +
+          '<button class="btn primary" id="mgGo">' + ICON.check + ' تنفيذ الدمج</button>',
+        onMount(r2){
+          $('#mgGo', r2).onclick = () => {
+            const rep = Store.merge(obj, true);
+            closeModal();
+            toast('تم الدمج: ' + rep.visitsAdded + ' زيارة و' + rep.teachersAdded + ' معلمة', 'ok');
+            state.date = ''; render();
+          };
+        }
+      });
+    };
+    fr.readAsText(file);
+  };
   $('#stImportBtn').onclick = () => $('#stImport').click();
   $('#stImport').onchange = () => {
     const file = $('#stImport').files[0]; if(!file) return;
@@ -4851,7 +4976,7 @@ VIEWS.after_settings = function(){
     fr.onload = () => {
       try{
         const obj = JSON.parse(fr.result);
-        confirmDialog('استعادة نسخة احتياطية', 'سيتم استبدال جميع البيانات الحالية ببيانات الملف. هل ترغبين بالمتابعة؟',
+        confirmDialog('استعادة نسخة احتياطية', 'تحذير: سيتم حذف جميع بياناتك الحالية واستبدالها ببيانات الملف. إن كنتِ تريدين إضافة بيانات الملف إلى ما لديك فاستخدمي «دمج نسخة احتياطية» بدلًا من هذا.',
           () => { Store.import(obj); toast('تمت الاستعادة', 'ok'); state.date = ''; render(); }, 'استعادة');
       }catch(e){ toast('ملف غير صالح', 'err'); }
     };
