@@ -1843,6 +1843,7 @@ VIEWS.daily = function(){
   '<div class="page-head"><div class="page-title">الزيارات الصفية اليومية' +
     '<span class="sub en">Daily Classroom Visit Planner · ' + h(fmtLong(date)) + '</span></div>' +
     '<div class="page-actions">' +
+      '<button class="btn" id="btnImportVisits">' + ICON.upload + ' استيراد زيارات سابقة</button>' +
       '<button class="btn" id="btnPaperLog">' + ICON.book + ' السجل الورقي</button>' +
       '<button class="btn" id="btnPrintDay">' + ICON.print + ' طباعة خطة اليوم</button>' +
       '<button class="btn" id="btnBatch">' + ICON.file + ' طباعة نماذج زيارات اليوم</button>' +
@@ -1991,6 +1992,7 @@ VIEWS.after_daily = function(){
   $('#btnGenForm').onclick = () => openVisitForm(null, currentDate(), {generate:true});
   $('#btnPrintDay').onclick = () => printDailyPlan(currentDate());
   $('#btnPaperLog').onclick = openPaperLog;
+  $('#btnImportVisits').onclick = openImportVisits;
   $('#btnBatch').onclick = () => openBatchPrint(currentDate());
 
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
@@ -3377,6 +3379,168 @@ function openTimetable(id){
   });
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   BULK IMPORT OF PAST VISITS
+   Lets a term of visits already recorded on paper be typed into a sheet and
+   brought in at once. Missing columns are simply left blank on the record.
+   ══════════════════════════════════════════════════════════════════════ */
+const VISIT_IMPORT_COLS = [
+  ['date','التاريخ'], ['teacher','اسم المعلمة'], ['subject','المادة'], ['grade','الصف'], ['cls','الشعبة'],
+  ['period','الحصة'], ['type','نوع الزيارة'], ['topic','عنوان الدرس'],
+  ['objective','الهدف الرئيسي'], ['outcomes','نواتج التعلم'], ['criteria','معايير النجاح'],
+  ['total','إجمالي الطالبات'], ['present','الحاضرات'], ['absent','الغائبات'], ['sen','أصحاب الهمم'],
+  ['adaptations','التكييفات'],
+  ['evidence','أدلة التعلم'], ['strengths','نقاط القوة'], ['development','فرص التحسين'],
+  ['actionAgreed','إجراء متفق عليه'], ['responsible','المسؤول'], ['followUpDate','موعد المتابعة'],
+  ['verifyEvidence','دليل التحقق'], ['observer','الملاحِظة'],
+];
+/* RFC-4180 style parser: quoted fields may hold commas and newlines */
+function parseCSV(text){
+  const rows = []; let row = [], field = '', q = false;
+  text = String(text).replace(/^﻿/, '').replace(/\r\n?/g, '\n');
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(q){
+      if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else q = false; }
+      else field += c;
+    } else if(c === '"') q = true;
+    else if(c === ','){ row.push(field); field = ''; }
+    else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+    else field += c;
+  }
+  if(field || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim() !== ''));
+}
+function parseAnyDate(v){
+  const x = String(v || '').trim();
+  let m = x.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(m) return m[1] + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[3]).padStart(2,'0');
+  m = x.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+  if(m) return m[3] + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[1]).padStart(2,'0');
+  return '';
+}
+function visitImportTemplate(){
+  const head = VISIT_IMPORT_COLS.map(c => c[1]);
+  const sample = ['03/09/2026','فاطمة الكعبي','English','7','2','3','Learning Walk','Present Perfect',
+    'أن تستخدم الطالبة المضارع التام','تكوّن ثلاث جمل صحيحة','أذكر ثلاث جمل وأبرّر اختيار الزمن',
+    '27','25','2','1','جلوس أمامي ووقت إضافي',
+    'فسّرت ثلاث طالبات اختيار الزمن في مثال جديد','أسئلة متدرجة أنتجت تفسيرًا','إتاحة وقت تفكير أطول',
+    'تطبيق Think-Pair-Share في حصتين أسبوعيًا','معلمة المادة','10/09/2026','ملاحظة صفية قصيرة','عائشة النعيمي'];
+  return [head, sample].map(r => r.map(csvCell).join(',')).join('\n');
+}
+/* turn one parsed row into a saved visit, creating the teacher when needed */
+function importVisitRow(rec, counters){
+  const date = parseAnyDate(rec.date);
+  const name = String(rec.teacher || '').trim();
+  if(!date || !name) return false;
+  let t = Model.teachers().find(x => x.name === name);
+  if(!t){
+    t = Model.blankTeacher(); t.name = name; t.subject = String(rec.subject || '').trim();
+    Model.saveTeacher(t); counters.teachers++;
+  }
+  const v = Model.blankVisit(date);
+  v.teacherId = t.id;
+  v.subject = String(rec.subject || t.subject || '').trim();
+  v.grade = String(rec.grade || '').trim(); v.cls = String(rec.cls || '').trim();
+  v.period = String(rec.period || '').trim(); v.topic = String(rec.topic || '').trim();
+  const ty = String(rec.type || '').trim();
+  v.type = S().visitTypes.includes(ty) ? ty : 'Short Visit';
+  v.observer = String(rec.observer || '').trim() || S().observer;
+  v.objective = String(rec.objective || '').trim();
+  v.outcomes = String(rec.outcomes || '').trim();
+  v.criteria = String(rec.criteria || '').trim();
+  v.students = {total: rec.total||'', present: rec.present||'', absent: rec.absent||'',
+                sen: rec.sen||'', adaptations: String(rec.adaptations||'').trim()};
+  v.evidence = String(rec.evidence || '').trim();
+  v.strengths = String(rec.strengths || '').trim();
+  v.development = String(rec.development || '').trim();
+  v.actionAgreed = String(rec.actionAgreed || '').trim();
+  v.verifyEvidence = String(rec.verifyEvidence || '').trim();
+  v.followUpPerson = String(rec.responsible || '').trim();
+  v.followUpDate = parseAnyDate(rec.followUpDate);
+  if(v.followUpDate || v.actionAgreed) v.followUp = 'Follow-up Required';
+  /* a visit being entered after the fact has already happened */
+  v.status = 'Completed';
+  v.completedAt = nowISO();
+  if(v.strengths || v.development || v.evidence) v.feedbackStatus = 'Feedback Given';
+  Model.saveVisit(v);
+  counters.visits++;
+  return true;
+}
+function openImportVisits(){
+  openModal({
+    title:'استيراد زيارات سابقة', sub:'Bulk import of past visits — CSV', size:'wide',
+    body:'<div class="note" style="margin-bottom:12px">' + ICON.info +
+      ' نزّلي القالب، املئيه في Excel بزياراتك السابقة، ثم احفظيه بصيغة <b>CSV UTF-8</b> وارفعيه هنا.' +
+      ' <b>التاريخ واسم المعلمة</b> مطلوبان في كل سطر، وبقية الأعمدة اختيارية.' +
+      ' المعلمة غير الموجودة في القائمة تُضاف تلقائيًا.</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">' +
+        '<button class="btn" id="ivTpl">' + ICON.download + ' تحميل القالب</button>' +
+        '<button class="btn" id="ivPick">' + ICON.upload + ' اختيار ملف CSV</button>' +
+        '<input type="file" id="ivFile" accept=".csv,text/csv" class="hidden">' +
+      '</div>' +
+      '<div class="field"><label>أو الصقي الجدول هنا مباشرة<span class="en"> Paste CSV</span></label>' +
+        '<textarea id="ivText" style="min-height:120px" placeholder="التاريخ,اسم المعلمة,المادة,..."></textarea></div>' +
+      '<div id="ivPrev" style="margin-top:12px"></div>',
+    foot:'<span id="ivCount" style="font-size:11px;color:var(--ink-3)"></span><div class="spacer"></div>' +
+      '<button class="btn" data-close="1">إلغاء</button>' +
+      '<button class="btn primary" id="ivGo" disabled>' + ICON.check + ' استيراد</button>',
+    onMount(r){
+      let rows = [];
+      const preview = () => {
+        const txt = $('#ivText', r).value.trim();
+        const box = $('#ivPrev', r), btn = $('#ivGo', r);
+        rows = [];
+        if(!txt){ box.innerHTML = ''; btn.disabled = true; $('#ivCount', r).textContent = ''; return; }
+        const grid = parseCSV(txt);
+        if(grid.length < 2){ box.innerHTML = '<div class="note warn">لا توجد صفوف بيانات تحت العناوين.</div>'; btn.disabled = true; return; }
+        const head = grid[0].map(x => String(x).trim());
+        const idx = {};
+        VISIT_IMPORT_COLS.forEach(([key, label]) => { const i = head.indexOf(label); if(i >= 0) idx[key] = i; });
+        if(idx.date == null || idx.teacher == null){
+          box.innerHTML = '<div class="note warn">' + ICON.alert + ' لم يُعثر على عمودَي <b>التاريخ</b> و<b>اسم المعلمة</b>. استخدمي القالب كما هو.</div>';
+          btn.disabled = true; return;
+        }
+        const bad = [];
+        grid.slice(1).forEach((rw, i) => {
+          const rec = {};
+          Object.keys(idx).forEach(k => rec[k] = rw[idx[k]] || '');
+          if(!parseAnyDate(rec.date) || !String(rec.teacher).trim()) bad.push(i + 2);
+          else rows.push(rec);
+        });
+        box.innerHTML =
+          '<div class="note">' + ICON.checkCircle + ' جاهز للاستيراد: <b>' + rows.length + '</b> زيارة' +
+            (bad.length ? ' · <span style="color:var(--alert)">تُستثنى الأسطر ' + bad.join(', ') + ' (تاريخ أو اسم ناقص)</span>' : '') + '</div>' +
+          (rows.length ? '<div class="tbl-wrap" style="margin-top:10px;max-height:210px;overflow:auto">' +
+            '<table class="tbl"><thead><tr><th>التاريخ</th><th>المعلمة</th><th>المادة</th><th>الصف</th><th>الحصة</th><th>نوع الزيارة</th></tr></thead><tbody>' +
+            rows.slice(0, 12).map(x => '<tr><td class="mono">' + h(parseAnyDate(x.date)) + '</td><td>' + h(x.teacher) +
+              '</td><td>' + h(x.subject || '—') + '</td><td class="mono">' + h(x.grade || '—') + '</td>' +
+              '<td class="mono">' + h(x.period || '—') + '</td><td>' + h(x.type || 'Short Visit') + '</td></tr>').join('') +
+            '</tbody></table></div>' + (rows.length > 12 ? '<p class="hint" style="margin-top:6px">تُعرض أول ١٢ سطرًا فقط.</p>' : '') : '');
+        btn.disabled = !rows.length;
+        $('#ivCount', r).textContent = rows.length ? rows.length + ' زيارة' : '';
+      };
+      $('#ivText', r).oninput = preview;
+      $('#ivTpl', r).onclick = () => { downloadFile('قالب-استيراد-الزيارات.csv', visitImportTemplate()); toast('تم تنزيل القالب', 'ok'); };
+      $('#ivPick', r).onclick = () => $('#ivFile', r).click();
+      $('#ivFile', r).onchange = () => {
+        const f = $('#ivFile', r).files[0]; if(!f) return;
+        const fr = new FileReader();
+        fr.onload = () => { $('#ivText', r).value = fr.result; preview(); };
+        fr.onerror = () => toast('تعذّرت قراءة الملف', 'err');
+        fr.readAsText(f, 'utf-8');
+      };
+      $('#ivGo', r).onclick = () => {
+        const c = {teachers:0, visits:0};
+        rows.forEach(rec => importVisitRow(rec, c));
+        closeModal();
+        toast('تم استيراد ' + c.visits + ' زيارة' + (c.teachers ? ' وإضافة ' + c.teachers + ' معلمة' : ''), 'ok');
+        state.date = ''; render();
+      };
+    }
+  });
+}
+
 /* ── bulk import of teacher names ── */
 function openImportTeachers(){
   openModal({
@@ -4285,6 +4449,7 @@ VIEWS.settings = function(){
       '<button class="btn" id="stImportBtn">' + ICON.upload + ' استعادة نسخة احتياطية</button>' +
       '<input type="file" id="stImport" accept="application/json" class="hidden">' +
       '<button class="btn" id="stCsv">' + ICON.download + ' تصدير الزيارات CSV</button>' +
+      '<button class="btn" id="stImpVisits">' + ICON.upload + ' استيراد زيارات سابقة</button>' +
       '<button class="btn" id="stDemo">' + ICON.users + ' تحميل بيانات تجريبية</button>' +
       '<button class="btn danger" id="stReset">' + ICON.trash + ' حذف جميع البيانات</button>' +
     '</div>' +
@@ -4391,6 +4556,7 @@ VIEWS.after_settings = function(){
     fr.readAsText(file);
   };
   $('#stCsv').onclick = exportVisitsCSV;
+  $('#stImpVisits').onclick = openImportVisits;
   $('#stDemo').onclick = loadDemoData;
   $('#stReset').onclick = () => confirmDialog('حذف جميع البيانات',
     'سيتم حذف جميع المعلمات والزيارات والتقييمات والإعدادات نهائيًا من هذا الجهاز. يُنصح بتصدير نسخة احتياطية أولًا.',
