@@ -143,6 +143,31 @@ a{color:var(--olive-d);text-decoration:none}
 .page-title{font-size:19px;font-weight:800;color:var(--ink);line-height:1.4}
 .page-title .sub{display:block;font-size:12px;font-weight:400;color:var(--ink-3);margin-top:1px}
 .page-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* ── quick visit · the 3-minute entry screen ── */
+.qv-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;background:var(--ivory-2);
+  border:1px solid var(--line);border-radius:var(--r-sm);margin-bottom:12px}
+.qv-bar .t{font-size:12px;color:var(--ink-2)}
+.qv-clock{margin-inline-start:auto;font-size:12.5px;font-weight:700;color:var(--olive);
+  direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.qv-clock.over{color:var(--rust)}
+.pickrow{display:flex;flex-wrap:wrap;gap:5px}
+.pickrow button{padding:6px 11px;font-size:12px;border:1px solid var(--line);border-radius:999px;
+  background:var(--white);color:var(--ink-2);line-height:1.5}
+.pickrow button:hover{border-color:var(--olive-3);background:var(--ivory-2)}
+.pickrow button.on{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:700}
+.pickrow button.lv1.on{background:#2f6b45;border-color:#2f6b45}
+.pickrow button.lv5.on,.pickrow button.lv6.on{background:var(--rust);border-color:var(--rust)}
+.qv-std{border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;margin-bottom:9px;background:var(--white)}
+.qv-std > .hd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.qv-std > .hd b{font-size:12.5px;color:var(--ink)}
+.qv-std > .hd .code{font-size:11px;font-weight:700;color:var(--olive);direction:ltr;unicode-bidi:isolate;
+  background:var(--ivory-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px}
+.qv-std textarea{min-height:52px}
+.qv-phr{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.qv-phr button{font-size:11px;padding:4px 9px;border:1px dashed var(--line);border-radius:999px;
+  background:var(--ivory);color:var(--ink-3);text-align:start;line-height:1.5;max-width:100%}
+.qv-phr button:hover{border-style:solid;border-color:var(--olive-3);color:var(--ink-2);background:var(--white)}
+
 .scope-pick{display:inline-flex;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;background:var(--white)}
 .scope-pick button{padding:8px 13px;font-size:12.5px;color:var(--ink-2);border-inline-start:1px solid var(--line-2)}
 .scope-pick button:first-child{border-inline-start:none}
@@ -1202,6 +1227,59 @@ const REVIEW_STD = [
 const REVIEW_BANDS = [['الجميع تقريبًا','>90%'], ['معظم','75–90%'], ['أغلبية كبيرة','61–74%'],
   ['أغلبية','50–60%'], ['أقلية كبيرة','31–49%'], ['أقلية','16–30%'], ['قليل','≤15%']];
 const REVIEW_LEVELS = ['ممتاز', 'جيد جدًا', 'جيد', 'مقبول', 'ضعيف', 'ضعيف جدًا'];
+/* Ready evidence sentences, in the wording these cards already use — one tap
+   drops a sentence into the box, which stays fully editable. */
+const REVIEW_PHRASES = {
+  s31: ['بداية فعّالة بقواعد واضحة وتوضيح المتوقع من الطالبات.',
+        'نمذجة المهارة المستهدفة خطوة بخطوة قبل تكليف الطالبات بها.',
+        'الأنشطة بدأت دون توضيح الغرض والتعليمات والمخرج المتوقع.',
+        'استراتيجيات متنوعة وموارد مناسبة أسهمت في مشاركة الطالبات.',
+        'الانتقالات بين الأنشطة متسارعة وأثّرت في الفهم والتركيز.',
+        'الأسئلة لم تتجاوز التذكر والفهم المباشر إلى التفسير والتعليل.',
+        'أسئلة متدرجة من المباشر إلى الاستنتاج والتعليل، مع وقت انتظار.',
+        'معظم الحصة بقيادة المعلمة، والمسؤولية المعرفية لدى المعلمة أكثر.'],
+  s13: ['شاركت ___ طالبة من ___ بفاعلية.',
+        'عملت الطالبات في مجموعات بأدوار محددة وتحمّلن المسؤولية.',
+        'فرص النقاش بقيادة الطالبات والتقييم الذاتي محدودة.',
+        'عللت الطالبات آراءهن واستشهدن بالنص/بالدليل.',
+        'طرحت الطالبات أسئلة من تلقاء أنفسهن.',
+        'اقتصر دور الطالبات على الاستماع أو القراءة دون عمل مستقل.'],
+  s11: ['استنتاج: لا أدلة مدوّنة على مستوى الطالبات قياسًا إلى المنهاج؛ يُفترض المتوقع.',
+        'أظهرت غالبية الطالبات مستوى يتناسب مع توقعات المنهاج.',
+        'أجابت ___ من ___ إجابات صحيحة عن سؤال المهارة المستهدفة.',
+        'مستوى معظم الطالبات ضمن المتوقع لا فوقه.',
+        'تفاوت واضح بين الطالبات في إتقان المهارة المستهدفة.'],
+  s12: ['تحسّن أداء الطالبات بعد النمذجة والتغذية الراجعة.',
+        'ارتفعت الإجابة الصحيحة من ___ في التهيئة إلى ___ في بطاقة الخروج.',
+        'لم تُسجَّل نسبة من حققن الهدف، فلا تتوفر أدلة على التقدم.',
+        'التقدم غير متساوٍ بين الفئات المختلفة.',
+        'لم يُتح وقت كافٍ للختام والتحقق من تحقق الهدف.'],
+  s32: ['تحقق مستمر من فهم الطالبات أثناء الحصة.',
+        'بطاقة خروج قصيرة في ختام الحصة لقياس تحقق الهدف.',
+        'الإجابات لم تُراجع أو تُصحَّح باستمرار مما قد يرسّخ مفاهيم خاطئة.',
+        'تغذية راجعة مكتوبة محددة تخبر الطالبة بخطوتها التالية.',
+        'تقييم أقران بمعايير نجاح واضحة.',
+        'استنتاج: لا أدلة مدوّنة على تغذية راجعة.'],
+  s42: ['مهام متمايزة بثلاثة مستويات (دعم، أساسي، إثرائي).',
+        'استنتاج: لم تُذكر مهام متمايزة؛ المهمة نفسها لجميع الطالبات.',
+        'دعم مباشر من المعلمة لمجموعة الطالبات المتعثرات.',
+        'التحدي المقدم للمتفوقات محدود.',
+        'لا بدائل لمن واجهن صعوبة في الوصول إلى المهمة.'],
+  s52: ['شاركت ___ من ___ (___%) عبر الاستدعاء بالاسم/الاختيار العشوائي.',
+        'بيئة صفية آمنة يسودها الاحترام والتعاون.',
+        'دعم مكيّف لطالبة من أصحاب الهمم.',
+        'مشاركة محدودة لبعض الطالبات مقارنة بزميلاتهن؛ تلزم استراتيجيات مشاركة شاملة.',
+        'استنتاج: لم يُرصد في الزيارة؛ من محاور الزيارة القادمة.'],
+};
+const QV_DIST = ['وضوح نواتج التعلم وربطها بالأنشطة.', 'نمذجة المهارة قبل التكليف بها.',
+  'تقييم تكويني مستمر وتغذية راجعة محددة.', 'تعلم تعاوني منظم بأدوار محددة.',
+  'توظيف فاعل للتقنية في التعلم.', 'بيئة صفية آمنة ومشاركة واسعة.'];
+const QV_PRIO = ['تقديم كل نشاط بغرضه وتعليماته والمخرج المتوقع.',
+  'نمذجة المهارة المستهدفة قبل تنفيذ المهمة.',
+  'رفع المشاركة إلى جميع الطالبات (استدعاء بالاسم، وقت انتظار).',
+  'زيادة أسئلة التفكير العليا والتعليل.',
+  'تمايز المهام وفق مستويات الطالبات.',
+  'تخصيص وقت للختام والتحقق من تحقق الهدف.'];
 const REVIEW_REASONS = ['تقييمية', 'تطويرية', 'متابعة', 'مشتركة'];
 const REVIEW_FOCUS = 'التركيز في الحكم: ماذا تعلّمت الطالبات؟ وما الدليل على أثر التدريس والتقييم؟ — الحكم يستند إلى شواهد تعلم فعلية، ولا يكفي تنفيذ النشاط أو مجرد مشاركة الطالبات؛ وقياس الاتجاهات عبر الزمن يحتاج أيضًا إلى مراجعة الأعمال ونتائج التقييم خارج الحصة.';
 const REVIEW_RULE = 'أفضل انطباق لا متوسط حسابي · «جيد» هو المستوى المتوقع و«مقبول» هو الحد الأدنى · التقدير العام لا يتجاوز تقدير التقدم.';
@@ -1687,6 +1765,25 @@ const Model = {
       notesPending: visits.filter(v => STAGE_INDEX[this.computeStage(v)] >= STAGE_INDEX.visited && !(v.admin && v.admin.current)).length,
     };
   },
+  /* Never substitute a name for an observer the source left blank */
+  observerOf(v){
+    if(v && Array.isArray(v.dataGaps) && v.dataGaps.indexOf('observer') >= 0) return v.observer || '—';
+    return (v && v.observer) || S().observer || '—';
+  },
+  /* Best fit across the seven, never an average, and never above 1.2 progress */
+  suggestOverall(rows){
+    const vals = REVIEW_STD.map(st => (rows[st.id] || {}).level).filter(Boolean);
+    if(!vals.length) return '';
+    const n = {}; vals.forEach(v => n[v] = (n[v] || 0) + 1);
+    let best = vals[0], bi = REVIEW_LEVELS.indexOf(vals[0]);
+    Object.keys(n).forEach(k => {
+      const i = REVIEW_LEVELS.indexOf(k);
+      if(n[k] > n[best] || (n[k] === n[best] && i > bi)){ best = k; bi = i; }
+    });
+    const prog = (rows.s12 || {}).level;
+    if(prog && REVIEW_LEVELS.indexOf(prog) > bi) return prog;   /* cannot exceed progress */
+    return best;
+  },
   /* Records whose source document left header fields blank — never guessed */
   incompleteVisits(){
     return DB().visits.filter(v => v.status !== 'Cancelled' &&
@@ -1948,7 +2045,8 @@ VIEWS.dashboard = function(){
           '<button class="' + (state.scope === x[0] ? 'on' : '') + '" data-scope="' + x[0] + '">' + h(x[1]) + '</button>').join('') +
       '</div>' +
       '<button class="btn" data-nav="daily">' + ICON.calendar + ' الزيارات اليومية</button>' +
-      '<button class="btn primary" id="dashAdd">' + ICON.plus + ' إضافة زيارة صفية</button>' +
+      '<button class="btn" id="dashAdd">' + ICON.plus + ' إضافة زيارة صفية</button>' +
+      '<button class="btn primary" id="dashQuick">' + ICON.check + ' زيارة سريعة</button>' +
     '</div></div>' +
 
   '<div class="stat-grid">' +
@@ -2028,6 +2126,7 @@ VIEWS.after_dashboard = function(){
   $$('#view [data-scope]').forEach(b => b.onclick = () => { state.scope = b.dataset.scope; render(); });
   $$('#view [data-fixgap]').forEach(b => b.onclick = () => openVisitForm(b.dataset.fixgap));
   const add = $('#dashAdd'); if(add) add.onclick = () => openVisitForm(null, todayISO());
+  const q = $('#dashQuick'); if(q) q.onclick = () => openQuickVisit({date: todayISO()});
   $$('#view [data-teacher]').forEach(b => b.onclick = () => go('teacher', b.dataset.teacher));
   bindMiniTable();
 };
@@ -2328,6 +2427,184 @@ function periodOptions(sel){
   return optionList(out, sel, 'اختاري الحصة');
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   QUICK VISIT · one screen, taps instead of typing, target 3 minutes
+   ═══════════════════════════════════════════════════════════════ */
+function openQuickVisit(prefill){
+  prefill = prefill || {};
+  if(!Model.activeTeachers().length){
+    return openModal({title:'لا توجد معلمات مسجلة', size:'narrow',
+      body:'<p style="font-size:12.5px;line-height:1.9">أضيفي المعلمات أولًا من صفحة المعلمات، ثم تصبح الزيارة السريعة جاهزة بنقرات.</p>',
+      foot:'<button class="btn" data-close="1">إغلاق</button><button class="btn primary" id="qT">' + ICON.users + ' إدارة المعلمات</button>',
+      onMount(r){ $('#qT', r).onclick = () => { closeModal(); go('teachers'); }; }});
+  }
+  const s = S();
+  const v = Model.blankVisit(prefill.date || todayISO());
+  v.teacherId = prefill.teacherId || '';
+  v.period = prefill.period || '';
+  v.type = 'Formal Observation';
+  const R = v.review;
+
+  const pick = (name, items, sel, cls) =>
+    '<div class="pickrow" data-pick="' + name + '">' + items.map((x, i) => {
+      const val = Array.isArray(x) ? x[0] : x, lab = Array.isArray(x) ? x[1] : x;
+      return '<button type="button" class="' + (cls ? cls + (i+1) : '') + (val === sel ? ' on' : '') +
+             '" data-val="' + h(val) + '">' + h(lab) + '</button>';
+    }).join('') + '</div>';
+
+  const stdBlock = std =>
+    '<div class="qv-std" data-std="' + std.id + '">' +
+      '<div class="hd"><span class="code">' + h(std.code) + '</span><b>' + h(std.ar) + '</b></div>' +
+      pick('lv|' + std.id, REVIEW_LEVELS, '', 'lv') +
+      '<textarea data-note="' + std.id + '" style="margin-top:8px" placeholder="شاهد واحد يكفي — انقري عبارة جاهزة ثم عدّليها."></textarea>' +
+      '<div class="qv-phr">' + (REVIEW_PHRASES[std.id] || []).map(t =>
+        '<button type="button" data-phr="' + h(std.id) + '">' + h(t) + '</button>').join('') + '</div>' +
+    '</div>';
+
+  const body =
+    '<div class="qv-bar"><span class="t">' + ICON.info +
+      ' اختاري، ثم انقري التقدير وعبارة جاهزة لكل معيار. الحقول المتروكة فارغة تبقى فارغة ولا تُخمَّن.</span>' +
+      '<span class="qv-clock" id="qvClock">0:00</span></div>' +
+
+    '<div class="form-grid">' +
+      '<div class="field"><label>المعلمة <span class="req">*</span></label><select id="qTeacher">' +
+        optionList(Model.activeTeachers().map(t => [t.id, t.name + (t.subject ? ' — ' + t.subject : '')]), v.teacherId, 'اختاري المعلمة') + '</select></div>' +
+      '<div class="field"><label>التاريخ</label><input type="date" id="qDate" value="' + h(v.date) + '"></div>' +
+      '<div class="field"><label>الملاحِظة</label><input type="text" id="qObserver" value="' + h(s.observer || '') + '"></div>' +
+    '</div>' +
+
+    '<div class="field" style="margin-top:11px"><label>الحصة <span class="req">*</span></label>' +
+      pick('period', Array.from({length: s.periods || 8}, (_, i) => String(i+1)), v.period) + '</div>' +
+
+    '<div class="form-grid" style="margin-top:11px">' +
+      '<div class="field"><label>المادة</label><select id="qSubject">' + optionList(s.subjects, '', 'المادة') + '</select></div>' +
+      '<div class="field"><label>الصف</label><select id="qGrade">' + optionList(s.grades, '', 'الصف') + '</select></div>' +
+      '<div class="field"><label>الشعبة</label><select id="qClass">' + optionList(s.classes, '', 'الشعبة') + '</select></div>' +
+    '</div>' +
+
+    '<div class="field" style="margin-top:11px"><label>عنوان الدرس والأهداف</label>' +
+      '<input type="text" id="qTopic" placeholder="عنوان الدرس وهدفه في سطر"></div>' +
+
+    '<div class="field" style="margin-top:11px"><label>سبب الزيارة</label>' + pick('reason', REVIEW_REASONS, '') + '</div>' +
+
+    '<div class="section-title" style="margin-top:16px">' + ICON.clipboard + ' المعايير السبعة <span class="en">· tap a judgement, tap a sentence</span></div>' +
+    REVIEW_STD.map(stdBlock).join('') +
+
+    '<div class="qv-std" style="border-color:var(--olive-3)">' +
+      '<div class="hd"><b>التقدير العام للحصة</b><span class="hint" id="qvHint"></span></div>' +
+      pick('overall', REVIEW_LEVELS, '', 'lv') +
+      '<p class="hint" style="margin-top:7px">' + h(REVIEW_RULE) + '</p>' +
+      '<div class="form-grid two" style="margin-top:10px">' +
+        '<div class="field"><label>نقطة التميز</label><textarea id="qDist" style="min-height:54px"></textarea>' +
+          '<div class="qv-phr">' + QV_DIST.map(t => '<button type="button" data-phr2="qDist">' + h(t) + '</button>').join('') + '</div></div>' +
+        '<div class="field"><label>الأولوية التطويرية</label><textarea id="qPrio" style="min-height:54px"></textarea>' +
+          '<div class="qv-phr">' + QV_PRIO.map(t => '<button type="button" data-phr2="qPrio">' + h(t) + '</button>').join('') + '</div></div>' +
+      '</div>' +
+    '</div>';
+
+  openModal({
+    title:'زيارة سريعة', sub:'تعبئة كاملة بالنقر — الهدف ثلاث دقائق', size:'wide', body,
+    foot:'<button class="btn" data-close="1">إلغاء</button>' +
+         '<button class="btn primary" id="qSave">' + ICON.check + ' حفظ الزيارة</button>',
+    onMount(r){
+      const t0 = Date.now();
+      const clock = $('#qvClock', r);
+      const tick = setInterval(() => {
+        if(!document.body.contains(clock)) return clearInterval(tick);
+        const sec = Math.floor((Date.now() - t0) / 1000);
+        clock.textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
+        clock.classList.toggle('over', sec > 180);
+      }, 1000);
+
+      const state = {period:'', reason:'', overall:'', overallTouched:false, lv:{}};
+      const refreshOverall = () => {
+        if(state.overallTouched) return;
+        const rows = {}; Object.keys(state.lv).forEach(k => rows[k] = {level: state.lv[k]});
+        const sug = Model.suggestOverall(rows);
+        state.overall = sug;
+        $$('[data-pick="overall"] button', r).forEach(b => b.classList.toggle('on', b.dataset.val === sug));
+        $('#qvHint', r).textContent = sug ? 'مقترح تلقائيًا من المعايير — يمكن تغييره' : '';
+      };
+
+      $$('[data-pick]', r).forEach(group => {
+        const name = group.dataset.pick;
+        group.onclick = e => {
+          const b = e.target.closest('button'); if(!b) return;
+          const already = b.classList.contains('on');
+          $$('button', group).forEach(x => x.classList.remove('on'));
+          if(!already) b.classList.add('on');
+          const val = already ? '' : b.dataset.val;
+          if(name === 'period') state.period = val;
+          else if(name === 'reason') state.reason = val;
+          else if(name === 'overall'){ state.overall = val; state.overallTouched = true; $('#qvHint', r).textContent = ''; }
+          else if(name.startsWith('lv|')){
+            const sid = name.slice(3);
+            if(val) state.lv[sid] = val; else delete state.lv[sid];
+            refreshOverall();
+          }
+        };
+      });
+
+      /* tapping a ready sentence appends it to its box */
+      const append = (el, txt) => {
+        const cur = el.value.trim();
+        el.value = cur ? cur + ' ' + txt : txt;
+        el.focus(); el.selectionStart = el.selectionEnd = el.value.length;
+      };
+      $$('[data-phr]', r).forEach(b => b.onclick = () =>
+        append($('textarea[data-note="' + b.dataset.phr + '"]', r), b.textContent));
+      $$('[data-phr2]', r).forEach(b => b.onclick = () => append($('#' + b.dataset.phr2, r), b.textContent));
+
+      /* picking the teacher fills in her subject and grade */
+      const tSel = $('#qTeacher', r);
+      tSel.onchange = () => {
+        const t = Model.teacher(tSel.value); if(!t) return;
+        if(t.subject && !$('#qSubject', r).value) $('#qSubject', r).value = t.subject;
+        if((t.grades || []).length && !$('#qGrade', r).value) $('#qGrade', r).value = t.grades[0];
+        if((t.classes || []).length && !$('#qClass', r).value) $('#qClass', r).value = t.classes[0];
+      };
+      if(v.teacherId){ tSel.value = v.teacherId; tSel.onchange(); }
+
+      const save = () => {
+        if(!tSel.value) return toast('اختاري المعلمة أولًا', 'warn');
+        if(!state.period) return toast('اختاري الحصة', 'warn');
+        v.teacherId = tSel.value;
+        v.date = $('#qDate', r).value || todayISO();
+        v.observer = $('#qObserver', r).value.trim();
+        v.period = state.period;
+        v.subject = $('#qSubject', r).value;
+        v.grade = $('#qGrade', r).value;
+        v.cls = $('#qClass', r).value;
+        v.topic = $('#qTopic', r).value.trim();
+        v.objective = v.topic;
+        v.startTime = s.periodTimes[v.period] || '';
+        R.reason = state.reason;
+        R.overall = state.overall;
+        R.rows = {};
+        REVIEW_STD.forEach(st => {
+          const note = ($('textarea[data-note="' + st.id + '"]', r).value || '').trim();
+          const lvl = state.lv[st.id] || '';
+          if(note || lvl) R.rows[st.id] = {note, level: lvl, band: ''};
+        });
+        R.distinction = $('#qDist', r).value.trim();
+        R.priority = $('#qPrio', r).value.trim();
+        v.strengths = R.distinction;
+        v.development = R.priority;
+        v.status = 'Completed';
+        v.completedAt = nowISO();
+        Model.saveVisit(v);
+        clearInterval(tick);
+        const sec = Math.floor((Date.now() - t0) / 1000);
+        closeModal(); render();
+        toast('حُفظت الزيارة ' + v.code + ' — ' + Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'), 'ok');
+      };
+      $('#qSave', r).onclick = save;
+      r.addEventListener('keydown', e => { if((e.ctrlKey || e.metaKey) && e.key === 'Enter') save(); });
+      setTimeout(() => tSel.focus(), 60);
+    }
+  });
+}
+
 function openVisitForm(visitId, dateISO, opts){
   opts = opts || {};
   const editing = !!visitId;
@@ -2615,7 +2892,7 @@ function openVisitRecord(id, focusSection){
     '<div><div class="k en">Visit Time</div><div class="v mono">' + fmtTime(v.startTime || s.periodTimes[v.period]) + '</div></div>' +
     '<div><div class="k en">Duration</div><div class="v mono">' + h(v.duration || '—') + ' min</div></div>' +
     '<div><div class="k en">Visit Type</div><div class="v en">' + h(v.type) + '</div></div>' +
-    '<div><div class="k en">Observer</div><div class="v">' + h(v.observer || s.observer) + '</div></div>' +
+    '<div><div class="k en">Observer</div><div class="v">' + h(Model.observerOf(v)) + '</div></div>' +
     '<div><div class="k en">Lesson / Topic</div><div class="v">' + h(v.topic || '—') + '</div></div>' +
     '<div><div class="k en">Printed</div><div class="v">' + (v.printedAt ? 'نعم — ' + (v.printCount||1) + '×' : 'لم يُطبع بعد') + '</div></div>' +
     '<div><div class="k en">Evaluation</div><div class="v">' + (ev ? (ev.status === 'Completed' ? 'مكتمل' : 'مسودة') : 'لم يُنشأ') + '</div></div>' +
@@ -2915,7 +3192,7 @@ function visitFormSheet(v){
     printHeader('نموذج الزيارة الصفية', 'Classroom Visit Form', [
       '<span class="pr-idbox"><span class="en">Visit ID:</span> <b>' + h(v.code) + '</b></span>',
       '<span class="en">Academic Year:</span> <b>' + h(s.academicYear) + '</b>',
-      '<span class="en">Observer:</span> <b>' + h(v.observer || s.observer) + '</b>'
+      '<span class="en">Observer:</span> <b>' + h(Model.observerOf(v)) + '</b>'
     ]) +
     '<div class="pr-sec"><h4>Visit Information — بيانات الزيارة</h4>' +
       '<div class="pr-fields c3">' +
@@ -2927,7 +3204,7 @@ function visitFormSheet(v){
         fld('Visit Time', time ? fmtTime(time) : '', false, true) +
         fld('Visit Type', v.type, false, true) +
         fld('Duration', v.duration ? v.duration + ' minutes' : '', false, true) +
-        fld('Observer', v.observer || s.observer) +
+        fld('Observer', Model.observerOf(v)) +
         fld('Lesson Topic', v.topic, true) +
       '</div></div>' +
     '<div class="pr-sec"><h4>Focus of Visit — محاور الزيارة</h4>' +
@@ -2963,13 +3240,13 @@ function visitRecordSheet(v){
       '<span class="pr-idbox"><span class="en">Visit ID:</span> <b>' + h(v.code) + '</b></span>',
       '<span class="en">Teacher:</span> <b>' + h(t ? t.name : '—') + '</b>',
       '<span class="en">Date:</span> <b>' + h(fmtDate(v.date)) + '</b>',
-      '<span class="en">Observer:</span> <b>' + h(v.observer || s.observer) + '</b>'
+      '<span class="en">Observer:</span> <b>' + h(Model.observerOf(v)) + '</b>'
     ]) +
     '<div class="pr-sec"><h4>Visit Information — بيانات الزيارة</h4><div class="pr-fields">' +
       fld('Teacher Name', t ? t.name : '') + fld('Subject', v.subject) +
       fld('Grade / Class', v.grade ? v.grade + ' / ' + v.cls : '', false, true) + fld('Date', fmtDate(v.date), false, true) +
       fld('Period', v.period, false, true) + fld('Duration', v.duration ? v.duration + ' min' : '', false, true) +
-      fld('Visit Type', v.type, false, true) + fld('Observer', v.observer || s.observer) +
+      fld('Visit Type', v.type, false, true) + fld('Observer', Model.observerOf(v)) +
       fld('Lesson Topic', v.topic, true) +
       fld('Workflow Stage', st.en) + fld('Feedback', v.feedbackStatus) +
       fld('Follow-up', v.followUp + (v.followUpDate ? ' — ' + fmtDate(v.followUpDate) : ''), true) +
@@ -3224,7 +3501,7 @@ function reviewCardSheet(v){
     '</div>' +
     '<div class="rv-focus">' + h(REVIEW_FOCUS) + '</div>' +
     '<div class="rv-row">' +
-      rvField('اسم الملاحِظة', v.observer || S().observer, 30, true) +
+      rvField('اسم الملاحِظة', Model.observerOf(v), 30, true) +
       rvField('الوظيفة', obsRole, 28) +
       '<div class="rv-f" style="width:42%"><span class="k">سبب الزيارة</span>' +
         rvPick(REVIEW_REASONS, r.reason, 'r') + '</div>' +
@@ -3359,7 +3636,7 @@ function teacherReportSheet(v){
     nbSec('7', 'الإجراء التطويري والمتابعة', 'Action and follow-up', action) +
     (ev && ev.observerComments ? nbSec('8', 'تعليق الملاحِظة', 'Observer comment', nbFilled(10, ev.observerComments)) : '') +
     '<div class="nb-foot">' +
-      '<div>توقيع الملاحِظة · ' + h(v.observer || S().observer) + '</div>' +
+      '<div>توقيع الملاحِظة · ' + h(Model.observerOf(v)) + '</div>' +
       '<div>توقيع المعلمة</div><div>تاريخ التغذية الراجعة</div>' +
     '</div>' +
   '</div>';
