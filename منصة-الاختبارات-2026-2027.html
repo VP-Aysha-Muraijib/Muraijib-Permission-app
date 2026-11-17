@@ -75,6 +75,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
 <div class="hint no-print">النماذج معبّأة بالبيانات الثابتة وقابلة للتعبئة الإلكترونية — اكتبي في أي خانة، فعّلي مربعات الاختيار، ثم اطبعي النموذج أو احفظيه PDF.</div>
 <main><div class="view" id="v-before"><section class="formcard" id="F-01">
       <div class="fc-head no-print"><div class="fc-id">F-01</div><div class="fc-ti">تشكيل اللجان وتوزيع المهام والبدلاء</div><button class="pbtn" onclick="printForm('F-01')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-01</span> تشكيل اللجان وتوزيع المهام والبدلاء</div>
@@ -85,16 +86,18 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-02">
       <div class="fc-head no-print"><div class="fc-id">F-02</div><div class="fc-ti">تعهد السرية وعدم وجود مانع/صلة قرابة</div><button class="pbtn" onclick="printForm('F-02')">🖨 طباعة هذا النموذج</button></div>
+      <div class="picker no-print"><span class="pl">اختاري المعلمة لتعبئة التعهد ببياناتها (من منظومة الاحتياط الذكية):</span><select id="f02sel" onchange="fillF02(this.value)"></select><button class="pbtn2" onclick="printForm(&quot;F-02&quot;)">🖨 طباعة تعهد المعلمة المحددة</button><button class="pbtn2" onclick="printAllF02()">🖨 طباعة تعهدات جميع المعلمات</button></div>
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-02</span> تعهد السرية وعدم وجود مانع/صلة قرابة</div>
         <div class="frule"></div><div class="formsub">يوقعه جميع المكلفين بأعمال الاختبارات وفق الضوابط</div>
         <table class="t"><tr><th class="">العام الدراسي</th><th class="">المدرسة</th><th class="">الفرع / النطاق</th><th class="">الفصل / الفترة</th></tr>
-    <tr><td class="e" contenteditable="true">2026 / 2027</td><td class="e" contenteditable="true">مدرسة مريجب — حلقة ثانية</td><td class="e" contenteditable="true">AD 2.6</td><td class="e" contenteditable="true">الفصل الدراسي الأول</td></tr></table><table class="t"><tr><th class="">الاسم</th><th class="">المسمى الوظيفي</th><th class="">الرقم الوظيفي</th><th class="">المهمة</th></tr><tr><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td></tr></table><div class="lead">أتعهد بما يلي:</div><ul class="bl"><li>عدم وجود موانع من وضع اختبار كصلة قرابة من الدرجتين الأولى والثانية (الابن، الابنة، الأب، الأم، الزوج، الزوجة، الحفيد، الحفيدة، الأخ، الأخت) للصف الثاني عشر.</li><li>عدم وجود موانع اختبارية بسبب صلة قرابة من الدرجة الأولى (الابن، الابنة، الأب، الأم، الزوج، الزوجة) للصفوف من الثالث إلى الحادي عشر.</li><li>الالتزام بما ورد في قوانين الموارد البشرية الخاصة في الحكومة الاتحادية بسرية التعامل مع الوثائق الاختبارية، بما يضمن سلامة الإجراءات المنظمة وتوثيقها.</li><li>عدم الإفصاح عن أية بيانات أو إحصائيات أو نتائج قبل موعد اعتمادها رسمياً.</li><li>اطلعت على جميع اللوائح والنظم والقوانين المنظمة لأعمال الاختبارات والمرسوم بقانون اتحادي رقم (33) لسنة 2023 في شأن مكافحة الغش والإخلال بنظام الاختبارات والدليل الصادر بشأنه، وألتزم بوثيقة السلوك المهني والأخلاقي، وأتعهد بأداء واجباتي الوظيفية بأمانة ونزاهة وموضوعية، وستكون ممارستي في حدود الصلاحيات والاختصاصات المنوطة بي.</li><li>أتحمل المسؤولية عند حدوث أي تقصير في المهام والمسؤوليات، أو مخالفة التنظيمات واللوائح الاختبارية.</li></ul><div class="note">كما أتعهد بالمحافظة على سرية المواد والبيانات والنتائج وعدم تداولها أو تصويرها أو مشاركتها عبر قنوات غير مصرح بها، والإفصاح فوراً عند وجود أي مانع أو تعارض مصلحة، وتوثيق أي حالة أو مخالفة تقع أثناء العمل.</div><table class="t"><tr><th class="">الصفوف والمسار التي يوجد بها مانع</th><th class="">تفاصيل المانع / صلة القرابة</th><th class="">الإجراء / إعادة التوزيع</th></tr><tr><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td></tr></table><div class="sigline">الاسم: ____________________  التاريخ: ____ / ____ / ______  التوقيع: ________________</div>
+    <tr><td class="e" contenteditable="true">2026 / 2027</td><td class="e" contenteditable="true">مدرسة مريجب — حلقة ثانية</td><td class="e" contenteditable="true">AD 2.6</td><td class="e" contenteditable="true">الفصل الدراسي الأول</td></tr></table><table class="t"><tr><th class="">الاسم</th><th class="">المسمى الوظيفي</th><th class="">الرقم الوظيفي</th><th class="">المهمة</th></tr><tr><td class="e" id="f02-name" contenteditable="true"></td><td class="e" id="f02-title" contenteditable="true"></td><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td></tr></table><div class="lead">أتعهد بما يلي:</div><ul class="bl"><li>عدم وجود موانع من وضع اختبار كصلة قرابة من الدرجتين الأولى والثانية (الابن، الابنة، الأب، الأم، الزوج، الزوجة، الحفيد، الحفيدة، الأخ، الأخت) للصف الثاني عشر.</li><li>عدم وجود موانع اختبارية بسبب صلة قرابة من الدرجة الأولى (الابن، الابنة، الأب، الأم، الزوج، الزوجة) للصفوف من الثالث إلى الحادي عشر.</li><li>الالتزام بما ورد في قوانين الموارد البشرية الخاصة في الحكومة الاتحادية بسرية التعامل مع الوثائق الاختبارية، بما يضمن سلامة الإجراءات المنظمة وتوثيقها.</li><li>عدم الإفصاح عن أية بيانات أو إحصائيات أو نتائج قبل موعد اعتمادها رسمياً.</li><li>اطلعت على جميع اللوائح والنظم والقوانين المنظمة لأعمال الاختبارات والمرسوم بقانون اتحادي رقم (33) لسنة 2023 في شأن مكافحة الغش والإخلال بنظام الاختبارات والدليل الصادر بشأنه، وألتزم بوثيقة السلوك المهني والأخلاقي، وأتعهد بأداء واجباتي الوظيفية بأمانة ونزاهة وموضوعية، وستكون ممارستي في حدود الصلاحيات والاختصاصات المنوطة بي.</li><li>أتحمل المسؤولية عند حدوث أي تقصير في المهام والمسؤوليات، أو مخالفة التنظيمات واللوائح الاختبارية.</li></ul><div class="note">كما أتعهد بالمحافظة على سرية المواد والبيانات والنتائج وعدم تداولها أو تصويرها أو مشاركتها عبر قنوات غير مصرح بها، والإفصاح فوراً عند وجود أي مانع أو تعارض مصلحة، وتوثيق أي حالة أو مخالفة تقع أثناء العمل.</div><table class="t"><tr><th class="">الصفوف والمسار التي يوجد بها مانع</th><th class="">تفاصيل المانع / صلة القرابة</th><th class="">الإجراء / إعادة التوزيع</th></tr><tr><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td><td class="e" contenteditable="true"></td></tr></table><div class="sigline">الاسم: ____________________  التاريخ: ____ / ____ / ______  التوقيع: ________________</div>
         <div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · F-02</div>
       </div>
     </section><section class="formcard" id="F-03">
       <div class="fc-head no-print"><div class="fc-id">F-03</div><div class="fc-ti">قائمة جاهزية القاعات والتقنية</div><button class="pbtn" onclick="printForm('F-03')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-03</span> قائمة جاهزية القاعات والتقنية</div>
@@ -105,6 +108,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-04">
       <div class="fc-head no-print"><div class="fc-id">F-04</div><div class="fc-ti">استلام وتسليم المواد والتذاكر</div><button class="pbtn" onclick="printForm('F-04')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-04</span> استلام وتسليم المواد والتذاكر</div>
@@ -115,6 +119,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-05">
       <div class="fc-head no-print"><div class="fc-id">F-05</div><div class="fc-ti">توزيع المراقبين والملاحظين</div><button class="pbtn" onclick="printForm('F-05')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-05</span> توزيع المراقبين والملاحظين</div>
@@ -125,6 +130,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section></div><div class="view" id="v-during"><section class="formcard" id="F-06">
       <div class="fc-head no-print"><div class="fc-id">F-06</div><div class="fc-ti">نموذج غياب / حالة استثنائية</div><button class="pbtn" onclick="printForm('F-06')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-06</span> نموذج غياب / حالة استثنائية</div>
@@ -134,6 +140,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-07">
       <div class="fc-head no-print"><div class="fc-id">F-07</div><div class="fc-ti">سجل خلل تقني</div><button class="pbtn" onclick="printForm('F-07')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-07</span> سجل خلل تقني</div>
@@ -144,6 +151,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-08">
       <div class="fc-head no-print"><div class="fc-id">F-08</div><div class="fc-ti">تقرير غش / إخلال بنظام الاختبارات لطالب</div><button class="pbtn" onclick="printForm('F-08')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-08</span> تقرير غش / إخلال بنظام الاختبارات لطالب</div>
@@ -153,6 +161,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-09">
       <div class="fc-head no-print"><div class="fc-id">F-09</div><div class="fc-ti">تقرير إخلال بنظام الاختبارات لموظف</div><button class="pbtn" onclick="printForm('F-09')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-09</span> تقرير إخلال بنظام الاختبارات لموظف</div>
@@ -162,6 +171,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section></div><div class="view" id="v-after"><section class="formcard" id="F-10">
       <div class="fc-head no-print"><div class="fc-id">F-10</div><div class="fc-ti">تقرير الإغلاق اليومي</div><button class="pbtn" onclick="printForm('F-10')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-10</span> تقرير الإغلاق اليومي</div>
@@ -172,6 +182,7 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section><section class="formcard" id="F-11">
       <div class="fc-head no-print"><div class="fc-id">F-11</div><div class="fc-ti">مراجعة واعتماد الدرجات</div><button class="pbtn" onclick="printForm('F-11')">🖨 طباعة هذا النموذج</button></div>
+      
       <div class="sheet">
         <div class="fcorner"></div>
         <div class="fhead"><span class="fcode">F-11</span> مراجعة واعتماد الدرجات</div>
@@ -182,41 +193,63 @@ ol.ol{margin:4px 20px;font-size:11.6px;line-height:1.7}ol.ol li{margin-bottom:4p
       </div>
     </section></div></main>
 <div id="printRoot"></div>
-<script>function show(p){
+<script>const TEACHERS=[{"n": "مريم خليفه", "t": "معلمة تربية إسلامية"}, {"n": "جميله الكعبي", "t": "معلمة تربية إسلامية"}, {"n": "موزه المضاوي", "t": "معلمة تربية إسلامية"}, {"n": "خوله البلوشي", "t": "معلمة تربية إسلامية"}, {"n": "موزه الشامسي", "t": "معلمة لغة عربية"}, {"n": "راوية الظاهري", "t": "معلمة لغة عربية"}, {"n": "جميله الدرمكي", "t": "معلمة لغة عربية"}, {"n": "سلامة العامري", "t": "معلمة لغة عربية"}, {"n": "شيخه الشامسي", "t": "معلمة لغة عربية"}, {"n": "عائشة الغيثي", "t": "معلمة لغة عربية"}, {"n": "مني صقر", "t": "معلمة لغة عربية"}, {"n": "ناعمة الكعبي", "t": "معلمة لغة إنجليزية"}, {"n": "شمسة عزيز", "t": "معلمة لغة إنجليزية"}, {"n": "فريال احمد", "t": "معلمة لغة إنجليزية"}, {"n": "Robyn Canau", "t": "معلمة لغة إنجليزية"}, {"n": "Bushra Khadem", "t": "معلمة لغة إنجليزية"}, {"n": "امنه الشامسي", "t": "معلمة لغة إنجليزية"}, {"n": "Sheejamol Babu", "t": "معلمة رياضيات"}, {"n": "Rahila Naseeha", "t": "معلمة رياضيات"}, {"n": "سامية يحيى", "t": "معلمة رياضيات"}, {"n": "نمارق عبدالله", "t": "معلمة رياضيات"}, {"n": "أمامه الفلالي", "t": "معلمة رياضيات"}, {"n": "سميه سليم", "t": "معلمة رياضيات"}, {"n": "كنة الشامسي", "t": "معلمة رياضيات"}, {"n": "مها النعيمي", "t": "معلمة علوم"}, {"n": "Anita Raja", "t": "معلمة علوم"}, {"n": "دارين محمد", "t": "معلمة علوم"}, {"n": "صالحه السبوسي", "t": "معلمة علوم"}, {"n": "فاطمة صبحي", "t": "معلمة علوم"}, {"n": "هند زيدان", "t": "معلمة علوم"}, {"n": "زلفه الظاهري", "t": "معلمة دراسات اجتماعية"}, {"n": "مريم العتيبه", "t": "معلمة دراسات اجتماعية"}, {"n": "الهن العفاري", "t": "معلمة دراسات اجتماعية"}, {"n": "حصة الاحبابي", "t": "معلمة تقنية معلومات"}, {"n": "سهيلة الكتبي", "t": "معلمة تقنية معلومات"}, {"n": "حصة السبوسي", "t": "معلمة تقنية معلومات"}, {"n": "حكيمة الهلالي", "t": "معلمة لغة فرنسية"}, {"n": "هييبة غابري", "t": "معلمة لغة فرنسية"}, {"n": "سندس القلي", "t": "معلمة تربية رياضية"}, {"n": "هند خالد", "t": "معلمة تربية رياضية"}, {"n": "Diana Menezes", "t": "معلمة جيوجتسو"}, {"n": "Jaqueline", "t": "معلمة جيوجتسو"}, {"n": "صبرين حمدي", "t": "معلمة دراما"}, {"n": "جهان سلمان", "t": "معلمة تربية موسيقية"}, {"n": "أمل القبيسي", "t": "معلمة تربية فنية"}, {"n": "أماني الجعيدي", "t": "معلمة تربية خاصة"}, {"n": "العنود البريكي", "t": "معلمة تربية خاصة"}, {"n": "حمدة الظاهري", "t": "معلمة تربية خاصة"}, {"n": "ثمنه المحرمي", "t": "اختصاصية مصادر تعلم"}, {"n": "حصة المزروعي", "t": "اختصاصية مصادر تعلم"}, {"n": "مريم هلال", "t": "اختصاصية مختبر"}, {"n": "رقيه الصوافي", "t": "اختصاصية مختبر"}];
+function show(p){
   ['before','during','after'].forEach(x=>{
     document.getElementById('v-'+x).classList.toggle('on',x===p);
     document.getElementById('t-'+x).classList.toggle('active',x===p);
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
-show('before');
 
-/* طباعة نموذج واحد معزول عبر إطار مستقل (يحافظ على التعبئة) */
-var PCSS="";
-(function(){ // اجمع أنماط الصفحة لإعادة استخدامها في الطباعة
-  for(const s of document.querySelectorAll('style')) PCSS+=s.textContent;
-})();
-function captureValues(root){ // ثبّت القيم المكتوبة والمربعات قبل النسخ
-  root.querySelectorAll('[contenteditable]').forEach(e=>e.setAttribute('data-v',e.innerHTML));
-  root.querySelectorAll('input[type=checkbox]').forEach(e=>{ if(e.checked) e.setAttribute('checked','checked'); else e.removeAttribute('checked'); });
+/* ===== أنماط الطباعة ===== */
+var PCSS="";(function(){for(const s of document.querySelectorAll('style'))PCSS+=s.textContent;})();
+function captureValues(root){
+  root.querySelectorAll('input[type=checkbox]').forEach(e=>{ if(e.checked)e.setAttribute('checked','checked'); else e.removeAttribute('checked'); });
 }
-function printForm(id){
-  const card=document.getElementById(id); if(!card) return;
-  captureValues(card);
-  const sheet=card.querySelector('.sheet').cloneNode(true);
+function printDoc(inner){
   const html='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">'+
     '<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Cairo:wght@600;700;800;900&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">'+
     '<style>'+PCSS+'@page{size:A4 portrait;margin:8mm}html,body{background:#fff}body{padding:0}'+
-    '.sheet{box-shadow:none;border-radius:0;padding:0}.gov-band{margin:0 0 10px}'+
-    'table.t td.e:focus,.kv .v:focus,.box:focus{background:transparent;box-shadow:none}'+
-    '[contenteditable]{outline:none}</style></head><body>'+sheet.outerHTML+'</body></html>';
+    '.sheet{box-shadow:none;border-radius:0;padding:0;margin:0}'+
+    'table.t td.e:focus,.kv .v:focus,.box:focus{background:transparent;box-shadow:none}[contenteditable]{outline:none}'+
+    '.pb{page-break-after:always}</style></head><body>'+inner+'</body></html>';
   const ifr=document.createElement('iframe');
   ifr.style.cssText='position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;opacity:0';
   document.body.appendChild(ifr);
-  let done=false; const go=()=>{ if(done)return; done=true; try{ifr.contentWindow.focus();ifr.contentWindow.print();}catch(e){} setTimeout(()=>ifr.remove(),1500); };
+  let done=false;const go=()=>{if(done)return;done=true;try{ifr.contentWindow.focus();ifr.contentWindow.print();}catch(e){}setTimeout(()=>ifr.remove(),1500);};
   ifr.onload=()=>setTimeout(go,350);
-  const d=ifr.contentWindow.document; d.open(); d.write(html); d.close();
-  setTimeout(go,1200);
+  const d=ifr.contentWindow.document;d.open();d.write(html);d.close();setTimeout(go,1200);
 }
+function printForm(id){
+  const card=document.getElementById(id);if(!card)return;
+  captureValues(card);
+  printDoc(card.querySelector('.sheet').outerHTML);
+}
+
+/* ===== F-02 تعهد السرية: نسخة لكل معلمة ===== */
+function fillF02(i){
+  const t=TEACHERS[i]; if(!t)return;
+  const n=document.getElementById('f02-name'), m=document.getElementById('f02-title');
+  if(n)n.textContent=t.n; if(m)m.textContent=t.t;
+}
+function f02SheetFor(t){
+  const card=document.getElementById('F-02'); captureValues(card);
+  const sheet=card.querySelector('.sheet').cloneNode(true);
+  sheet.querySelector('#f02-name').textContent=t.n;
+  sheet.querySelector('#f02-title').textContent=t.t;
+  return '<div class="pb">'+sheet.outerHTML+'</div>';
+}
+function printAllF02(){
+  const parts=TEACHERS.map(f02SheetFor).join('');
+  printDoc(parts);
+}
+function initF02(){
+  const sel=document.getElementById('f02sel'); if(!sel)return;
+  sel.innerHTML=TEACHERS.map((t,i)=>`<option value="${i}">${t.n} — ${t.t}</option>`).join('');
+  fillF02(0);
+}
+
+show('before'); initF02();
 </script>
 </body></html>
