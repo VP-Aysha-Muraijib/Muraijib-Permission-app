@@ -31,6 +31,8 @@ def card(st, grade, section):
         meta=f"{EXAM} · الصف {grade_disp(grade)} — الشعبة {section}"
     en=titlecase_en(st.get("en",""))
     en_html=f'<div class="en">{esc(en)}</div>' if en else ''
+    origin=st.get("origin","")
+    orig_html=f'<div class="orig">الشعبة الأصلية: <b>{esc(origin)}</b></div>' if origin else ''
     return (f'<div class="card">'
             f'<div class="chd"><img class="clogo" src="{CORNER}">'
             f'<div class="ctx"><div class="c1">{SCHOOL}</div>'
@@ -41,6 +43,7 @@ def card(st, grade, section):
             f'<div class="names"><div class="ar">{esc(st["ar"])}</div>{en_html}</div>'
             f'<div class="rule"></div>'
             f'<div class="sid"><span class="lbl">رقم الطالب</span><span class="num">{esc(str(st["id"]))}</span></div>'
+            f'{orig_html}'
             f'</div></div></div>')
 
 def page(students, grade, section):
@@ -58,7 +61,7 @@ html,body{{background:#fff;font-family:'Tajawal','Noto Kufi Arabic',Arial,sans-s
 .grid{{height:100%;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:3mm;direction:rtl}}
 .card{{border:2px solid #000;border-radius:8px;display:flex;flex-direction:column;overflow:hidden;background:#fff}}
 .card.empty{{border:1.4px dashed #bbb}}
-.chd{{display:flex;align-items:center;gap:7px;background:#fff;border-bottom:1.4px solid #000;padding:3px 10px}}
+.chd{{display:flex;align-items:center;gap:7px;background:#fff;border-bottom:1.4px solid #000;padding:2px 10px}}
 .clogo{{height:14px;filter:grayscale(1) contrast(1.2)}}
 .ctx{{flex:1;text-align:center;line-height:1.3}}
 .c1{{font-family:'Cairo','Tajawal',sans-serif;font-weight:700;font-size:9px;color:#000}}
@@ -67,14 +70,16 @@ html,body{{background:#fff;font-family:'Tajawal','Noto Kufi Arabic',Arial,sans-s
 .seq{{flex:0 0 64px;background:#fff;color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-left:1.6px solid #000}}
 .snum{{font-family:'Cairo','Tajawal',sans-serif;font-weight:900;font-size:44px;line-height:.95}}
 .slbl{{font-family:'Cairo','Tajawal',sans-serif;font-weight:700;font-size:8.5px;letter-spacing:1px;color:#000}}
-.body{{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:5px 11px;min-width:0}}
-.names{{display:flex;flex-direction:column;align-items:center;gap:3px}}
-.ar{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:16px;color:#000;line-height:1.18}}
-.en{{font-weight:600;font-size:12.5px;color:#000;line-height:1.2;direction:ltr;letter-spacing:.2px}}
-.rule{{width:58%;height:1px;background:#000;margin:5px 0}}
+.body{{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3px 11px;min-width:0}}
+.names{{display:flex;flex-direction:column;align-items:center;gap:2px}}
+.ar{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:15.5px;color:#000;line-height:1.15}}
+.en{{font-weight:600;font-size:12px;color:#000;line-height:1.15;direction:ltr;letter-spacing:.2px}}
+.rule{{width:56%;height:1px;background:#000;margin:3px 0}}
 .sid{{display:flex;align-items:baseline;gap:7px;justify-content:center}}
 .sid .lbl{{font-weight:600;font-size:10px;color:#000}}
 .sid .num{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:15.5px;color:#000;letter-spacing:1px}}
+.orig{{margin-top:2px;font-size:9.5px;font-weight:600;color:#000;border:1px solid #000;border-radius:5px;padding:0 6px}}
+.orig b{{font-weight:800}}
 """
 
 def build(sections_subset, out_html):
