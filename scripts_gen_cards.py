@@ -20,16 +20,25 @@ def titlecase_en(s):
         out.append(lw if (lw in small and out) else lw.capitalize())
     return " ".join(out)
 
+def grade_disp(g):
+    if g=="تربية خاصة": return g
+    return g if g.startswith("ال") else "ال"+g
+
 def card(st, grade, section):
+    if grade=="تربية خاصة":
+        meta=f"{EXAM} · التربية الخاصة — {section}"
+    else:
+        meta=f"{EXAM} · الصف {grade_disp(grade)} — الشعبة {section}"
+    en=titlecase_en(st.get("en",""))
+    en_html=f'<div class="en">{esc(en)}</div>' if en else ''
     return (f'<div class="card">'
             f'<div class="chd"><img class="clogo" src="{CORNER}">'
             f'<div class="ctx"><div class="c1">{SCHOOL}</div>'
-            f'<div class="c2">{EXAM} · الصف {grade} — الشعبة {section}</div></div></div>'
+            f'<div class="c2">{meta}</div></div></div>'
             f'<div class="cbody">'
             f'<div class="seq"><div class="snum">{st["seq"]}</div><div class="slbl">الترتيب</div></div>'
             f'<div class="body">'
-            f'<div class="names"><div class="ar">{esc(st["ar"])}</div>'
-            f'<div class="en">{esc(titlecase_en(st["en"]))}</div></div>'
+            f'<div class="names"><div class="ar">{esc(st["ar"])}</div>{en_html}</div>'
             f'<div class="rule"></div>'
             f'<div class="sid"><span class="lbl">رقم الطالب</span><span class="num">{esc(str(st["id"]))}</span></div>'
             f'</div></div></div>')
