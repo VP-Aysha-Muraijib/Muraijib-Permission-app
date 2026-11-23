@@ -46,38 +46,44 @@ sheet=(f'<div class="sheet"><div class="fcorner"></div>'
        f'<div class="fhead">نموذج متابعة إنجاز التصحيح والتدقيق والرصد</div>'
        f'<div class="frule"></div>'
        f'<div class="formsub">متابعة إنجاز أعمال نهاية الفصل الدراسي الأول لكل مادة ولكل صف — صفحة واحدة</div>'
-       f'{hdr4()}{legend}{table}{foot}'
+       f'{hdr4()}{legend}<div class="gridwrap">{table}</div>{foot}'
        f'<div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · متابعة الإنجاز</div></div>')
 
 PRINT="""
-@page{size:A3 landscape;margin:9mm}
+@page{size:A3 landscape;margin:7mm}
+*{box-sizing:border-box}
 html,body{background:#fff}
 body{margin:0;padding:0}
-.sheet{box-shadow:none;border-radius:0;padding:0;margin:0;width:auto}
-.sheet, .sheet *{font-family:'Noto Sans Arabic','Tajawal',sans-serif!important}
-.fhead{font-size:25px;font-weight:800}
-.formsub{font-size:14px}
-table.t{font-size:13px}
+.sheet{box-shadow:none;border-radius:0;padding:0;margin:0;width:100%}
+.fcorner{flex:0 0 auto}
+.fhead{font-size:23px;font-weight:800}
+.frule{flex:0 0 auto}
+.formsub{font-size:13px;margin-bottom:2px}
+table.t.hdr{flex:0 0 auto}
+.legend{background:#F4F8F5;border:1px solid #D7E7DD;border-right:5px solid var(--green);border-radius:6px;padding:6px 14px;font-size:12px;color:#2E4438;margin:6px 0;text-align:justify}
+.gridwrap{margin:6px 0}
+table.t{font-size:14px}
+table.t.grid{width:100%}
 table.t.grid th{padding:5px 4px}
-table.t.grid td.tcell{padding:5px 4px;height:48px;vertical-align:middle}
-table.t.hdr td,table.t.hdr th{padding:7px 8px;font-size:13px}
-.subj{min-width:150px;text-align:right!important;font-weight:800;font-size:15px}
-.sname{font-weight:800;font-size:15px;color:#000}
-.sdate{font-weight:600;font-size:10.5px;color:var(--green-d);margin-top:2px}
-table.t.grid th.stg{background:var(--green)!important;color:#fff!important;font-size:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-table.t.grid th.tk{background:var(--beige)!important;color:var(--ink);font-size:12.5px;font-weight:700}
-table.t.grid th.subj{background:var(--green-d)!important;color:#fff!important}
-.sq{width:23px;height:23px;border:2px solid var(--green-d);border-radius:5px;margin:0 auto 5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.dwrap{display:flex;flex-direction:column;align-items:center;gap:0;margin:0 2px}
-.dcap{font-size:8px;color:var(--green-d);font-weight:700}
-.dline{font-size:10px;color:#8A857C;letter-spacing:.2px;direction:ltr}
-.legend{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:6px;padding:7px 14px;font-size:12px;color:#2E4438;margin:8px 0;text-align:justify}
-table.sign{margin-top:12px}
-table.sign th{background:var(--beige);font-size:13px}
-table.sign td{height:36px}
+table.t.grid td.tcell{padding:5px 4px;height:60px;vertical-align:middle}
+table.t.hdr td,table.t.hdr th{padding:6px 8px;font-size:13px}
+.subj{min-width:160px;text-align:right!important;font-weight:800}
+.sname{font-weight:800;font-size:16px;color:#000}
+.sdate{font-weight:600;font-size:12.5px;color:var(--green-d);margin-top:3px}
+table.t.grid th.stg{background:var(--green)!important;color:#fff!important;font-family:'Cairo','Tajawal',sans-serif;font-size:19px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.t.grid th.tk{background:var(--beige)!important;color:var(--ink);font-size:14.5px;font-weight:700}
+table.t.grid th.subj{background:var(--green-d)!important;color:#fff!important;font-family:'Cairo','Tajawal',sans-serif;font-size:16px}
+.sq{width:25px;height:25px;border:2.2px solid var(--green-d);border-radius:6px;margin:0 auto 6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.dwrap{display:flex;flex-direction:column;align-items:center;gap:2px;margin:0 3px}
+.dcap{font-size:10px;color:var(--green-d);font-weight:700}
+.dline{font-size:12px;color:#8A857C;letter-spacing:.2px;direction:ltr}
+table.sign{flex:0 0 auto;margin-top:6px}
+table.sign th{background:var(--beige);font-size:13px;padding:6px}
+table.sign td{height:36px;font-size:13px}
 .rh2{font-weight:700}
+.rfoot{flex:0 0 auto;font-size:11px;margin-top:6px}
 """
 
-doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{FONT2}\n{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
+doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
 open(BASE+'/followup_a3.html','w',encoding='utf-8').write(doc)
 print('ok', len(SUBJECTS),'subjects x',len(STAGES),'stages x',len(TASKS),'tasks')
