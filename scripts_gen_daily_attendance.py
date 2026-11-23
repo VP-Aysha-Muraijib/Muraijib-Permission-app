@@ -28,7 +28,7 @@ foot=('<table class="t sign"><tr><th>اسم مُعِدّة الحصر</th><th>ا
 sheet=(f'<div class="sheet"><div class="fcorner"></div>'
        f'<div class="fhead">الحصر اليومي لحضور وغياب الطالبات</div>'
        f'<div class="frule"></div>'
-       f'<div class="formsub">يُعبّأ يومياً بقلم السبورة — نموذج مُغلّف حرارياً · حلقة ثانية</div>'
+       f'<div class="formsub">{SCHOOL}</div>'
        f'{info}{blocks}{foot}'
        f'<div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · الحصر اليومي</div></div>')
 
