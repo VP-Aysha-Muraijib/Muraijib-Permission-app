@@ -24,12 +24,24 @@ def grade_disp(g):
     if g=="تربية خاصة": return g
     return g if g.startswith("ال") else "ال"+g
 
+_CONN={'بن','بنت','بنته','ابن','بنْت','bin','Bin','BIN','bint','Bint','BINT','ben','Ben'}
+_PART_AR={'آل','ال'}; _PART_EN={'al','el'}
+def shorten_name(name):
+    toks=[t for t in (name or "").split() if t not in _CONN]
+    if len(toks)<=4: return " ".join(toks)
+    pen=toks[-2]
+    tail=toks[-2:] if (pen in _PART_AR or pen.lower() in _PART_EN) else [toks[-1]]
+    return " ".join(toks[:3]+tail)
+
 def card(st, grade, section):
     if grade=="تربية خاصة":
         meta=f"{EXAM} · التربية الخاصة — {section}"
+    elif str(section).startswith("شعبة"):
+        meta=f"{EXAM} · الصف {grade_disp(grade)} — شعبة اضافية"
     else:
         meta=f"{EXAM} · الصف {grade_disp(grade)} — الشعبة {section}"
-    en=titlecase_en(st.get("en",""))
+    ar=shorten_name(st["ar"])
+    en=titlecase_en(shorten_name(st.get("en","")))
     en_html=f'<div class="en">{esc(en)}</div>' if en else ''
     origin=st.get("origin","")
     orig_html=f'<div class="orig">الشعبة الأصلية: <b>{esc(origin)}</b></div>' if origin else ''
@@ -40,7 +52,7 @@ def card(st, grade, section):
             f'<div class="cbody">'
             f'<div class="seq"><div class="snum">{st["seq"]}</div><div class="slbl">الترتيب</div></div>'
             f'<div class="body">'
-            f'<div class="names"><div class="ar">{esc(st["ar"])}</div>{en_html}</div>'
+            f'<div class="names"><div class="ar">{esc(ar)}</div>{en_html}</div>'
             f'<div class="rule"></div>'
             f'<div class="sid"><span class="lbl">رقم الطالب</span><span class="num">{esc(str(st["id"]))}</span></div>'
             f'{orig_html}'
@@ -70,11 +82,11 @@ html,body{{background:#fff;font-family:'Tajawal','Noto Kufi Arabic',Arial,sans-s
 .seq{{flex:0 0 64px;background:#fff;color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-left:1.6px solid #000}}
 .snum{{font-family:'Cairo','Tajawal',sans-serif;font-weight:900;font-size:44px;line-height:.95}}
 .slbl{{font-family:'Cairo','Tajawal',sans-serif;font-weight:700;font-size:8.5px;letter-spacing:1px;color:#000}}
-.body{{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:3px 11px;min-width:0}}
-.names{{display:flex;flex-direction:column;align-items:center;gap:2px}}
-.ar{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:15.5px;color:#000;line-height:1.15}}
-.en{{font-weight:600;font-size:12px;color:#000;line-height:1.15;direction:ltr;letter-spacing:.2px}}
-.rule{{width:56%;height:1px;background:#000;margin:3px 0}}
+.body{{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:4px 11px 6px;gap:0;min-width:0;overflow:hidden}}
+.names{{display:flex;flex-direction:column;align-items:center;gap:5px}}
+.ar{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:16.5px;color:#000;line-height:1.15}}
+.en{{font-weight:600;font-size:12px;color:#000;line-height:1.15;direction:ltr;letter-spacing:.3px}}
+.rule{{width:54%;height:1px;background:#000;margin:3px 0}}
 .sid{{display:flex;align-items:baseline;gap:7px;justify-content:center}}
 .sid .lbl{{font-weight:600;font-size:10px;color:#000}}
 .sid .num{{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:15.5px;color:#000;letter-spacing:1px}}
