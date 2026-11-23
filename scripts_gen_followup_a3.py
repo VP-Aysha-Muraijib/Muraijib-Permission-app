@@ -2,8 +2,15 @@
 BASE='/tmp/claude-0/-home-user-Muraijib-Permission-app/8f6a88b6-523b-54a7-a25d-16b0f2fb94db/scratchpad'
 ns={}; exec(compile(open(BASE+'/build_platform.py',encoding='utf-8').read(),'bp','exec'),ns)
 CSS=ns['CSS']; CORNER=ns['CORNER']; SCHOOL=ns['SCHOOL']; YEAR=ns['YEAR']; TERM=ns['TERM']
+FONT2=open(BASE+'/noto_embedded.css',encoding='utf-8').read()
 
-SUBJECTS=["التربية الإسلامية","اللغة العربية","اللغة الإنجليزية","الرياضيات","العلوم","الدراسات الاجتماعية"]
+# ترتيب المواد حسب جدول اختبارات نهاية الفصل الأول للصفوف 5–8
+SUBJECTS=[("الرياضيات","الأربعاء 25 / 11"),
+          ("اللغة الإنجليزية","الخميس 26 / 11"),
+          ("العلوم","الاثنين 7 / 12"),
+          ("اللغة العربية","الثلاثاء 8 / 12"),
+          ("التربية الإسلامية","الأربعاء 9 / 12"),
+          ("الدراسات الاجتماعية","الخميس 10 / 12")]
 STAGES=["الخامس","السادس","السابع","الثامن"]
 TASKS=["التصحيح","التدقيق","الرصد"]
 
@@ -21,8 +28,9 @@ def tcell():
 h1='<tr><th class="subj" rowspan="2">المادة / الاختبار</th>'+ "".join(f'<th colspan="3" class="stg">الصف {s}</th>' for s in STAGES)+'</tr>'
 h2='<tr>'+ "".join("".join(f'<th class="tk">{t}</th>' for t in TASKS) for _ in STAGES)+'</tr>'
 body=""
-for sub in SUBJECTS:
-    body+=f'<tr><td class="subj rh">{sub}</td>'+ "".join(tcell() for _ in STAGES for _ in TASKS)+'</tr>'
+for name,date in SUBJECTS:
+    cell=f'<td class="subj rh"><div class="sname">{name}</div><div class="sdate">{date}</div></td>'
+    body+=f'<tr>{cell}'+ "".join(tcell() for _ in STAGES for _ in TASKS)+'</tr>'
 table=f'<table class="t grid">{h1}{h2}{body}</table>'
 
 legend=('<div class="legend">آلية التعبئة: تضع الإدارية المسؤولة علامة (✓) في المربع عند إنجاز كل مرحلة '
@@ -46,13 +54,16 @@ PRINT="""
 html,body{background:#fff}
 body{margin:0;padding:0}
 .sheet{box-shadow:none;border-radius:0;padding:0;margin:0;width:auto}
-.fhead{font-size:26px}
+.sheet, .sheet *{font-family:'Noto Sans Arabic','Tajawal',sans-serif!important}
+.fhead{font-size:25px;font-weight:800}
 .formsub{font-size:14px}
 table.t{font-size:13px}
 table.t.grid th{padding:5px 4px}
 table.t.grid td.tcell{padding:5px 4px;height:48px;vertical-align:middle}
 table.t.hdr td,table.t.hdr th{padding:7px 8px;font-size:13px}
-.subj{min-width:140px;text-align:right!important;font-weight:800;font-size:15px}
+.subj{min-width:150px;text-align:right!important;font-weight:800;font-size:15px}
+.sname{font-weight:800;font-size:15px;color:#000}
+.sdate{font-weight:600;font-size:10.5px;color:var(--green-d);margin-top:2px}
 table.t.grid th.stg{background:var(--green)!important;color:#fff!important;font-size:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.t.grid th.tk{background:var(--beige)!important;color:var(--ink);font-size:12.5px;font-weight:700}
 table.t.grid th.subj{background:var(--green-d)!important;color:#fff!important}
@@ -67,6 +78,6 @@ table.sign td{height:36px}
 .rh2{font-weight:700}
 """
 
-doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
+doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{FONT2}\n{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
 open(BASE+'/followup_a3.html','w',encoding='utf-8').write(doc)
 print('ok', len(SUBJECTS),'subjects x',len(STAGES),'stages x',len(TASKS),'tasks')
