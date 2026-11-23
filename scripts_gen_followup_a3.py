@@ -2,7 +2,7 @@
 BASE='/tmp/claude-0/-home-user-Muraijib-Permission-app/8f6a88b6-523b-54a7-a25d-16b0f2fb94db/scratchpad'
 ns={}; exec(compile(open(BASE+'/build_platform.py',encoding='utf-8').read(),'bp','exec'),ns)
 CSS=ns['CSS']; CORNER=ns['CORNER']; SCHOOL=ns['SCHOOL']; YEAR=ns['YEAR']; TERM=ns['TERM']
-FONT2=open(BASE+'/noto_embedded.css',encoding='utf-8').read()
+FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
 
 # ترتيب المواد حسب جدول اختبارات نهاية الفصل الأول للصفوف 5–8
 SUBJECTS=[("الرياضيات","الأربعاء 25 / 11"),
@@ -84,6 +84,6 @@ table.sign td{height:36px;font-size:13px}
 .rfoot{flex:0 0 auto;font-size:11px;margin-top:6px}
 """
 
-doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
+doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{FONT}\n{CSS}\n{PRINT}</style></head><body>{sheet}</body></html>'
 open(BASE+'/followup_a3.html','w',encoding='utf-8').write(doc)
 print('ok', len(SUBJECTS),'subjects x',len(STAGES),'stages x',len(TASKS),'tasks')
