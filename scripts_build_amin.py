@@ -6,6 +6,9 @@ TEACHERS=json.load(open(BASE+'/teachers.json',encoding='utf-8'))
 CORNER=open(BASE+'/corner_uri.txt',encoding='utf-8').read().strip()
 FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
 
+# إضافة بلقيس (مساعد صف تربية خاصة) للقائمة لتثبيتها على تكييف سابع
+TEACHERS=TEACHERS+[{"n":"بلقيس علي الحارثي","t":"مساعد صف (تربية خاصة)"}]
+
 # لجان خاصة (مراقِبة واحدة لكل منها)
 HALLS=HALLS+[{"hall":"غرفة الممرضة (الحالات الصحية)","grade":"لجنة","section":"ممرضة","count":""},
              {"hall":"مختبر الحاسوب (الدعم التقني)","grade":"لجنة","section":"حاسوب","count":""}]
@@ -27,6 +30,16 @@ GRADE_EXCL={"هيبة حبيب غابري":["خامس"],
 SUBJMAP={"الرياضيات":["رياضيات"],"اللغة الإنجليزية":["إنجليزية"],
          "العلوم":["علوم","كيمياء"],"اللغة العربية":["عربية"],
          "التربية الإسلامية":["إسلامية"],"الدراسات الاجتماعية":["اجتماعية"]}
+# لجان مثبّتة طوال الاختبارات (اسم القاعة -> المعلمة)
+PINNED={"التعديل":"أماني جميل الجعيدي",
+        "تكييف خامس":"العنود عبدربه البريكي",
+        "تكييف سادس":"حمدة سيف الظاهري",
+        "تكييف سابع":"بلقيس علي الحارثي"}
+# دعم تقني: مستبعَدات من المراقبة في كل الأيام عدا هذه المواد
+TECH=["دعاء مصطفى عبدالمنعم","حصة سعيد السبوسي","حصة ناصر الأحبابي","سهيلة سعيد الكتبي"]
+TECH_OK=["التربية الإسلامية","الدراسات الاجتماعية"]
+# إشراف الدور — لا يراقبن داخل القاعات
+SUP=["رقية صالح الصوافي","مريم هلال الدرمكي"]
 
 SCHOOL="مدرسة مريجب — حلقة ثانية"; YEAR="2026 / 2027"
 
@@ -72,17 +85,20 @@ table.t select{font-family:inherit;font-size:12px;border:1px solid var(--line);b
 JS = r"""
 const TEACHERS=__TEACHERS__, HALLS=__HALLS__, DAYS=__DAYS__;
 const GEXCL=__GEXCL__, GRADE_EXCL=__GRADE_EXCL__, SUBJMAP=__SUBJMAP__;
+const PINNED=__PINNED__, TECH=__TECH__, TECH_OK=__TECH_OK__, SUP=__SUP__;
 const SCHOOL=__SCHOOL__, YEAR=__YEAR__;
 let EXCL=new Set(GEXCL), FIXED={}, assign=[], backup=[], dexcl=[], reserve=[], load={}, curDay=0, seed=11;
 function H(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0);}
-function pool(){return TEACHERS.map(t=>t.n).filter(n=>!EXCL.has(n));}
+function pool(){return TEACHERS.map(t=>t.n).filter(n=>!EXCL.has(n)&&SUP.indexOf(n)<0);}
 function tSubj(n){const t=TEACHERS.find(x=>x.n===n);return t?t.t:'';}
 function gradeOK(n,grade){const g=GRADE_EXCL[n];return !(g&&g.indexOf(grade)>=0);}
 function dayExcluded(d){
   const ex=new Set();
   [d,d-1].forEach(x=>{ if(x>=0){ const keys=SUBJMAP[DAYS[x].subject]||[]; TEACHERS.forEach(t=>{ if(keys.some(k=>t.t.indexOf(k)>=0)) ex.add(t.n); }); } });
+  if(TECH_OK.indexOf(DAYS[d].subject)<0){ TECH.forEach(n=>ex.add(n)); }   // دعم تقني إلا الإسلامية/الاجتماعية
   return ex;
 }
+function pinHallName(n){ return PINNED.hasOwnProperty(n); }
 function distribute(){
   load={}; pool().forEach(n=>load[n]=0);
   assign=DAYS.map(()=>Array(HALLS.length).fill(null));
@@ -90,8 +106,10 @@ function distribute(){
   reserve=DAYS.map(()=>[]); dexcl=DAYS.map(()=>[]);
   for(let d=0;d<DAYS.length;d++){
     const dex=dayExcluded(d); dexcl[d]=[...dex].filter(n=>!EXCL.has(n));
+    for(let h=0;h<HALLS.length;h++){ const pn=PINNED[HALLS[h].hall]; if(pn&&!EXCL.has(pn)) assign[d][h]=pn; }
+    for(let h=0;h<HALLS.length;h++){ const k=d+'|'+h; if(FIXED[k]&&!EXCL.has(FIXED[k])) assign[d][h]=FIXED[k]; }
     const used=new Set();
-    for(let h=0;h<HALLS.length;h++){const k=d+'|'+h;if(FIXED[k]&&!EXCL.has(FIXED[k])){assign[d][h]=FIXED[k];used.add(FIXED[k]);load[FIXED[k]]++;}}
+    for(let h=0;h<HALLS.length;h++){ const n=assign[d][h]; if(n){ used.add(n); load[n]++; } }
     const avail=pool().filter(n=>!dex.has(n));
     function cands(h){return avail.filter(n=>gradeOK(n,HALLS[h].grade));}
     // most-constrained halls first
@@ -115,7 +133,7 @@ function render(){
     const a=assign[d][h]||''; const cmt=hall.grade==='لجنة';
     rows+=`<tr class="${cmt?'cmt':''}"><td>${h+1}</td><td class="rh">${hall.hall}</td><td>${hall.count||'—'}</td>`+
       `<td><select onchange="setA(${h},this.value)">${optList(a)}</select></td>`+
-      `<td>${backup[d][h]||'—'}</td><td></td></tr>`;
+      `<td></td><td></td></tr>`;
   });
   const shortage=assign[d].filter(x=>!x).length;
   const resv=reserve[d].map(n=>`<span class="chip">${n}</span>`).join('')||'<span class="stat">لا يوجد احتياط</span>';
@@ -124,9 +142,10 @@ function render(){
     `<div class="sess">الجلسة: ${day.subject} — ${day.date} · الصفوف 5–8 · ${SCHOOL}</div>`+
     (shortage?`<div class="warn no-print">تنبيه: ${shortage} قاعة بدون مراقبة (نقص بعد تطبيق الاستثناءات).</div>`:'')+
     `<div class="card"><h3>توزيع المراقبة — ${day.subject}</h3>`+
-    `<table class="t"><tr><th style="width:36px">م</th><th>القاعة / الشعبة</th><th style="width:70px">عدد الطالبات</th><th>المراقبة (الملاحِظة)</th><th>البديل (احتياط)</th><th style="width:90px">التوقيع</th></tr>${rows}</table></div>`+
+    `<table class="t"><tr><th style="width:36px">م</th><th>القاعة / الشعبة</th><th style="width:70px">عدد الطالبات</th><th>المراقبة (الملاحِظة)</th><th>البديل</th><th style="width:90px">التوقيع</th></tr>${rows}</table></div>`+
     `<div class="card no-print"><h3>مستبعَدات اليوم: معلمات المادة (اليوم + اليوم السابق)</h3><div class="chips">${dex}</div></div>`+
-    `<div class="card"><h3>الاحتياط لهذا اليوم (${reserve[d].length})</h3><div class="chips">${resv}</div></div>`;
+    `<div class="card"><h3>مراقبات الاحتياط لهذا اليوم (${reserve[d].length})</h3><div class="chips">${resv}</div></div>`+
+    `<div class="card"><h3>إشراف الدور</h3><div class="chips">${SUP.map(n=>'<span class="chip">'+n+'</span>').join('')}</div></div>`;
   renderStats();
 }
 function renderStats(){
@@ -145,7 +164,7 @@ function toggleExcl(n){ if(EXCL.has(n))EXCL.delete(n); else EXCL.add(n); distrib
 function printF05(){
   const d=curDay, day=DAYS[d];
   let rows='';
-  HALLS.forEach((hall,h)=>{ rows+=`<tr><td>${h+1}</td><td style="text-align:right">${hall.hall}</td><td>${hall.count||'—'}</td><td>${assign[d][h]||''}</td><td></td><td>${backup[d][h]||''}</td><td></td></tr>`; });
+  HALLS.forEach((hall,h)=>{ rows+=`<tr><td>${h+1}</td><td style="text-align:right">${hall.hall}</td><td>${hall.count||'—'}</td><td>${assign[d][h]||''}</td><td></td><td></td><td></td></tr>`; });
   const sheet=`<div class="sheet"><div class="fcorner"></div>`+
     `<div class="fhead"><span class="fcode">F-05</span> توزيع المراقبين والملاحظين</div><div class="frule"></div>`+
     `<table class="p"><tr><th>العام الدراسي</th><th>المدرسة</th><th>اليوم والتاريخ</th><th>المادة</th><th>الصفوف</th><th>الجلسة</th></tr>`+
@@ -174,6 +193,10 @@ JS = (JS.replace('__TEACHERS__', json.dumps(TEACHERS, ensure_ascii=False))
         .replace('__GEXCL__', json.dumps(GEXCL, ensure_ascii=False))
         .replace('__GRADE_EXCL__', json.dumps(GRADE_EXCL, ensure_ascii=False))
         .replace('__SUBJMAP__', json.dumps(SUBJMAP, ensure_ascii=False))
+        .replace('__PINNED__', json.dumps(PINNED, ensure_ascii=False))
+        .replace('__TECH__', json.dumps(TECH, ensure_ascii=False))
+        .replace('__TECH_OK__', json.dumps(TECH_OK, ensure_ascii=False))
+        .replace('__SUP__', json.dumps(SUP, ensure_ascii=False))
         .replace('__SCHOOL__', json.dumps(SCHOOL, ensure_ascii=False))
         .replace('__YEAR__', json.dumps(YEAR, ensure_ascii=False)))
 
