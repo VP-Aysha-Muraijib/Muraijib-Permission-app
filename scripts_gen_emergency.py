@@ -142,12 +142,12 @@ sign=('<table class="t sign"><tr>'
       '<td>'+bc("التوقيع والتاريخ","Signature & Date")+'</td></tr></table>')
 
 sheet=(f'<section class="sheet"><div class="fcorner"></div>'
-       f'<div class="fhead"><span class="fcode">F-12</span> خطة الاستجابة للطوارئ أثناء فترة الاختبارات'
+       f'<div class="fhead">خطة الاستجابة للطوارئ أثناء فترة الاختبارات'
        f'<span class="hen">Emergency Response Plan — Examination Period</span></div><div class="frule"></div>'
        f'<div class="formsub"><span class="ar">تُحدِّد هذه الخطة الإجراءات المُعتمَدة للتعامل مع الحالات الطارئة المحتملة خلال فترة الاختبارات، بما يكفل سلامة الطالبات وانتظام سير الاختبار، ويُعمَّم مضمونها على جميع لجان المدرسة.</span>'
        f'<span class="en">This plan defines the approved procedures for handling potential emergencies throughout the examination period, safeguarding students and preserving the orderly conduct of exams; it is circulated to all school committees.</span></div>'
        f'{info}{blocks}{note}{sign}'
-       f'<div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · F-12 · خطة الاستجابة للطوارئ — School Exams Management Guide · Emergency Response Plan</div></section>')
+       f'<div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · خطة الاستجابة للطوارئ — School Exams Management Guide · Emergency Response Plan</div></section>')
 
 CSS="""
 *{box-sizing:border-box;margin:0;padding:0}
