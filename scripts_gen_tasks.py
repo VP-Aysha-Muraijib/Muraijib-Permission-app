@@ -90,9 +90,8 @@ note=('<div class="note"><span class="ar"><b>تنويه:</b> هذا التكلي
       'approved instructions must be followed, coordinating with the Halls Committee and the Control Committee when needed.</span></div>')
 
 sign=('<table class="t sign"><tr>'
-      +th("اسم المُلاحِظة (المكلّفة)","Invigilator (Assignee)")+th("التوقيع (اطّلاع والتزام)","Signature (Acknowledged)")
-      +th("اعتماد / مديرة المدرسة","Approved / School Principal")+th("التوقيع","Signature")+'</tr>'
-      '<tr><td></td><td></td><td>د. اليازية نخيرة الظاهري</td><td></td></tr></table>')
+      +th("اعتماد / مديرة المدرسة","Approved / School Principal")+th("التوقيع","Signature")+th("التاريخ","Date")+'</tr>'
+      '<tr><td>د. اليازية نخيرة الظاهري</td><td></td><td></td></tr></table>')
 
 sheet=(f'<section class="sheet"><div class="fcorner"></div>'
        f'<div class="fhead">تكليف مهام المُلاحِظات لاختبارات نهاية الفصل الدراسي الأول'
