@@ -8,7 +8,13 @@ FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
 CORNER=open(BASE+'/corner_uri.txt',encoding='utf-8').read().strip()
 SCHOOL="مدرسة مريجب — حلقة ثانية"; SCHOOL_EN="Muraijib School — Cycle 2"
 YEAR="2026 / 2027"
-SUP=["رقية صالح الصوافي","مريم هلال الدرمكي"]
+# إشراف/مراقبة الدور لكل مرحلة — من لجنة تنظيم القاعات والمراقبة والملاحظة (وثيقة التشكيل 2026/11/16)
+SUP_BY_GRADE={"خامس":["علياء الشامسي","شماء الكتبي"],
+              "سادس":["اليازية الخييلي","مريم خلفان الظاهري"],
+              "سابع":["هبة الكمالي","مريم هلال الدرمكي"],
+              "ثامن":["هدى الكعبي","مريم راشد الدرمكي"],
+              "تربية خاصة":["رقية الصوافي"],
+              "لجنة":["رقية الصوافي"]}
 day=d['day']; halls=d['halls']; assign=d['assign']; reserve=d.get('reserve',[])
 
 def e(x): return _h.escape(str(x) if x is not None else "")
@@ -57,12 +63,12 @@ def hall_tbl(items):
     heads=heads.replace('<th>','<th class="wn">',1)  # first col narrow
     return f'<table class="t htbl"><tr>{heads}</tr>{rows}</table>'
 
-def reserve_box():
+def reserve_box(g):
     chips="".join(f'<span class="rchip">{e(n)}</span>' for n in reserve) or '<span class="none">لا يوجد — None</span>'
-    sup="، ".join(e(n) for n in SUP)
+    sup="، ".join(e(n) for n in SUP_BY_GRADE.get(g,[])) or "—"
     return (f'<div class="xbox"><div class="xrow"><span class="xlbl">مراقبات الاحتياط<b>Reserve Invigilators</b></span>'
             f'<span class="xval">{chips}</span></div>'
-            f'<div class="xrow"><span class="xlbl">إشراف الدور<b>Session Supervision</b></span>'
+            f'<div class="xrow"><span class="xlbl">إشراف الدور للمرحلة<b>Grade Duty Supervision</b></span>'
             f'<span class="xval">{sup}</span></div></div>')
 
 def foot():
@@ -86,7 +92,7 @@ def page(g,items):
             f'{sess_tbl()}'
             f'<div class="band"><span class="ar">{GNAME.get(g,g)}</span><span class="ben">{GEN.get(g,g)}</span></div>'
             f'{hall_tbl(items)}'
-            f'{reserve_box()}'
+            f'{reserve_box(g)}'
             f'{note}'
             f'{foot()}'
             f'<div class="rfoot">دليل تنظيم وإدارة الاختبارات المدرسية · العام الدراسي 2026/2027 · F-05 · {GNAME.get(g,g)} '
