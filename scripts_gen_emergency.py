@@ -44,12 +44,26 @@ SECTIONS=[
   "توجيه الطالبات إلى مخرج آمن بديل وإبلاغ مسؤول الأمن والسلامة فوراً.",
   "Direct students to a safe alternate exit and promptly inform the safety officer.",
   "مسؤول الأمن والسلامة","Health & Safety Officer"),
- ("تقلبات جوية حادة (عاصفة أو أمطار غزيرة)","Severe weather conditions (storm or heavy rain)",
-  "إبقاء الطالبات في أماكن آمنة والالتزام بتعليمات الجهات المختصة.",
-  "Keep students in safe areas and comply with the competent authorities' instructions.",
-  "مسؤول الأمن والسلامة + الإدارة","Safety Officer + Administration"),
 ]),
-("ثالثاً: المرافق والبنية التحتية","III. Facilities & Infrastructure",[
+("ثالثاً: الأحوال الجوية والطوارئ المناخية","III. Weather & Climate Emergencies",[
+ ("أمطار غزيرة أو تجمّع مياه (احتمال سيول)","Heavy rain or water accumulation (possible flooding)",
+  "إبقاء الطالبات داخل القاعات الآمنة وتأجيل الخروج حتى زوال الخطر وتنسيق الحركة مع الإدارة.",
+  "Keep students inside safe halls, delay dismissal until the hazard clears, and coordinate movement with administration.",
+  "مسؤول الأمن والسلامة + الإدارة","Safety Officer + Administration"),
+ ("ضباب كثيف يؤثر على الرؤية أو مواعيد الحضور","Dense fog affecting visibility or arrival times",
+  "مراعاة تأخر الطالبات لظروف الضباب وتأجيل بدء الجلسة عند الحاجة وفق التعليمات، والتنسيق مع أولياء الأمور والنقل المدرسي.",
+  "Allow for fog-related late arrivals, postpone the session start if needed per instructions, and coordinate with parents and transport.",
+  "لجنة الحضور والغياب + الإدارة","Attendance Committee + Administration"),
+ ("عاصفة رعدية أو رياح شديدة","Thunderstorm or strong winds",
+  "إبعاد الطالبات عن النوافذ والمنافذ الخارجية والالتزام بتعليمات الجهات المختصة.",
+  "Keep students away from windows and exterior openings and comply with the competent authorities' instructions.",
+  "مسؤول الأمن والسلامة","Health & Safety Officer"),
+ ("عاصفة غبارية أو رملية","Dust or sandstorm",
+  "إغلاق النوافذ والمنافذ وإبقاء الطالبات داخل المبنى ومتابعة حالات ضيق التنفس.",
+  "Close windows and openings, keep students indoors, and monitor any breathing difficulties.",
+  "مسؤول الأمن والسلامة + الممرضة","Safety Officer + Nurse"),
+]),
+("رابعاً: المرافق والبنية التحتية","IV. Facilities & Infrastructure",[
  ("انقطاع التيار الكهربائي أثناء الاختبار","Power outage during the exam",
   "توفير الإضاءة البديلة والتواصل الفوري مع فريق الصيانة.",
   "Provide backup lighting and contact the maintenance team immediately.",
@@ -63,7 +77,7 @@ SECTIONS=[
   "Temporarily close the affected area, provide suitable alternatives, and inform administration.",
   "فريق الصيانة + الإدارة","Maintenance + Administration"),
 ]),
-("رابعاً: الاختبارات الإلكترونية وأوراق الاختبار","IV. E-Exams & Exam Materials",[
+("خامساً: الاختبارات الإلكترونية وأوراق الاختبار","V. E-Exams & Exam Materials",[
  ("تعطّل الأجهزة أو انقطاع الإنترنت أثناء الاختبار الإلكتروني","Device failure or internet outage during an e-exam",
   "إبلاغ الدعم الفني وتوفير بديل مناسب وإشعار لجنة الاختبارات واتباع الإجراءات المعتمدة.",
   "Notify technical support, provide a suitable alternative, inform the exams committee, and follow approved procedures.",
@@ -73,7 +87,7 @@ SECTIONS=[
   "Inform the exams committee to provide the required copies immediately.",
   "اللجنة الرئيسية للاختبارات","Main Exams Committee"),
 ]),
-("خامساً: التنظيم والانضباط","V. Organization & Conduct",[
+("سادساً: التنظيم والانضباط","VI. Organization & Conduct",[
  ("تأخر طالبة عن موعد الاختبار","A student arrives late for the exam",
   "إبلاغ لجنة الاختبارات والتواصل مع ولي الأمر وفق التعليمات المعتمدة.",
   "Inform the exams committee and contact the parent in line with approved instructions.",
