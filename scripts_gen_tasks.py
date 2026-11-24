@@ -79,9 +79,8 @@ for title_ar,title_en,items in SECTIONS:
     for t_ar,t_en in items:
         n+=1
         rows+=(f'<tr><td class="cm">{n}</td>'
-               f'<td class="tsk">{bc(t_ar,t_en)}</td>'
-               f'<td class="chk"><span class="box"></span></td></tr>')
-    heads=(th("م","No.")+th("المهمة","Task")+th("الإنجاز","Done"))
+               f'<td class="tsk">{bc(t_ar,t_en)}</td></tr>')
+    heads=(th("م","No.")+th("المهمة","Task"))
     heads=heads.replace('<th>','<th class="wn">',1)
     blocks+=f'<div class="sec">{band}<table class="t gtbl"><tr>{heads}</tr>{rows}</table></div>'
 
@@ -116,9 +115,10 @@ html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Kufi Arab
 .fhead .hen{display:block;font-size:11.5px;font-weight:700;color:var(--mut);direction:ltr}
 .frule{height:2px;background:var(--green);margin:8px 0 5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .formsub{color:var(--mut);font-size:10.5px;margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:6px;line-height:1.5;text-align:justify}
-.formsub .en{display:block;font-size:9px;direction:ltr;margin-top:2px}
+.formsub{font-size:11px}
+.formsub .en{display:block;font-size:10px;direction:ltr;margin-top:2px}
 .band{font-family:'Cairo','Tajawal',sans-serif;background:var(--green);color:#fff;font-weight:800;font-size:13.5px;padding:5px 13px;border-radius:7px 7px 0 0;display:flex;justify-content:space-between;align-items:baseline;-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-after:avoid}
-.band .ben{font-size:10.5px;font-weight:700;opacity:.92;direction:ltr}
+.band .ben{font-size:11.5px;font-weight:700;opacity:.95;direction:ltr}
 .sec{page-break-inside:avoid;margin-top:9px}
 .sec .band{margin-top:0}
 table.t{width:100%;border-collapse:collapse;font-size:12px;margin:0 0 4px}
@@ -126,16 +126,16 @@ table.t.sess{margin:6px 0 0}
 table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:center;vertical-align:middle}
 table.t th{background:var(--beige);font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.t th .ar{display:block;font-size:11px}
-table.t th .en{display:block;font-size:8.3px;font-weight:600;color:var(--green-d);direction:ltr;margin-top:1px}
+table.t th .en{display:block;font-size:9.8px;font-weight:600;color:var(--green-d);direction:ltr;margin-top:1px}
 td .ar{display:block;font-size:11.5px;line-height:1.45}
-td .en{display:block;font-size:8.6px;color:var(--mut);direction:ltr;line-height:1.4;margin-top:1px}
+td .en{display:block;font-size:10.3px;color:#6B665D;direction:ltr;line-height:1.4;margin-top:2px}
 tr{page-break-inside:avoid}
 .wn{width:26px}
 table.gtbl td.tsk{text-align:right;font-weight:600}
 table.gtbl td.chk{width:56px}
 .box{display:inline-block;width:15px;height:15px;border:1.6px solid var(--green-d);border-radius:4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .note{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:6px;padding:7px 12px;font-size:10.5px;line-height:1.5;margin:10px 0 7px;-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-inside:avoid}
-.note .en{display:block;direction:ltr;color:var(--mut);font-size:9px;margin-top:3px;border-top:1px dashed #D7E7DD;padding-top:3px}
+.note .en{display:block;direction:ltr;color:#6B665D;font-size:10px;margin-top:3px;border-top:1px dashed #D7E7DD;padding-top:3px}
 table.sign{page-break-inside:avoid;margin-top:4px}
 table.sign td{height:40px}
 .rfoot{text-align:center;font-size:8.3px;color:#B3AC9F;border-top:1.5px solid var(--green);padding-top:6px;margin-top:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
