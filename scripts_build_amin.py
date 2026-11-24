@@ -94,7 +94,7 @@ function tSubj(n){const t=TEACHERS.find(x=>x.n===n);return t?t.t:'';}
 function gradeOK(n,grade){const g=GRADE_EXCL[n];return !(g&&g.indexOf(grade)>=0);}
 function dayExcluded(d){
   const ex=new Set();
-  [d,d-1].forEach(x=>{ if(x>=0){ const keys=SUBJMAP[DAYS[x].subject]||[]; TEACHERS.forEach(t=>{ if(keys.some(k=>t.t.indexOf(k)>=0)) ex.add(t.n); }); } });
+  [d].forEach(x=>{ if(x>=0){ const keys=SUBJMAP[DAYS[x].subject]||[]; TEACHERS.forEach(t=>{ if(keys.some(k=>t.t.indexOf(k)>=0)) ex.add(t.n); }); } });
   if(TECH_OK.indexOf(DAYS[d].subject)<0){ TECH.forEach(n=>ex.add(n)); }   // دعم تقني إلا الإسلامية/الاجتماعية
   return ex;
 }
@@ -143,7 +143,7 @@ function render(){
     (shortage?`<div class="warn no-print">تنبيه: ${shortage} قاعة بدون مراقبة (نقص بعد تطبيق الاستثناءات).</div>`:'')+
     `<div class="card"><h3>توزيع المراقبة — ${day.subject}</h3>`+
     `<table class="t"><tr><th style="width:36px">م</th><th>القاعة / الشعبة</th><th style="width:70px">عدد الطالبات</th><th>المراقبة (الملاحِظة)</th><th>البديل</th><th style="width:90px">التوقيع</th></tr>${rows}</table></div>`+
-    `<div class="card no-print"><h3>مستبعَدات اليوم: معلمات المادة (اليوم + اليوم السابق)</h3><div class="chips">${dex}</div></div>`+
+    `<div class="card no-print"><h3>مستبعَدات اليوم: معلمات مادة اليوم</h3><div class="chips">${dex}</div></div>`+
     `<div class="card"><h3>مراقبات الاحتياط لهذا اليوم (${reserve[d].length})</h3><div class="chips">${resv}</div></div>`+
     `<div class="card"><h3>إشراف الدور</h3><div class="chips">${SUP.map(n=>'<span class="chip">'+n+'</span>').join('')}</div></div>`;
   renderStats();
@@ -208,7 +208,7 @@ HTML = ('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8">'
  '<div><div class="bt1">منصة أمين — التوزيع الذكي لمراقبة الاختبارات</div>'
  '<div class="bt2">مدرسة مريجب — حلقة ثانية · العام الدراسي 2026/2027 · نموذج F-05</div></div></header>'
  '<div class="wrap">'
- '<div class="hint no-print">توزيع تلقائي متوازن مع تطبيق الاستثناءات: معلمات المادة لا يراقبن يوم مادتهنّ واليوم التالي، والمستبعَدات كلياً، وقيود المراحل، ولجنتا الممرضة والحاسوب. عدّلي أي خانة يدوياً، ثم اطبعي F-05 لليوم.</div>'
+ '<div class="hint no-print">توزيع تلقائي متوازن مع تطبيق الاستثناءات: معلمات المادة لا يراقبن يوم مادتهنّ، والمستبعَدات كلياً، وقيود المراحل، ولجنتا الممرضة والحاسوب. عدّلي أي خانة يدوياً، ثم اطبعي F-05 لليوم.</div>'
  '<div class="tabs no-print" id="tabs"></div>'
  '<div class="toolbar no-print">'
  '<button class="btn" onclick="printF05()">🖨 طباعة F-05 لليوم المحدد</button>'
