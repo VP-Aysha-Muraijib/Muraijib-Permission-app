@@ -140,10 +140,17 @@ for title_ar,title_en,items in SECTIONS:
     heads=heads.replace('<th>','<th class="wn">',1)
     blocks+=f'<div class="sec">{band}<table class="t gtbl"><tr>{heads}</tr>{rows}</table></div>'
 
-note=('<div class="note"><span class="ar"><b>مبدأ الأولوية:</b> عند وجود خطر على سلامة الطالبات تكون الأولوية المطلقة '
+note=('<div class="note">'
+      '<div class="pr"><span class="ar"><b>مبدأ الأولوية:</b> عند وجود خطر على سلامة الطالبات تكون الأولوية المطلقة '
       'للاستجابة للطوارئ وحماية الأرواح، ثم يُستكمل إجراء الاختبار وفق التعليمات المعتمدة.</span>'
       '<span class="en"><b>Priority principle:</b> When students\' safety is at risk, emergency response and the protection of '
-      'life take absolute priority; exam procedures are then completed in accordance with approved instructions.</span></div>')
+      'life take absolute priority; exam procedures are then completed in accordance with approved instructions.</span></div>'
+      '<div class="pr"><span class="ar"><b>الالتزام بالتعليمات الرسمية:</b> تُتَّخذ قرارات التعليق أو الإخلاء أو تأجيل الجلسات '
+      'وفق تعليمات الجهات الرسمية المختصة (وزارة التربية والتعليم / دائرة التعليم والمعرفة، الدفاع المدني، الشرطة، هيئة الطوارئ والأزمات)، '
+      'ويُعتمد التعميم الرسمي الأحدث الصادر عنها.</span>'
+      '<span class="en"><b>Compliance with official directives:</b> Decisions to suspend, evacuate, or postpone sessions follow the '
+      'instructions of the competent official authorities (Ministry of Education / ADEK, Civil Defence, Police, Emergency & Crisis '
+      'Authority); the latest official circular issued by them prevails.</span></div></div>')
 
 sign=('<table class="t sign"><tr>'
       +th("إعداد الخطة","Prepared by")+th("مراجعة / مسؤول الأمن والسلامة","Reviewed / Safety Officer")
@@ -196,6 +203,7 @@ table.gtbl td.res{width:21%;font-weight:700;color:var(--green-d)}
 table.gtbl td.res .en{color:var(--green-d);opacity:.8}
 .note{background:#FBF3EF;border:1px solid #E8C9BC;border-right:4px solid #C0633F;border-radius:6px;padding:7px 12px;font-size:10.5px;line-height:1.5;margin:10px 0 7px;-webkit-print-color-adjust:exact;print-color-adjust:exact;page-break-inside:avoid}
 .note .en{display:block;direction:ltr;color:var(--mut);font-size:9px;margin-top:3px;border-top:1px dashed #E8C9BC;padding-top:3px}
+.note .pr+.pr{margin-top:6px;padding-top:6px;border-top:1.5px solid #E8C9BC}
 table.sign{page-break-inside:avoid;margin-top:4px}
 table.sign td{padding:7px}
 table.sign tr.sg td{color:var(--mut);height:30px;vertical-align:top;font-size:9px}
