@@ -15,6 +15,10 @@ SUP_BY_GRADE={"خامس":["علياء الشامسي","شماء الكتبي"],
               "ثامن":["هدى الكعبي","مريم راشد الدرمكي"],
               "تربية خاصة":["رقية الصوافي"],
               "لجنة":["رقية الصوافي"]}
+# الدعم التقني لكل مرحلة — من اللجنة التقنية والاختبارات الإلكترونية (وثيقة التشكيل 2026/11/16)
+TECH_BY_GRADE={"خامس":["دعاء مصطفى"],"سادس":["سهيلة الكتبي"],
+               "سابع":["حصة الأحبابي"],"ثامن":["حصة السبوسي"],
+               "تربية خاصة":[],"لجنة":[]}
 day=d['day']; halls=d['halls']; assign=d['assign']; reserve=d.get('reserve',[])
 
 def e(x): return _h.escape(str(x) if x is not None else "")
@@ -66,10 +70,17 @@ def hall_tbl(items):
 def reserve_box(g):
     chips="".join(f'<span class="rchip">{e(n)}</span>' for n in reserve) or '<span class="none">لا يوجد — None</span>'
     sup="، ".join(e(n) for n in SUP_BY_GRADE.get(g,[])) or "—"
+    tech=SUP=TECH_BY_GRADE.get(g,[])
+    tech_row=""
+    if tech:
+        tech_txt="، ".join(e(n) for n in tech)
+        tech_row=(f'<div class="xrow"><span class="xlbl">الدعم التقني للمرحلة<b>Grade Technical Support</b></span>'
+                  f'<span class="xval">{tech_txt}</span></div>')
     return (f'<div class="xbox"><div class="xrow"><span class="xlbl">مراقبات الاحتياط<b>Reserve Invigilators</b></span>'
             f'<span class="xval">{chips}</span></div>'
             f'<div class="xrow"><span class="xlbl">إشراف الدور للمرحلة<b>Grade Duty Supervision</b></span>'
-            f'<span class="xval">{sup}</span></div></div>')
+            f'<span class="xval">{sup}</span></div>'
+            f'{tech_row}</div>')
 
 def foot():
     heads=(th("اسم رئيس المركز / مديرة المدرسة","Center Head / School Principal")+
