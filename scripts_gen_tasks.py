@@ -122,12 +122,13 @@ html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Kufi Arab
 .sec .band{margin-top:0}
 table.t{width:100%;border-collapse:collapse;font-size:12px;margin:0 0 4px}
 table.t.sess{margin:6px 0 0}
-table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:center;vertical-align:middle}
+table.t th,table.t td{border:1px solid var(--line);padding:9px 8px;text-align:center;vertical-align:middle}
+table.t.sess th,table.t.sess td{padding:7px 8px}
 table.t th{background:var(--beige);font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.t th .ar{display:block;font-size:11px}
 table.t th .en{display:block;font-size:9.8px;font-weight:600;color:var(--green-d);direction:ltr;margin-top:1px}
-td .ar{display:block;font-size:11.5px;line-height:1.45}
-td .en{display:block;font-size:10.3px;color:#6B665D;direction:ltr;line-height:1.4;margin-top:2px}
+td .ar{display:block;font-size:12px;line-height:1.5}
+td .en{display:block;font-size:10.5px;color:#454039;direction:ltr;line-height:1.45;margin-top:2px}
 tr{page-break-inside:avoid}
 .wn{width:26px}
 table.gtbl td.tsk{text-align:right;font-weight:600}
