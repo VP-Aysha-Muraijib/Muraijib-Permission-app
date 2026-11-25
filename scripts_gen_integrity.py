@@ -2,7 +2,7 @@
 import html as _h
 BASE='/tmp/claude-0/-home-user-Muraijib-Permission-app/8f6a88b6-523b-54a7-a25d-16b0f2fb94db/scratchpad'
 FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
-CORNER=open(BASE+'/corner_uri.txt',encoding='utf-8').read().strip()
+MOE=open(BASE+'/corner_uri.txt',encoding='utf-8').read().strip()
 SCHOOL="مدرسة مريجب — حلقة ثانية"; YEAR="2026 / 2027"
 def e(x): return _h.escape(str(x) if x is not None else "")
 def ul(items): return '<ul>'+''.join(f'<li>{e(i)}</li>' for i in items)+'</ul>'
@@ -32,87 +32,91 @@ REPEAT=["حسم 12 درجة من درجة السلوك.",
         "استدعاء فوري لولي الأمر وتوقيعه على الإنذار والقرار.",
         "إحالة الطالب لبرامج «تقويم السلوك» بالتعاون مع الجهات المختصة وفق الحالة."]
 
+# شريط ضبط الوثيقة
+ctl=('<table class="ctl"><tr>'
+     '<th>الجهة المُصدِرة</th><th>الفئة المستهدفة</th><th>المرجع</th><th>الإصدار</th><th>العام الدراسي</th></tr>'
+     f'<tr><td>{SCHOOL}</td><td>الطلبة وأولياء الأمور</td>'
+     '<td>دليل مكافحة الغشّ والإخلال بنظام الاختبارات — وزارة التربية والتعليم</td>'
+     f'<td>الأول (2024–2025)</td><td>{YEAR}</td></tr></table>')
+
 sheet=(
  '<section class="sheet">'
- # الترويسة
- '<div class="hero"><div class="hlogo"></div>'
- '<div class="htext"><div class="h1">ميثاق النزاهة في الاختبارات</div>'
- '<div class="h2">دليل الطالب وولي الأمر</div></div></div>'
- f'<div class="subbar"><span>{SCHOOL}</span><span>العام الدراسي {YEAR}</span></div>'
+ # ترويسة رسمية
+ '<div class="gov"><img class="moe" src="'+MOE+'"></div>'
+ '<div class="frule"></div>'
+ '<div class="doctitle">النزاهة في الاختبارات</div>'
+ '<div class="docsub">دليل الطالب وولي الأمر — مستخلَص من دليل وزارة التربية والتعليم لمكافحة الغشّ والإخلال بنظام الاختبارات</div>'
+ f'{ctl}'
  # مقدمة
  '<div class="intro">النزاهة في الاختبارات أمانةٌ ومسؤوليةٌ مشتركة بين الطالب وأسرته والمدرسة. '
- 'هذه النشرة تلخّص أهمّ ما يخصّ الطالب من دليل وزارة التربية والتعليم لمكافحة الغشّ والإخلال بنظام الاختبارات، '
- 'لنحافظ معاً على بيئةٍ اختباريةٍ عادلةٍ تُكافئ الاجتهاد الحقيقي.</div>'
- # إرشادات الطالب — ثلاث بطاقات
- '<div class="sechead"><span class="ic">📘</span> إرشادات الطالب</div>'
+ 'تُلخّص هذه الوثيقة أهمّ ما يخصّ الطالب من دليل الوزارة، تعزيزاً لبيئةٍ اختباريةٍ عادلةٍ تُكافئ الاجتهاد الحقيقي، '
+ 'وتُعمَّم للاطّلاع والالتزام.</div>'
+ # إرشادات الطالب
+ '<div class="sechead">أولاً: إرشادات الطالب</div>'
  '<div class="cards">'
- f'<div class="card c-before"><div class="ch">قبل الاختبار</div>{ul(BEFORE)}</div>'
- f'<div class="card c-during"><div class="ch">أثناء الاختبار</div>{ul(DURING)}</div>'
- f'<div class="card c-after"><div class="ch">بعد الاختبار وبوجهٍ عام</div>{ul(AFTER)}</div>'
+ f'<div class="card"><div class="ch">قبل الاختبار</div>{ul(BEFORE)}</div>'
+ f'<div class="card"><div class="ch">أثناء الاختبار</div>{ul(DURING)}</div>'
+ f'<div class="card"><div class="ch">بعد الاختبار وبوجهٍ عام</div>{ul(AFTER)}</div>'
  '</div>'
  # المخالفات
- '<div class="sechead warn"><span class="ic">⚠️</span> ما يُعدّ إخلالاً بنظام الاختبارات</div>'
+ '<div class="sechead warn">ثانياً: ما يُعدّ إخلالاً بنظام الاختبارات</div>'
  f'<div class="violbox">{ul(VIOL)}'
  '<div class="vnote">تُعدّ هذه الأفعال مخالفةً سواء ارتُكبت قبل الاختبار أو أثناءه أو بعده، داخل القاعة أو خارجها.</div></div>'
  # الإجراءات
- '<div class="sechead act"><span class="ic">⚖️</span> الإجراءات المترتّبة على الطالب (وفق لائحة سلوك الطلبة)</div>'
+ '<div class="sechead">ثالثاً: الإجراءات المترتّبة على الطالب (وفق لائحة سلوك الطلبة)</div>'
  '<div class="cards two">'
- f'<div class="card c-first"><div class="ch">عند ارتكاب المخالفة</div>{ul(FIRST)}</div>'
- f'<div class="card c-repeat"><div class="ch">عند تكرار المخالفة</div>{ul(REPEAT)}</div>'
+ f'<div class="card"><div class="ch">عند ارتكاب المخالفة</div>{ul(FIRST)}</div>'
+ f'<div class="card"><div class="ch">عند تكرار المخالفة</div>{ul(REPEAT)}</div>'
  '</div>'
- # شعار ختامي
- '<div class="pledge">«الاختبار أمانة… والنزاهة قيمة.» — نجاحك الحقيقي يبدأ من التزامك.</div>'
- # إقرار
- '<table class="ack"><tr><th>اطّلعتُ على مضمون هذه النشرة والتزمتُ بها</th><th>الاسم</th><th>التوقيع</th><th>التاريخ</th></tr>'
+ # إقرار واعتماد
+ '<div class="sechead">الإقرار والاعتماد</div>'
+ '<table class="ack"><tr><th>اطّلعتُ على مضمون هذه الوثيقة والتزمتُ بما ورد فيها</th><th>الاسم</th><th>التوقيع</th><th>التاريخ</th></tr>'
  '<tr><td>الطالب/ة</td><td></td><td></td><td></td></tr>'
- '<tr><td>ولي الأمر</td><td></td><td></td><td></td></tr></table>'
- '<div class="src">المصدر: دليل مكافحة الغشّ والإخلال بنظام الاختبارات — وزارة التربية والتعليم، الإصدار 1. '
- f'إعداد وتعميم: {SCHOOL}.</div>'
+ '<tr><td>ولي الأمر</td><td></td><td></td><td></td></tr>'
+ '<tr><td>اعتماد / مديرة المدرسة</td><td>د. اليازية نخيرة الظاهري</td><td></td><td></td></tr></table>'
+ '<div class="src">المصدر: دليل مكافحة الغشّ والإخلال بنظام الاختبارات — وزارة التربية والتعليم، الإصدار الأول 2024–2025 · '
+ f'www.moe.gov.ae — وثيقة معتمدة للتعميم من {SCHOOL}.</div>'
  '</section>')
 
 CSS="""
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--green:#5E9A78;--green-d:#3E7A5E;--beige:#F5EFE8;--line:#D9D2C7;--ink:#33302B;--mut:#8A857C;
---amber:#C8902F;--red:#B5533A;--corner:url('__CORNER__')}
-@page{size:A4 portrait;margin:6.5mm}
+:root{--green:#5E9A78;--green-d:#3E7A5E;--beige:#F5EFE8;--line:#D9D2C7;--ink:#33302B;--mut:#8A857C;--red:#B5533A;--gold:#B8902F}
+@page{size:A4 portrait;margin:7mm}
 html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Kufi Arabic',sans-serif}
 .sheet{padding:0}
 ul{list-style:none;margin:0;padding:0}
-li{position:relative;padding:2.5px 16px 2.5px 0;font-size:10.7px;line-height:1.45}
-li::before{content:"";position:absolute;right:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--green)}
-/* الترويسة */
-.hero{background:var(--green);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:16px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.hlogo{flex:0 0 118px;height:46px;background:#fff;border-radius:8px;background-image:var(--corner);background-size:86px auto;background-position:center;background-repeat:no-repeat;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.htext{flex:1;text-align:right;color:#fff}
-.h1{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:23px;line-height:1.2}
-.h2{font-size:12.5px;font-weight:600;opacity:.95;margin-top:3px}
-.subbar{display:flex;justify-content:space-between;background:var(--beige);border:1px solid var(--line);border-radius:8px;padding:5px 14px;margin-top:7px;font-size:11px;font-weight:700;color:var(--green-d);-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.intro{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:8px;padding:8px 13px;margin:8px 0;font-size:11px;line-height:1.55;text-align:justify;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sechead{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:14.5px;color:var(--green-d);margin:9px 0 6px;display:flex;align-items:center;gap:7px;border-bottom:2px solid var(--green);padding-bottom:4px}
-.sechead .ic{font-size:16px}
-.sechead.warn{color:var(--red);border-color:var(--red)}
-.sechead.act{color:var(--amber);border-color:var(--amber)}
-.cards{display:flex;gap:9px}
+li{position:relative;padding:2px 15px 2px 0;font-size:10.5px;line-height:1.4}
+li::before{content:"";position:absolute;right:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* ترويسة حكومية */
+.gov{text-align:center;padding:0 0 4px}
+.moe{height:40px;width:auto}
+.frule{height:2px;background:var(--green);margin:0 0 8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.doctitle{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:19px;color:var(--green-d);text-align:center}
+.docsub{text-align:center;font-size:10px;color:var(--mut);margin:2px 0 7px;line-height:1.45}
+/* ضبط الوثيقة */
+table.ctl{width:100%;border-collapse:collapse;font-size:9.3px;margin-bottom:8px}
+table.ctl th,table.ctl td{border:1px solid var(--line);padding:5px 6px;text-align:center;vertical-align:middle}
+table.ctl th{background:var(--green);color:#fff;font-weight:700;font-size:9px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.ctl td{font-weight:600}
+.intro{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:6px;padding:7px 13px;margin:0 0 6px;font-size:10.5px;line-height:1.5;text-align:justify;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sechead{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:13px;color:#fff;background:var(--green-d);border-radius:6px 6px 0 0;padding:5px 12px;margin:7px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sechead.warn{background:var(--red)}
+.cards{display:flex;gap:7px;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:6px;background:#FCFBF9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .cards.two .card{flex:1}
-.card{flex:1;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;page-break-inside:avoid}
-.ch{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:12.5px;color:#fff;padding:7px 12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.card ul{padding:6px 11px 7px}
-.c-before .ch{background:#5E9A78}.c-during .ch{background:#3E7A5E}.c-after .ch{background:#6B8E9A}
-.c-before li::before{background:#5E9A78}.c-during li::before{background:#3E7A5E}.c-after li::before{background:#6B8E9A}
-.violbox{border:1px solid #E6C6BC;border-radius:10px;background:#FBF3EF;padding:8px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.card{flex:1;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;page-break-inside:avoid}
+.ch{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:12px;color:var(--green-d);background:var(--beige);padding:6px 11px;border-bottom:2px solid var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.card ul{padding:5px 10px 6px}
+.violbox{border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:#FBF3EF;padding:8px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .violbox li::before{background:var(--red)}
-.violbox li{font-size:11.5px}
-.vnote{margin-top:6px;border-top:1px dashed #E6C6BC;padding-top:6px;font-size:10.5px;color:var(--red);font-weight:700}
-.c-first .ch{background:var(--amber)}.c-repeat .ch{background:#9A6B2F}
-.c-first li::before{background:var(--amber)}.c-repeat li::before{background:#9A6B2F}
-.pledge{background:var(--green-d);color:#fff;text-align:center;font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:13.5px;border-radius:10px;padding:9px;margin:9px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-table.ack{width:100%;border-collapse:collapse;font-size:11px;margin-top:2px}
-table.ack th,table.ack td{border:1px solid var(--line);padding:7px;text-align:center}
-table.ack th{background:var(--beige);font-weight:700;font-size:10.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-table.ack td:first-child{font-weight:700;background:#FbF8F3;width:120px}
-table.ack th:first-child{width:auto;text-align:right}
-.src{text-align:center;font-size:9px;color:var(--mut);border-top:1.5px solid var(--green);padding-top:6px;margin-top:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-""".replace('__CORNER__',CORNER)
+.violbox li{font-size:11px}
+.vnote{margin-top:6px;border-top:1px dashed #E6C6BC;padding-top:6px;font-size:10.3px;color:var(--red);font-weight:700}
+table.ack{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:0;border:1px solid var(--line);border-top:none}
+table.ack th,table.ack td{border:1px solid var(--line);padding:5.5px 7px;text-align:center}
+table.ack th{background:var(--beige);font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table.ack td:first-child{font-weight:700;background:#FbF8F3;width:150px;text-align:right}
+table.ack th:first-child{text-align:right}
+.src{text-align:center;font-size:8.6px;color:var(--mut);border-top:1.5px solid var(--green);padding-top:5px;margin-top:7px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+""".replace('__',' ')
 doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{FONT}\n{CSS}</style></head><body>{sheet}</body></html>'
 open(BASE+'/integrity.html','w',encoding='utf-8').write(doc)
 print('ok')
