@@ -46,10 +46,13 @@ html,body{background:#fff}body{margin:0;padding:0}
 .pg{page-break-after:always}.pg:last-child{page-break-after:auto}
 .sheet{box-shadow:none;border-radius:0;padding:0;margin:0}
 [contenteditable]{outline:none}.no-print{display:none!important}
-td.fx{background:#F7FAF8;font-weight:700;color:#2E4A3C;text-align:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+td.fx{background:#F7FAF8;font-weight:700;color:#2E4A3C;text-align:center;vertical-align:middle;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.hand td.cm{font-weight:700}
-table.hand td{height:34px}
-table.hand td.mn{background:#fff}
+table.hand td{height:62px;vertical-align:middle}
+table.hand td.mn{background:#fff;vertical-align:top;padding-top:6px}
+table.hand th{padding:8px 6px}
+/* خط إرشادي خفيف لفصل اسمين داخل خانة الكتابة */
+table.hand td.mn{background-image:repeating-linear-gradient(transparent 0 29px,#ECEAE4 29px 30px);background-position:0 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 """
 doc=f'<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>{FONT}\n{CSS}\n{EXTRA}</style></head><body>{sheets}</body></html>'
 open(BASE+'/f04_daily.html','w',encoding='utf-8').write(doc)
