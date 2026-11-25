@@ -27,7 +27,7 @@ def day_sheet(subj,day,date):
         rows+=f'<tr><td class="cm">{i}</td>{fx(st)}{fx(qty)}{mn()}{mn()}{mn()}{mn()}</tr>'
     main=f'<table class="t hand">{hd}{rows}</table>'
     foot=('<table class="t"><tr>'+th("اسم المشرف المكلّف (1)")+th("التوقيع")+th("اسم المشرف المكلّف (2)")+th("التوقيع")+'</tr>'
-          f'<tr>{mn()}{mn()}{mn()}{mn()}</tr>'
+          f'<tr>{fx("عائشة النعيمي")}{mn()}{mn()}{mn()}</tr>'
           '<tr>'+th("اعتماد رئيس المركز / مديرة المدرسة")+th("التاريخ")+th("التوقيع")+th("")+'</tr>'
           f'<tr><td class="fx">د. اليازية نخيرة الظاهري</td>{mn()}{mn()}<td class="fx"></td></tr></table>')
     body=(hdr4()+sess+main
