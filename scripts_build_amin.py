@@ -8,6 +8,8 @@ FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
 
 # إضافة بلقيس (مساعد صف تربية خاصة) للقائمة لتثبيتها على تكييف سابع
 TEACHERS=TEACHERS+[{"n":"بلقيس علي الحارثي","t":"مساعد صف (تربية خاصة)"}]
+# إضافة رحمة (معلمة احتياط) لتدخل التوزيع كمراقبة
+TEACHERS=TEACHERS+[{"n":"رحمة (احتياط)","t":"معلمة (احتياط)"}]
 
 # لجان خاصة (مراقِبة واحدة لكل منها)
 HALLS=HALLS+[{"hall":"غرفة الممرضة (الحالات الصحية)","grade":"لجنة","section":"ممرضة","count":""},
@@ -40,6 +42,9 @@ TECH=["دعاء مصطفى عبدالمنعم","حصة سعيد السبوسي",
 TECH_OK=["التربية الإسلامية","الدراسات الاجتماعية"]
 # إشراف الدور — لا يراقبن داخل القاعات
 SUP=["رقية صالح الصوافي","مريم هلال الدرمكي"]
+# استثناءات خاصة بيوم محدّد (رقم اليوم -> أسماء) — غياب/تفريغ للتصحيح…
+# اليوم 1 = اللغة الإنجليزية: غياب مها النعيمي، وتفريغ كنة/نمارق/شيجا/سامية للتصحيح
+DAY_EXCL={1:["مها محمد النعيمي","كنة مبارك الشامسي","نمارق عبدالله أحمد","Sheejamol Babu","سامية يحيى حسن"]}
 
 SCHOOL="مدرسة مريجب — حلقة ثانية"; YEAR="2026 / 2027"
 
@@ -85,7 +90,7 @@ table.t select{font-family:inherit;font-size:12px;border:1px solid var(--line);b
 JS = r"""
 const TEACHERS=__TEACHERS__, HALLS=__HALLS__, DAYS=__DAYS__;
 const GEXCL=__GEXCL__, GRADE_EXCL=__GRADE_EXCL__, SUBJMAP=__SUBJMAP__;
-const PINNED=__PINNED__, TECH=__TECH__, TECH_OK=__TECH_OK__, SUP=__SUP__;
+const PINNED=__PINNED__, TECH=__TECH__, TECH_OK=__TECH_OK__, SUP=__SUP__, DAY_EXCL=__DAY_EXCL__;
 const SCHOOL=__SCHOOL__, YEAR=__YEAR__;
 let EXCL=new Set(GEXCL), FIXED={}, assign=[], backup=[], dexcl=[], reserve=[], load={}, curDay=0, seed=11;
 function H(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0);}
@@ -96,6 +101,7 @@ function dayExcluded(d){
   const ex=new Set();
   [d].forEach(x=>{ if(x>=0){ const keys=SUBJMAP[DAYS[x].subject]||[]; TEACHERS.forEach(t=>{ if(keys.some(k=>t.t.indexOf(k)>=0)) ex.add(t.n); }); } });
   if(TECH_OK.indexOf(DAYS[d].subject)<0){ TECH.forEach(n=>ex.add(n)); }   // دعم تقني إلا الإسلامية/الاجتماعية
+  (DAY_EXCL[d]||[]).forEach(n=>ex.add(n));   // غياب/تفريغ خاص باليوم
   return ex;
 }
 function pinHallName(n){ return PINNED.hasOwnProperty(n); }
@@ -197,6 +203,7 @@ JS = (JS.replace('__TEACHERS__', json.dumps(TEACHERS, ensure_ascii=False))
         .replace('__TECH__', json.dumps(TECH, ensure_ascii=False))
         .replace('__TECH_OK__', json.dumps(TECH_OK, ensure_ascii=False))
         .replace('__SUP__', json.dumps(SUP, ensure_ascii=False))
+        .replace('__DAY_EXCL__', json.dumps(DAY_EXCL, ensure_ascii=False))
         .replace('__SCHOOL__', json.dumps(SCHOOL, ensure_ascii=False))
         .replace('__YEAR__', json.dumps(YEAR, ensure_ascii=False)))
 
