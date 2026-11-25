@@ -71,14 +71,10 @@ sheet=(
  f'<div class="card"><div class="ch">عند ارتكاب المخالفة</div>{ul(FIRST)}</div>'
  f'<div class="card"><div class="ch">عند تكرار المخالفة</div>{ul(REPEAT)}</div>'
  '</div>'
- # إقرار واعتماد
- '<div class="sechead">الإقرار والاعتماد</div>'
- '<table class="ack"><tr><th>اطّلعتُ على مضمون هذه الوثيقة والتزمتُ بما ورد فيها</th><th>الاسم</th><th>التوقيع</th><th>التاريخ</th></tr>'
- '<tr><td>الطالب/ة</td><td></td><td></td><td></td></tr>'
- '<tr><td>ولي الأمر</td><td></td><td></td><td></td></tr>'
- '<tr><td>اعتماد / مديرة المدرسة</td><td>د. اليازية نخيرة الظاهري</td><td></td><td></td></tr></table>'
+ # تذييل: للعلم والتعميم
+ '<div class="notice">هذه الوثيقة للعلم والتعميم على الطلبة وأولياء الأمور، تعزيزاً للوعي بنزاهة الاختبارات والالتزام بضوابطها.</div>'
  '<div class="src">المصدر: دليل مكافحة الغشّ والإخلال بنظام الاختبارات — وزارة التربية والتعليم، الإصدار الأول 2024–2025 · '
- f'www.moe.gov.ae — وثيقة معتمدة للتعميم من {SCHOOL}.</div>'
+ f'www.moe.gov.ae — صادرة عن {SCHOOL} للتعميم.</div>'
  '</section>')
 
 CSS="""
@@ -88,8 +84,8 @@ CSS="""
 html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Kufi Arabic',sans-serif}
 .sheet{padding:0}
 ul{list-style:none;margin:0;padding:0}
-li{position:relative;padding:2px 15px 2px 0;font-size:10.5px;line-height:1.4}
-li::before{content:"";position:absolute;right:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+li{position:relative;padding:2.7px 16px 2.7px 0;font-size:11px;line-height:1.45}
+li::before{content:"";position:absolute;right:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
 /* ترويسة رسمية */
 .letterhead{display:flex;justify-content:space-between;align-items:center;padding:0 2px 7px}
 .lh-text{text-align:right}
@@ -104,18 +100,19 @@ table.ctl{width:100%;border-collapse:collapse;font-size:9.3px;margin-bottom:8px}
 table.ctl th,table.ctl td{border:1px solid var(--line);padding:5px 6px;text-align:center;vertical-align:middle}
 table.ctl th{background:var(--green);color:#fff;font-weight:700;font-size:9px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.ctl td{font-weight:600}
-.intro{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:6px;padding:7px 13px;margin:0 0 6px;font-size:10.5px;line-height:1.5;text-align:justify;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.sechead{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:13px;color:#fff;background:var(--green-d);border-radius:6px 6px 0 0;padding:5px 12px;margin:7px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.intro{background:#F4F8F5;border:1px solid #D7E7DD;border-right:4px solid var(--green);border-radius:6px;padding:8px 14px;margin:0 0 7px;font-size:11px;line-height:1.55;text-align:justify;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sechead{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:13.5px;color:#fff;background:var(--green-d);border-radius:6px 6px 0 0;padding:6px 13px;margin:8px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .sechead.warn{background:var(--red)}
-.cards{display:flex;gap:7px;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:6px;background:#FCFBF9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cards{display:flex;gap:8px;border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;padding:7px;background:#FCFBF9;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .cards.two .card{flex:1}
 .card{flex:1;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;page-break-inside:avoid}
-.ch{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:12px;color:var(--green-d);background:var(--beige);padding:6px 11px;border-bottom:2px solid var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.card ul{padding:5px 10px 6px}
-.violbox{border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:#FBF3EF;padding:8px 14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ch{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:12.5px;color:var(--green-d);background:var(--beige);padding:7px 12px;border-bottom:2px solid var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.card ul{padding:6px 11px 7px}
+.violbox{border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:#FBF3EF;padding:8px 15px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .violbox li::before{background:var(--red)}
-.violbox li{font-size:11px}
-.vnote{margin-top:6px;border-top:1px dashed #E6C6BC;padding-top:6px;font-size:10.3px;color:var(--red);font-weight:700}
+.violbox li{font-size:11.5px}
+.vnote{margin-top:6px;border-top:1px dashed #E6C6BC;padding-top:6px;font-size:10.6px;color:var(--red);font-weight:700}
+.notice{text-align:center;background:var(--green-d);color:#fff;font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:12px;border-radius:8px;padding:9px 14px;margin:8px 0 0;line-height:1.45;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 table.ack{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:0;border:1px solid var(--line);border-top:none}
 table.ack th,table.ack td{border:1px solid var(--line);padding:5.5px 7px;text-align:center}
 table.ack th{background:var(--beige);font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
