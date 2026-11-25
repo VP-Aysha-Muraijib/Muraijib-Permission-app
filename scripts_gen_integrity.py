@@ -34,15 +34,18 @@ REPEAT=["حسم 12 درجة من درجة السلوك.",
 
 # شريط ضبط الوثيقة
 ctl=('<table class="ctl"><tr>'
-     '<th>الجهة المُصدِرة</th><th>الفئة المستهدفة</th><th>المرجع</th><th>الإصدار</th><th>العام الدراسي</th></tr>'
-     f'<tr><td>{SCHOOL}</td><td>الطلبة وأولياء الأمور</td>'
+     '<th>الفئة المستهدفة</th><th>المرجع</th><th>الإصدار</th></tr>'
+     '<tr><td>الطلبة وأولياء الأمور</td>'
      '<td>دليل مكافحة الغشّ والإخلال بنظام الاختبارات — وزارة التربية والتعليم</td>'
-     f'<td>الأول (2024–2025)</td><td>{YEAR}</td></tr></table>')
+     '<td>الأول (2024–2025)</td></tr></table>')
 
 sheet=(
  '<section class="sheet">'
- # ترويسة رسمية
- '<div class="gov"><img class="moe" src="'+MOE+'"></div>'
+ # ترويسة رسمية: الشعار يساراً، واسم المدرسة والنطاق والسنة يميناً
+ '<div class="letterhead">'
+ f'<div class="lh-text"><div class="lh-school">{SCHOOL}</div>'
+ f'<div class="lh-meta">النطاق التعليمي: AD 2.6 &nbsp;·&nbsp; العام الدراسي {YEAR}</div></div>'
+ '<img class="lh-logo" src="'+MOE+'"></div>'
  '<div class="frule"></div>'
  '<div class="doctitle">النزاهة في الاختبارات</div>'
  '<div class="docsub">دليل الطالب وولي الأمر — مستخلَص من دليل وزارة التربية والتعليم لمكافحة الغشّ والإخلال بنظام الاختبارات</div>'
@@ -87,9 +90,12 @@ html,body{background:#fff;color:var(--ink);font-family:'Tajawal','Noto Kufi Arab
 ul{list-style:none;margin:0;padding:0}
 li{position:relative;padding:2px 15px 2px 0;font-size:10.5px;line-height:1.4}
 li::before{content:"";position:absolute;right:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--green);-webkit-print-color-adjust:exact;print-color-adjust:exact}
-/* ترويسة حكومية */
-.gov{text-align:center;padding:0 0 4px}
-.moe{height:40px;width:auto}
+/* ترويسة رسمية */
+.letterhead{display:flex;justify-content:space-between;align-items:center;padding:0 2px 7px}
+.lh-text{text-align:right}
+.lh-school{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:16px;color:var(--green-d)}
+.lh-meta{font-size:10.5px;color:var(--mut);font-weight:700;margin-top:2px}
+.lh-logo{height:44px;width:auto}
 .frule{height:2px;background:var(--green);margin:0 0 8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .doctitle{font-family:'Cairo','Tajawal',sans-serif;font-weight:800;font-size:19px;color:var(--green-d);text-align:center}
 .docsub{text-align:center;font-size:10px;color:var(--mut);margin:2px 0 7px;line-height:1.45}
