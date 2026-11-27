@@ -8,7 +8,7 @@ FONT=open(BASE+'/gf_embedded.css',encoding='utf-8').read()
 # (رقم القاعة، المراقب، الملاحظ/المشرف)
 MON=[("1","ناعمة الكعبي","علياء الحميري"),
      ("1","شما الساعدي","حصة المزروعي"),
-     ("1","سكينة الأحبابي",""),
+     ("1","سكينة الملياني",""),
      ("1","بسمة خالد",""),
      ("1","سندس",""),]
 NROWS=10   # إجمالي صفوف الجدول كما في النموذج
@@ -50,7 +50,25 @@ def sheet(subj,day,date,sess,time):
     sec=form("F-05","توزيع المراقبين والملاحظين",f"الصف الثاني عشر — المسار العام · جلسة {subj} — {day} {date}",body)
     i=sec.index('<div class="sheet">'); return sec[i:].rsplit('</section>',1)[0].rstrip()
 
-sheets="".join(f'<div class="pg">{sheet(*e)}</div>' for e in EXAMS)
+def clinic_sheet(subj,day,date,sess,time):
+    s=('<table class="t"><tr>'+th("اليوم")+th("التاريخ")+th("المادة")+th("الصف / المسار")+th("الجلسة")+th("التوقيت")+'</tr>'
+       f'<tr>{fx(day)}{fx(date)}{fx(subj)}{fx("الثاني عشر — العام")}{fx(sess)}{fx(time)}</tr></table>')
+    band='<div class="band" style="font-family:\'Cairo\',sans-serif;background:#5E9A78;color:#fff;font-weight:800;padding:7px 14px;border-radius:7px 7px 0 0;margin-top:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact">لجنة خاصة — العيادة المدرسية</div>'
+    hd=('<tr>'+th("م","wn")+th("اللجنة الخاصة")+th("المراقِبة")+th("التوقيع","w2")
+        +th("الملاحِظة / المشرفة")+th("التوقيع","w2")+th("البديل","w2")+'</tr>')
+    rows=f'<tr><td class="cm">1</td>{fx("العيادة المدرسية")}{fx("جيهان سلمان")}{mn()}{mn()}{mn()}{mn()}</tr>'
+    for i in range(2,4):
+        rows+=f'<tr><td class="cm">{i}</td>{mn()}{mn()}{mn()}{mn()}{mn()}{mn()}</tr>'
+    main=f'<table class="t dist">{hd}{rows}</table>'
+    foot=('<table class="t"><tr>'+th("اسم رئيس المركز / مديرة المدرسة")+th("التاريخ")+th("التوقيع")+'</tr>'
+          f'<tr><td class="fx">د. اليازية نخيرة الظاهري</td>{mn()}{mn()}</tr></table>')
+    body=(hdr4()+s+band+main
+          +note("لجنة العيادة المدرسية للحالات الصحية الطارئة أثناء الجلسة، وتُبلَّغ إدارة المركز بأي حالة فور وقوعها.")
+          +foot)
+    sec=form("F-05","توزيع المراقبين والملاحظين — لجنة خاصة",f"العيادة المدرسية · جلسة {subj} — {day} {date}",body)
+    i=sec.index('<div class="sheet">'); return sec[i:].rsplit('</section>',1)[0].rstrip()
+
+sheets="".join(f'<div class="pg">{sheet(*e)}</div><div class="pg">{clinic_sheet(*e)}</div>' for e in EXAMS)
 EXTRA="""
 @page{size:A4 portrait;margin:8mm}
 html,body{background:#fff}body{margin:0;padding:0}
